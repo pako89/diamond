@@ -1,0 +1,11 @@
+.fuse*
+*.o
+*.a
+*.obj
+bin/
+obj/
+make.visual/ipch
+make.visual/obj
+make.visual/*.sdf
+make.visual/*.suo
+diamond
