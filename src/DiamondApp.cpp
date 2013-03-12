@@ -40,7 +40,7 @@ void CDiamondApp::PrintBanner(void)
 {
 	if(NULL != m_appName)
 	{
-		printf("%s", m_appName);
+		printf("%s\n", m_appName);
 	}
 }
 
