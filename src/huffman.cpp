@@ -575,7 +575,6 @@ void CHuffmanItem<T>::Print()
 	}
 }
 
-template class CHuffmanTree<int>;
-template class CHuffmanTree<uint32_t>;
-
+INSTANTIATE(CHuffmanTree, uint8_t);
+INSTANTIATE(CHuffmanTree, uint32_t);
 }

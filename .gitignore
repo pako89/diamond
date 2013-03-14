@@ -4,8 +4,11 @@
 *.obj
 bin/
 obj/
+doc/
 make.visual/ipch
 make.visual/obj
 make.visual/*.sdf
 make.visual/*.suo
 diamond
+video
+make.visual/output.diamond

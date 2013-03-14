@@ -39,8 +39,9 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>..\bin\$(Configuration)\</OutDir>
+    <OutDir>..\bin\</OutDir>
     <IntDir>$(SolutionDir)\obj\$(Configuration)\</IntDir>
+    <TargetName>$(ProjectName)_$(Configuration)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -51,7 +52,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>../include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
@@ -80,16 +81,23 @@
     <ClCompile Include="..\src\bitstream.cpp" />
     <ClCompile Include="..\src\component.cpp" />
     <ClCompile Include="..\src\DiamondApp.cpp" />
+    <ClCompile Include="..\src\getopt.cpp" />
+    <ClCompile Include="..\src\getopt_long.cpp" />
     <ClCompile Include="..\src\huffman.cpp" />
     <ClCompile Include="..\src\image.cpp" />
     <ClCompile Include="..\src\main.cpp" />
+    <ClCompile Include="..\src\sequence.cpp" />
+    <ClCompile Include="..\src\utils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\bitstream.h" />
     <ClInclude Include="..\include\component.h" />
     <ClInclude Include="..\include\DiamondApp.h" />
+    <ClInclude Include="..\include\getopt.h" />
     <ClInclude Include="..\include\huffman.h" />
     <ClInclude Include="..\include\image.h" />
+    <ClInclude Include="..\include\sequence.h" />
+    <ClInclude Include="..\include\utils.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

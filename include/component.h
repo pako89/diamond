@@ -17,11 +17,12 @@ public:
 	virtual int getWidth(void);
 	virtual int getHeight(void);
 	virtual bool setSize(int height, int width);
+	virtual size_t getBytesCount(void);
 protected:
-	T ** m_data;
+	T * m_data;
 	int m_width;
 	int m_height;
-
+	size_t m_bytes;
 	void release();
 };
 

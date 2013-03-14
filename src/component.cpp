@@ -1,4 +1,5 @@
 #include <component.h>
+#include <utils.h>
 
 using namespace avlib;
 
@@ -33,10 +34,6 @@ void CComponent<T>::release(void)
 {
 	if(NULL != m_data)
 	{
-		for(int i=0;i<m_height;i++)
-		{
-			delete [] m_data[i];
-		}
 		delete [] m_data;
 	}
 	m_data = NULL;
@@ -57,6 +54,12 @@ int CComponent<T>::getHeight(void)
 }
 
 template <class T>
+size_t CComponent<T>::getBytesCount(void)
+{
+	return m_bytes;
+}
+
+template <class T>
 bool CComponent<T>::setSize(int height, int width)
 {
 	if(height <= 0 || width <=0)
@@ -69,22 +72,20 @@ bool CComponent<T>::setSize(int height, int width)
 	}
 	m_height = height;
 	m_width = width;
-	m_data = new T*[m_height];
-	for(int i=0;i<m_height;i++)
-	{
-		m_data[i] = new T[m_width];
-	}
+	m_bytes = height*width*sizeof(T);
+	m_data = new T[m_height*m_width];
 	return true;
 }
 
 template <class T>
-T * CComponent<T>::operator[](int height)
+T * CComponent<T>::operator[](int h)
 {
-	return m_data[height];
+	return &m_data[h * m_width];
 }
 
-template class CComponent<int>;
-template class CComponent<float>;
+INSTANTIATE(CComponent, uint8_t);
+INSTANTIATE(CComponent, int);
+INSTANTIATE(CComponent, float);
 
 }
 

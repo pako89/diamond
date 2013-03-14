@@ -4,6 +4,7 @@
 #include <bitstream.h>
 #include <stdio.h>
 #include <stdint.h>
+#include <utils.h>
 
 namespace avlib
 {
