@@ -15,6 +15,8 @@ enum ImageType
 	IMAGE_TYPE_ARGB,
 };
 
+extern const char * ImageTypeString[];
+
 template <class T>
 class CImage
 {

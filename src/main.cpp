@@ -53,7 +53,7 @@ int main(int argc,char * argv[])
 				}
 				bstr.flush();
 			}
-		}while(0);		
+		}while(seq.Next());		
 		bstr.flush_all();
 	}
 	catch(diamond::ExitException & e)

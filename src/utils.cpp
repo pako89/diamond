@@ -1,7 +1,5 @@
 #include <utils.h>
 
-namespace diamond
-{
 namespace utils
 {
 
@@ -23,7 +21,7 @@ StringFormatException::StringFormatException(const char * fmt, ...)
 {
 	va_list argptr;
 	va_start(argptr, fmt);
-	m_msg = diamond::utils::string_format(fmt, argptr);
+	m_msg = utils::string_format(fmt, argptr);
 	va_end(argptr);
 }
 
@@ -63,5 +61,4 @@ std::string string_format(const char* fmt, ...)
 	return ret;
 }
 
-}
 }

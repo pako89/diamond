@@ -9,8 +9,6 @@
 
 #define INSTANTIATE(t_class, t_arg)		template class t_class<t_arg>
 
-namespace diamond
-{
 namespace utils
 {
 
@@ -35,7 +33,6 @@ protected:
 std::string string_format(const char* fmt, va_list vl);
 std::string string_format(const char * fmt, ...);
 
-}
 }
 
 

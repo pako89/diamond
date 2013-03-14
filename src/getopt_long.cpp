@@ -43,7 +43,9 @@ extern int	  optopt;	/* character checked for validity */
 int	  optreset;	/* reset getopt */
 extern char *optarg;	/* argument associated with option */
 
+#ifndef __P
 #define __P(x) x
+#endif
 #define _DIAGASSERT(x) assert(x)
 
 static char * __progname __P((char *));
@@ -65,10 +67,10 @@ __progname(
 	return(tmp);
 }
 
+
 #define	BADCH	(int)'?'
 #define	BADARG	(int)':'
-#define	EMSG	""
-
+#define EMSG	(char*)""
 /*
  * getopt --
  *	Parse argc/argv argument vector.
@@ -165,7 +167,7 @@ getopt_long(
 	char *const * nargv,
 	const char * options,
 	const struct  option * long_options,
-	int * index)
+	int * index) __THROW
 {
 	int retval;
 

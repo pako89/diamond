@@ -1,0 +1,37 @@
+# diamond(1) completion
+
+_diamond()
+{
+	local operations
+	local cur prev common_opts encode_opts decode_opts
+	operations="encode decode"
+	COMPREPLY=()
+	cur="${COMP_WORDS[COMP_CWORD]}"
+	prev="${COMP_WORDS[COMP_CWORD-1]}"
+	common_opts="--help"
+	encode_opts="--width --height"
+	decode_opts=
+	if [ "$(basename $prev)" = "diamond" ] 
+	then
+		COMPREPLY=($( compgen -W "${operations}" -- ${cur}) )
+		return 0
+	fi
+	if [[ "${cur}" == -* ]]
+	then
+		case "${prev}" in
+			encode)
+			COMPREPLY=($( compgen -W "${common_opts} ${encode_opts}" -- ${cur}))
+			return 0
+			;;
+			decode)
+			COMPREPLY=($( compgen -W "${common_opts} ${decode_opts}" -- ${cur}))
+			return 0
+			;;
+		esac
+	else
+		COMPREPLY=($( compgen -f "${cur}" ))
+		return 0
+	fi
+}
+
+complete -F _diamond diamond

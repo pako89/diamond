@@ -1,4 +1,5 @@
 #include "DiamondApp.h"
+#include <string.h>
 
 #define BANNER									"\
      _ _                                 _	\n\
@@ -29,7 +30,7 @@ ParseArgsException::ParseArgsException(const char * fmt, ...)
 {
 	va_list argptr;
 	va_start(argptr, fmt);
-	m_msg = diamond::utils::string_format(fmt, argptr);
+	m_msg = utils::string_format(fmt, argptr);
 	va_end(argptr);
 }
 
@@ -173,8 +174,8 @@ void CDiamondApp::ParseArgs(int argc, char * argv[])
 	{
 		throw utils::StringFormatException("unknown operation '%s'", argv[1]);
 	}
-	argv+=2;
-	argc-=2;
+	argv+=1;
+	argc-=1;
 	int opt, longind;
 	while((opt = getopt_long(argc, argv, shortopts, CDiamondApp::long_options, &longind)) != -1)
 	{

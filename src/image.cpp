@@ -4,6 +4,13 @@
 namespace avlib
 {
 
+const char * ImageTypeString[] = {
+/*[IMAGE_TYPE_UNKNOWN] 	=*/ "unknown",
+/*[IMAGE_TYPE_YUV420]	=*/ "YUV420",
+/*[IMAGE_TYPE_RGB]	=*/ "RGB",
+/*[IMAGE_TYPE_ARGB]	=*/ "ARGB",
+};
+
 template <class T>
 CImage<T>::CImage() :
 	m_comp_num(0),
@@ -16,7 +23,10 @@ CImage<T>::CImage(enum ImageType type, int height, int width) :
 	m_comp_num(0),
 	m_comp(NULL)
 {
-	setSize(type, height, width);
+	if(!setSize(type, height, width))
+	{
+		throw utils::StringFormatException("can not create image: [type=%s, height=%d, width=%d]", ImageTypeString[type], height, width);
+	}
 }
 
 template <class T>
