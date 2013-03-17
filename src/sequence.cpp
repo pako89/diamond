@@ -198,12 +198,9 @@ size_t CSequence::getFramesCount(void)
 		frame_size += (*m_image)[i].getBytesCount();
 	}
 	long pos = ftell(m_fh);
-	dbg("pos=%d\n", pos);
 	fseek(m_fh, 0, SEEK_END);
 	long count = ftell(m_fh);
-	dbg("count=%d\n", count);
 	fseek(m_fh, pos, SEEK_SET);
-	dbg("frames=%d\n", count/frame_size);
 	return (count/frame_size);
 }
 

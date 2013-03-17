@@ -6,7 +6,7 @@ CC	= g++
 
 # Compiler flags
 INCDIR	= -Iinclude
-CFLAGS	= -g $(INCDIR) -DDEBUG -O2
+CFLAGS	= -g $(INCDIR) -DDEBUG
 
 # Linker flags
 LDFLAGS	= -Llib

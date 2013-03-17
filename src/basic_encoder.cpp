@@ -21,11 +21,13 @@ bool CBasicEncoder::Encode(CSequence * pSeq, CBitstream * pBstr)
 	sos.height = pSeq->getHeight();
 	pBstr->write_block(&sos, sizeof(sos));
 	CHuffmanTree<uint8_t> htree;
+	CImage<float> imgF;
 	int i=0;
 	while(pSeq->ReadNext())
 	{
 		dbg("\rEncoding frame: %d", i++);
 		CImage<uint8_t> & frame = pSeq->getFrame();
+		imgF = frame;
 		for(int i=0;i<frame.getComponents();i++)
 		{
 			htree.EncodeBlock(frame[i][0], frame[i].getBytesCount(), pBstr);

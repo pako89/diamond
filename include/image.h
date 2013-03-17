@@ -3,17 +3,10 @@
 
 #include <stdlib.h>
 #include <component.h>
+#include <avlib.h>
 
 namespace avlib
 {
-
-enum ImageType
-{
-	IMAGE_TYPE_UNKNOWN = 0,
-	IMAGE_TYPE_YUV420,
-	IMAGE_TYPE_RGB,
-	IMAGE_TYPE_ARGB,
-};
 
 extern const char * ImageTypeString[];
 
@@ -22,14 +15,23 @@ class CImage
 {
 public:
 	CImage();
-	CImage(enum ImageType type, int height, int width);
+	CImage(CImageFormat format);
+	CImage(ImageType type, CSize size);
+	CImage(ImageType type, int height, int width);
+	template <class U> CImage(const CImage<U> & src);
+	template <class U> CImage & operator=(const CImage<U> & src);
 	virtual ~CImage();
 	virtual int getComponents(void);
-	virtual bool setSize(enum ImageType type, int height, int width);
+	virtual bool setFormat(CImageFormat format);
+	virtual bool setFormat(ImageType type, CSize size);
+	virtual bool setFormat(ImageType type, int height, int width);
+	virtual CImageFormat getFormat(void);
 	virtual CComponent<T> & operator[](int index);
 protected:
 	int m_comp_num;
 	CComponent<T> * m_comp;
+	CImageFormat m_format;
+template <class> friend class CImage;
 
 };
 
