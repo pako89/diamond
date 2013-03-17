@@ -138,8 +138,9 @@ void CBitstream::set_fh_fill(FILE * fh)
 {
 	if(fh!=NULL)
 	{
+		size_t ret;
 		this->fh=fh;
-		if((fread(this->mBuffer,1,this->mSize,this->fh))<0)
+		if((ret = fread(this->mBuffer,1,this->mSize,this->fh)) != this->mSize)
 		{
 			perror("set_fh:fill");
 			exit(1);

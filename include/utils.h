@@ -8,6 +8,7 @@
 #include <exception>
 
 #define INSTANTIATE(t_class, t_arg)		template class t_class<t_arg>
+#define ARRAY_SIZE(x)				(sizeof((x))/sizeof((x)[0]))
 
 namespace utils
 {

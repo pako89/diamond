@@ -39,7 +39,10 @@ CDiamondApp * CDiamondApp::m_instance = NULL;
 CDiamondApp::CDiamondApp(void) : 
 	m_op(DIAMOND_NOP),
 	m_appName(NULL),
-	m_inputFileName(NULL),
+	m_inputFileName("stdin"),
+	m_inputFile(stdin),
+	m_outputFileName("stdout"),
+	m_outputFile(stdout),
 	m_imageType(avlib::IMAGE_TYPE_UNKNOWN),
 	m_imageTypeStr("unknown"),
 	m_imageHeight(0),
@@ -134,7 +137,7 @@ void CDiamondApp::PrintBanner(void)
 
 void CDiamondApp::PrintUsage(void)
 {
-	printf("Usage: %s encode|decode [-%s] FILE\n", "diamond", m_shortOpts.c_str());
+	printf("Usage: %s encode|decode [OPTIONS] FILE\n", "diamond");
 }
 
 void CDiamondApp::PrintHelp(void)
@@ -143,28 +146,45 @@ void CDiamondApp::PrintHelp(void)
 	PrintUsage();
 }
 
-const struct option CDiamondApp::long_options[] = {
+
+const struct option CDiamondApp::common_options[] = {
 	{"help",		no_argument,		NULL,	'h'},
+	{"input",		required_argument,	NULL, 	'o'},
 	{"type",		required_argument,	NULL,	't'},
 	{"height",		required_argument,	NULL,	'H'},
 	{"width",		required_argument,	NULL,	'W'},	
 };
 
-#define LONG_OPTS_SIZE()	(sizeof(long_options)/sizeof(long_options[0]))
+#define COMMON_OPTS_SIZE	ARRAY_SIZE(common_options)
+
+const struct option CDiamondApp::encode_options[] = {
+};
+
+#define ENCODE_OPTS_SIZE	ARRAY_SIZE(encode_options)
+
+const struct option CDiamondApp::decode_options[] = {
+};
+
+#define DECODE_OPTS_SIZE	ARRAY_SIZE(decode_options)
+
+std::string CDiamondApp::getShortOpts(const struct option long_options[], int size)
+{
+	std::string shortOpts;
+	for(int i=0 ; i<size; i++)
+	{
+		char c = (char)long_options[i].val;
+		shortOpts += c;
+		if(long_options[i].has_arg == required_argument)
+		{
+			shortOpts += ':';
+		}
+	}
+	return shortOpts;
+}
 
 void CDiamondApp::ParseArgs(int argc, char * argv[])
 {
-	for(int i=0 ; i<LONG_OPTS_SIZE(); i++)
-	{
-		char c = (char)CDiamondApp::long_options[i].val;
-		m_shortOpts += c;
-		if(CDiamondApp::long_options[i].has_arg == required_argument)
-		{
-			m_shortOpts += ':';
-		}
-	}
-	const char * shortopts = m_shortOpts.c_str();
-	if(argc < 3)
+	if(argc < 2)
 	{
 		PrintBanner();
 		PrintUsage();
@@ -174,16 +194,28 @@ void CDiamondApp::ParseArgs(int argc, char * argv[])
 	{
 		throw utils::StringFormatException("unknown operation '%s'", argv[1]);
 	}
+	const char * shortopts = getShortOpts(common_options, COMMON_OPTS_SIZE).c_str();
 	argv+=1;
 	argc-=1;
 	int opt, longind;
-	while((opt = getopt_long(argc, argv, shortopts, CDiamondApp::long_options, &longind)) != -1)
+	while((opt = getopt_long(argc, argv, shortopts, CDiamondApp::common_options, &longind)) != -1)
 	{
 		switch(opt)
 		{
 		case 'h':
 			PrintHelp();
 			throw ExitException(0);
+			break;
+		case 'o':
+			m_outputFile = fopen(optarg, "w+");
+			if(NULL != m_outputFile)
+			{
+				m_outputFileName = optarg;
+			}
+			else
+			{
+				throw utils::StringFormatException("%s: can not open file for write\n", optarg);
+			}
 			break;
 		case 't':
 			m_imageType = parseImageType(optarg);
@@ -198,12 +230,20 @@ void CDiamondApp::ParseArgs(int argc, char * argv[])
 		case '?':
 			break;
 		default:
-            throw ParseArgsException("?? getopt returned character code 0%o ??\n", opt);
+            		throw ParseArgsException("?? getopt returned character code 0%o ??\n", opt);
 		}
 	}
 	if(optind < argc)
 	{
 		m_inputFileName = argv[optind];
+		if(strcmp(m_inputFileName, "stdin"))
+		{
+			m_inputFile = fopen(m_inputFileName, "r");
+			if(NULL == m_inputFile)
+			{
+				throw utils::StringFormatException(strerror(errno));
+			}
+		}
 	}
 	if(NULL == m_inputFileName)
 	{
@@ -215,6 +255,21 @@ void CDiamondApp::ParseArgs(int argc, char * argv[])
 const char * CDiamondApp::getInputFileName(void)
 {
 	return m_inputFileName;
+}
+
+const char * CDiamondApp::getOutputFileName(void)
+{
+	return m_outputFileName;
+}
+
+FILE * CDiamondApp::getInputFile(void)
+{
+	return m_inputFile;
+}
+
+FILE * CDiamondApp::getOutputFile(void)
+{
+	return m_outputFile;
 }
 
 avlib::ImageType CDiamondApp::getImageType(void)
@@ -237,5 +292,9 @@ int CDiamondApp::getWidth(void)
 	return m_imageWidth;
 }
 
+DiamondOperation CDiamondApp::getOperation(void)
+{
+	return m_op;
+}
 
 }

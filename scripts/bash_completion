@@ -11,7 +11,7 @@ _diamond()
 	common_opts="--help"
 	encode_opts="--width --height"
 	decode_opts=
-	if [ "$(basename $prev)" = "diamond" ] 
+	if [ "$(basename $prev 2>/dev/null)" = "diamond" ] 
 	then
 		COMPREPLY=($( compgen -W "${operations}" -- ${cur}) )
 		return 0
@@ -29,7 +29,7 @@ _diamond()
 			;;
 		esac
 	else
-		COMPREPLY=($( compgen -f "${cur}" ))
+		_filedir;
 		return 0
 	fi
 }

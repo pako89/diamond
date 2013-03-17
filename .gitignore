@@ -11,4 +11,6 @@ make.visual/*.sdf
 make.visual/*.suo
 diamond
 video
-make.visual/output.diamond
+output.diamond
+*.swp
+

@@ -6,6 +6,11 @@
 #include <huffman.h>
 #include <vector>
 #include <sequence.h>
+#include <basic_encoder.h>
+#include <basic_decoder.h>
+#include <log.h>
+
+
 
 #ifdef WIN32
 #define exit(v)		{system("pause"); exit((v));}
@@ -20,41 +25,34 @@ int main(int argc,char * argv[])
 	try
 	{
 		app->ParseArgs(argc, argv);
-		printf("Input file: %s\n", app->getInputFileName());
-		printf("Image type: %s\n", app->getImageTypeStr());
-		printf("Height    : %d\n", app->getHeight());
-		printf("Width     : %d\n", app->getWidth());
-		avlib::CBitstream bstr(100000);
-		FILE * fh = fopen("output.diamond", "w+");
-		if(NULL == fh)
+		dbg("Input file : %s\n", app->getInputFileName());
+		dbg("Output file: %s\n", app->getOutputFileName());
+		dbg("Image type : %s\n", app->getImageTypeStr());
+		dbg("Height     : %d\n", app->getHeight());
+		dbg("Width      : %d\n", app->getWidth());
+		diamond::DiamondOperation op = app->getOperation();
+		if(diamond::DIAMOND_OP_ENCODE == op)
 		{
-			perror("fopen");
-			exit(1);
-		}
-		bstr.set_fh(fh);
-		avlib::CHuffmanTree<uint8_t> htree;
-		avlib::CSequence seq;
-		seq.OpenFile(
-			app->getInputFileName(),
-			app->getImageType(),
-			app->getHeight(),
-			app->getWidth()
+			avlib::CSequence seq(
+				app->getInputFile(),
+				app->getImageType(),
+				app->getHeight(),
+				app->getWidth()
 			);
-		do
+			avlib::CBitstream bstr(1000000);
+			bstr.set_fh(app->getOutputFile());
+			avlib::CBasicEncoder enc;
+			enc.Encode(&seq, &bstr);
+			bstr.flush_all();
+		}
+		else if (diamond::DIAMOND_OP_DECODE == op)
 		{
-			for(int k = 0 ; k < seq.getFrame().getComponents(); k++)
-			{
-				for(int y=0;y<seq.getFrame()[k].getHeight(); y++)
-				{
-					for(int x=0;x<seq.getFrame()[k].getWidth(); x++)
-					{
-						htree.Encode(seq.getFrame()[k][y][x], &bstr);
-					}
-				}
-				bstr.flush();
-			}
-		}while(seq.Next());		
-		bstr.flush_all();
+			avlib::CSequence seq(app->getOutputFile());
+			avlib::CBitstream bstr(1000000);
+			bstr.set_fh_fill(app->getInputFile());
+			avlib::CBasicDecoder dec;
+			dec.Decode(&bstr, &seq);
+		}
 	}
 	catch(diamond::ExitException & e)
 	{
