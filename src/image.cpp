@@ -20,15 +20,50 @@ CImage<T>::CImage() :
 }
 
 template <class T>
+CImage<T>::CImage(CImageFormat format) :
+	m_comp_num(0),
+	m_comp(NULL),
+	m_format(IMAGE_TYPE_UNKNOWN, 0, 0)
+{
+	setFormat(format);
+}
+
+template <class T>
+CImage<T>::CImage(enum ImageType type, CSize size) :
+	m_comp_num(0),
+	m_comp(NULL),
+	m_format(IMAGE_TYPE_UNKNOWN, 0, 0)
+{
+	setFormat(type, size);
+}
+
+template <class T>
 CImage<T>::CImage(enum ImageType type, int height, int width) :
 	m_comp_num(0),
 	m_comp(NULL),
 	m_format(IMAGE_TYPE_UNKNOWN, 0, 0)
 {
-	if(!setFormat(type, height, width))
+	setFormat(type, height, width);
+}
+
+template <class T>
+CImage<T>::CImage(const CImage<T> & src)
+{
+	operator=(src);
+}
+
+template <class T>
+CImage<T> & CImage<T>::operator=(const CImage<T> & src)
+{
+	if(m_format != src.m_format)
 	{
-		throw utils::StringFormatException("can not create image: [type=%s, height=%d, width=%d]", ImageTypeString[type], height, width);
+		setFormat(src.m_format);
 	}
+	for(int i=0;i<m_comp_num;i++)
+	{
+		m_comp[i] = src.m_comp[i];
+	}
+	return *this;
 }
 
 template <class T>
@@ -51,6 +86,7 @@ template <class U> CImage<T> & CImage<T>::operator=(const CImage<U> & src)
 	{
 		m_comp[i] = src.m_comp[i];
 	}
+	return *this;
 }
 
 template <class T>
@@ -65,13 +101,13 @@ CImage<T>::~CImage()
 template <class T>
 bool CImage<T>::setFormat(enum ImageType type, CSize size)
 {
-	setFormat(CImageFormat(type, size));
+	return setFormat(CImageFormat(type, size));
 }
 
 template <class T>
 bool CImage<T>::setFormat(enum ImageType type, int height, int width)
 {
-	setFormat(CImageFormat(type, height, width));
+	return setFormat(CImageFormat(type, height, width));
 }
 
 template <class T>
@@ -122,9 +158,45 @@ CImageFormat CImage<T>::getFormat(void)
 	return m_format;
 }
 
+template <class T>
+CImage<T> & CImage<T>::operator-=(const CImage<T> & src)
+{
+	if(m_format != src.m_format)
+	{
+		throw utils::StringFormatException("wrong format\n");
+	}
+	for(int i=0;i<m_comp_num; i++)
+	{
+		m_comp[i] -= src.m_comp[i];
+	}
+	return *this;
+}
+
+template <class T>
+CImage<T> & CImage<T>::operator+=(const CImage<T> & src)
+{
+	if(m_format != src.m_format)
+	{
+		throw utils::StringFormatException("wrong format\n");
+	}
+	for(int i=0;i<m_comp_num; i++)
+	{
+		m_comp[i] += src.m_comp[i];
+	}
+	return *this;
+}
+
 INSTANTIATE(CImage, uint8_t);
-INSTANTIATE(CImage, int);
+INSTANTIATE(CImage, uint16_t);
+INSTANTIATE(CImage, int16_t);
+INSTANTIATE(CImage, int32_t);
 INSTANTIATE(CImage, float);
+CONVERSION(CImage, int16_t, float);
+CONVERSION(CImage, float, int16_t);
+CONVERSION(CImage, int32_t, float);
+CONVERSION(CImage, float, int32_t);
 CONVERSION(CImage, uint8_t, float);
 CONVERSION(CImage, float, uint8_t);
+CONVERSION(CImage, uint16_t, uint8_t);
+CONVERSION(CImage, uint8_t, uint16_t);
 }

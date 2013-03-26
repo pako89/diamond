@@ -42,8 +42,8 @@ public:
 	CHuffmanTree();
 	CHuffmanTree(const CHuffmanTree & source);
 	~CHuffmanTree(void);
-	bool EncodeBlock(void * ptr,uint32_t size,CBitstream * bstr= NULL,bool inc_new = true);
-	HuffmanItemType DecodeBlock(void * ptr,uint32_t size,CBitstream * bstr= NULL);
+	bool EncodeBlock(T * ptr,uint32_t size,CBitstream * bstr= NULL,bool inc_new = true);
+	HuffmanItemType DecodeBlock(T * ptr,uint32_t size,CBitstream * bstr= NULL);
 	bool Encode(T symbol,CBitstream * bitstream = NULL,bool inc_new = true);
 	bool EncodeCtl(HuffmanItemType itemtype,CBitstream * bitstream = NULL);
 	HuffmanItemType Decode(CBitstream * bitstream,T * symbol);

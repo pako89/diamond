@@ -28,6 +28,7 @@ public:
 	int getHeight(void);
 	int getWidth(void);
 	size_t getFramesCount(void);
+	avlib::CImageFormat getFormat(void);
 protected:
 	bool openFile(const char * file);
 	bool forward(int num);

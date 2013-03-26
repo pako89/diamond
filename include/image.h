@@ -18,6 +18,8 @@ public:
 	CImage(CImageFormat format);
 	CImage(ImageType type, CSize size);
 	CImage(ImageType type, int height, int width);
+	CImage(const CImage & src);
+	CImage & operator=(const CImage & src);
 	template <class U> CImage(const CImage<U> & src);
 	template <class U> CImage & operator=(const CImage<U> & src);
 	virtual ~CImage();
@@ -27,6 +29,8 @@ public:
 	virtual bool setFormat(ImageType type, int height, int width);
 	virtual CImageFormat getFormat(void);
 	virtual CComponent<T> & operator[](int index);
+	virtual CImage & operator-=(const CImage & src);
+	virtual CImage & operator+=(const CImage & src);
 protected:
 	int m_comp_num;
 	CComponent<T> * m_comp;

@@ -14,10 +14,14 @@ public:
 	CComponent();
 	CComponent(CSize size);
 	CComponent(int height, int width);
+	CComponent(const CComponent<T> & src);
+	CComponent & operator=(const CComponent & src);
 	template <class U> CComponent(const CComponent<U> & src);
 	template <class U> CComponent & operator=(const CComponent<U> & src);
 	virtual ~CComponent();
 	virtual T * operator[](int height);
+	virtual CComponent & operator-=(const CComponent & src);
+	virtual CComponent & operator+=(const CComponent & src);
 	virtual int getWidth(void);
 	virtual int getHeight(void);
 	virtual CSize getSize(void);

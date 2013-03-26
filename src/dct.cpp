@@ -2,6 +2,7 @@
 
 namespace avlib
 {
+
 const float CDCT::s1 = 0.195090322f;
 const float CDCT::s2 = 0.3826834324f;
 const float CDCT::s3 = 0.555570233f;
@@ -18,13 +19,52 @@ CDCT::~CDCT()
 {
 }
 
-void CDCT::Transform(float * pSrc, int srcStep, float * pdst, int dstStep)
+void CDCT::Transform(CImage<float> * src, CImage<float> * dst)
+{
+	if(src->getFormat() != dst->getFormat())
+	{
+		throw utils::StringFormatException("formats does not match to perform DCT\n");
+	}
+	for(int k=0;k<src->getComponents(); k++)
+	{
+		for(int y=0; y < (*src)[k].getHeight(); y+=8)
+		{
+			for(int x=0; x < (*src)[k].getWidth(); x+=8)
+			{
+				Transform8x8(&(*src)[k][y][x], &(*dst)[k][y][x], (*src)[k].getWidth());
+			}
+		}
+	}
+}
+
+void CDCT::Transform8x8(float * pSrc, float * pDst, int width)
+{
+	float temp[64];
+	for(int i=0;i<8;i++)
+	{
+		Transform8(&pSrc[i*width], 1, &temp[i*8], 1);
+	}
+	for(int i=0;i<8;i++)
+	{	
+		Transform8(&temp[i], 8, &pDst[i], width);
+	}
+	/*for(int i=0;i<8;i++)
+	{
+		Transform8(&pSrc[i], width, &temp[i], 8);
+	}
+	for(int i=0;i<8;i++)
+	{	
+		Transform8(&temp[i*8], 1, &pDst[i*width], 1);
+	}*/
+}
+
+void CDCT::Transform8(float * pSrc, int srcStep, float * pdst, int dstStep)
 {
 	if(!pSrc || !pdst)
 	{
 		throw utils::NullReferenceException();
 	}
-
+	
 	float * srcVector0 = pSrc;
 	float * srcVector1 = srcVector0 + srcStep;
         float * srcVector2 = srcVector1 + srcStep;
@@ -42,7 +82,7 @@ void CDCT::Transform(float * pSrc, int srcStep, float * pdst, int dstStep)
         float * dstVector5 = dstVector4 + dstStep;
         float * dstVector6 = dstVector5 + dstStep;
         float * dstVector7 = dstVector6 + dstStep;
-
+	
         float X07P = (*srcVector0) + (*srcVector7);
         float X07M = (*srcVector0) - (*srcVector7);
     
@@ -87,7 +127,7 @@ const float CIDCT::c3 = 1.175875602419359f;
 const float CIDCT::c4 = 0.785694958387102f;
 const float CIDCT::c5 = 0.541196100146197f;
 const float CIDCT::c6 = 0.275899379282943f;
-const float CIDCT::cn = 0.3535533905932737f;
+const float CIDCT::cn = 0.5*0.3535533905932737f;
 
 
 CIDCT::CIDCT()
@@ -98,7 +138,38 @@ CIDCT::~CIDCT()
 {
 }
 
-void CIDCT::Transform(float * pSrc, int srcStep, float * pdst, int dstStep)
+void CIDCT::Transform(CImage<float> * src, CImage<float> * dst)
+{
+	if(src->getFormat() != dst->getFormat())
+	{
+		throw utils::StringFormatException("formats does not match to perform DCT\n");
+	}
+	for(int k=0;k<src->getComponents(); k++)
+	{
+		for(int y=0; y < (*src)[k].getHeight(); y+=8)
+		{
+			for(int x=0; x < (*src)[k].getWidth(); x+=8)
+			{
+				Transform8x8(&(*src)[k][y][x], &(*dst)[k][y][x], (*src)[k].getWidth());
+			}
+		}
+	}
+}
+
+void CIDCT::Transform8x8(float * pSrc, float * pDst, int width)
+{
+	float temp[64];
+	for(int i=0;i<8;i++)
+	{
+		Transform8(&pSrc[i], width, &temp[i], 8);
+	}
+	for(int i=0;i<8;i++)
+	{	
+		Transform8(&temp[i*8], 1, &pDst[i*width], 1);
+	}
+}
+
+void CIDCT::Transform8(float * pSrc, int srcStep, float * pdst, int dstStep)
 {
 	if(!pSrc || !pdst)
 	{

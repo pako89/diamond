@@ -107,7 +107,10 @@ avlib::ImageType CDiamondApp::parseImageType(const char * arg)
 			throw utils::StringFormatException("unknown image type: '%s'", arg);
 		}
 	}
-	throw utils::NullReferenceException();
+	else
+	{
+		throw utils::NullReferenceException();
+	}
 }
 
 DiamondOperation CDiamondApp::parseOperation(const char * op)
@@ -158,11 +161,13 @@ const struct option CDiamondApp::common_options[] = {
 #define COMMON_OPTS_SIZE	ARRAY_SIZE(common_options)
 
 const struct option CDiamondApp::encode_options[] = {
+	{}
 };
 
 #define ENCODE_OPTS_SIZE	ARRAY_SIZE(encode_options)
 
 const struct option CDiamondApp::decode_options[] = {
+	{}
 };
 
 #define DECODE_OPTS_SIZE	ARRAY_SIZE(decode_options)

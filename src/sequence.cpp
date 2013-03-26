@@ -190,6 +190,18 @@ int CSequence::getWidth(void)
 	return (*m_image)[0].getWidth();
 }
 
+avlib::CImageFormat CSequence::getFormat(void)
+{
+	if(NULL != m_image)
+	{
+		return m_image->getFormat();
+	}
+	else
+	{
+		return CImageFormat();
+	}
+}
+
 size_t CSequence::getFramesCount(void)
 {
 	size_t frame_size = 0;

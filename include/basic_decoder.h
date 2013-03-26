@@ -4,6 +4,7 @@
 #include <decoder.h>
 #include <proto.h>
 #include <huffman.h>
+#include <dct.h>
 
 namespace avlib
 {

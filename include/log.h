@@ -3,12 +3,12 @@
 
 
 #define _FILE			stderr
-#define _LOG(fmt, args...)	fprintf(_FILE, fmt, ##args)
+#define _LOG(...)	fprintf(_FILE, __VA_ARGS__)
 
 #ifdef DEBUG
-#define dbg(fmt, args...)	_LOG(fmt, ##args)
+#define dbg(...)	_LOG(__VA_ARGS__)
 #else
-#define dbg(fmt, args...)	
+#define dbg(...)	
 #endif
 
 #endif //_LOG_H

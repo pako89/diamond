@@ -169,18 +169,16 @@ bool CHuffmanTree<T>::EncodeCtl(HuffmanItemType itemtype,CBitstream * bitstream)
 }
 
 template <class T> 
-bool CHuffmanTree<T>::EncodeBlock(void * ptr,uint32_t size,CBitstream * bstr,bool inc_new)
+bool CHuffmanTree<T>::EncodeBlock(T * ptr,uint32_t size,CBitstream * bstr,bool inc_new)
 {
-	uint8_t * bptr = (uint8_t*)ptr;
 	while(size--)
-		this->Encode(*(bptr++),bstr,inc_new);
+		this->Encode(*(ptr++),bstr,inc_new);
 	return true;
 }
 
 template <class T> 
-HuffmanItemType CHuffmanTree<T>::DecodeBlock(void * ptr,uint32_t size,CBitstream * bstr)
+HuffmanItemType CHuffmanTree<T>::DecodeBlock(T * ptr,uint32_t size,CBitstream * bstr)
 {
-	uint8_t * bptr = (uint8_t*)ptr;
 	HuffmanItemType itype;
 	T symbol;
 	while(size--)
@@ -188,7 +186,7 @@ HuffmanItemType CHuffmanTree<T>::DecodeBlock(void * ptr,uint32_t size,CBitstream
 		itype = this->Decode(bstr,&symbol);
 		if(itype!=Leaf && itype != New)
 			return itype;
-		*(bptr++) = (uint8_t)symbol;
+		*(ptr++) = symbol;
 	}
 	return None;
 }
@@ -555,26 +553,30 @@ void CHuffmanItem<T>::Print()
 	}
 	if(this->ItemType == Node)
 	{
-		printf("[Node][%d]:Weight = %u val=%d \n",this->SN,(unsigned int)this->Weight,this->Value);
+		//printf("[Node][%d]:Weight = %u val=%d \n",this->SN,(unsigned int)this->Weight,this->Value);
 		return;
 	}
 	if(this->ItemType == New)
 	{
-		printf("[New][%d]:Weight = %u val=%d \n",this->SN,(unsigned int)this->Weight,this->Value);
+		//printf("[New][%d]:Weight = %u val=%d \n",this->SN,(unsigned int)this->Weight,this->Value);
 		return;
 	}
 	if(this->ItemType == EOB)
 	{
-		printf("[EOB][%d]:Weight = %u val=%d\n",this->SN,(unsigned int)this->Weight,this->Value);
+		//printf("[EOB][%d]:Weight = %u val=%d\n",this->SN,(unsigned int)this->Weight,this->Value);
 		return;
 	}
 	if(this->ItemType == Leaf)
 	{
-		printf("[%d][%d]:Weight = %u itype=%d \n",this->Value,this->SN,(unsigned int)this->Weight,this->ItemType);
+		//printf("[%d][%d]:Weight = %u itype=%d \n",this->Value,this->SN,(unsigned int)this->Weight,this->ItemType);
 		return;
 	}
 }
 
 INSTANTIATE(CHuffmanTree, uint8_t);
+INSTANTIATE(CHuffmanTree, uint16_t);
+INSTANTIATE(CHuffmanTree, int16_t);
 INSTANTIATE(CHuffmanTree, uint32_t);
+INSTANTIATE(CHuffmanTree, int32_t);
+INSTANTIATE(CHuffmanTree, float);
 }

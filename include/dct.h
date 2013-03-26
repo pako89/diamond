@@ -2,16 +2,19 @@
 #define _DCT_H
 
 #include <utils.h>
+#include <transform.h>
 
 namespace avlib
 {
 
-class CDCT
+class CDCT 
 {
 public:
 	CDCT();
 	virtual ~CDCT();
-	virtual void Transform(float * pSrc, int srcStep, float * pDst, int dstStep);
+	virtual void Transform(CImage<float> * src, CImage<float> * dst);
+	virtual void Transform8x8(float * pSrc, float * pDst, int width);
+	virtual void Transform8(float * pSrc, int srcStep, float * pDst, int dstStep);
 protected:
 	static const float s1;
 	static const float s2;
@@ -27,7 +30,9 @@ class CIDCT
 public:
 	CIDCT();
 	virtual ~CIDCT();
-	virtual void Transform(float * pSrc, int srcStep, float * pDst, int dstStep);
+	virtual void Transform(CImage<float> * src, CImage<float> * dst);
+	virtual void Transform8x8(float * pSrc, float * pDst, int width);
+	virtual void Transform8(float * pSrc, int srcStep, float * pDst, int dstStep);
 protected:
 	static const float c1;
 	static const float c2;

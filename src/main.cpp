@@ -20,6 +20,9 @@
 
 int main(int argc,char * argv[])
 {
+	avlib::CComponent<uint8_t> u8;
+	avlib::CComponent<float> fl;
+	fl=u8;
 	diamond::CDiamondApp * app = diamond::CDiamondApp::getInstance();
 	app->setName(argv[0]);
 	try
@@ -33,25 +36,28 @@ int main(int argc,char * argv[])
 		diamond::DiamondOperation op = app->getOperation();
 		if(diamond::DIAMOND_OP_ENCODE == op)
 		{
-			avlib::CSequence seq(
+			avlib::CSequence * seq = new avlib::CSequence(
 				app->getInputFile(),
 				app->getImageType(),
 				app->getHeight(),
 				app->getWidth()
 			);
-			avlib::CBitstream bstr(1000000);
-			bstr.set_fh(app->getOutputFile());
+			avlib::CBitstream * bstr = new avlib::CBitstream(10000000);
+			bstr->set_fh(app->getOutputFile());
 			avlib::CBasicEncoder enc;
-			enc.Encode(&seq, &bstr);
-			bstr.flush_all();
+			enc.Encode(seq, bstr);
+			bstr->flush_all();
+			delete bstr;
+			delete seq;
 		}
 		else if (diamond::DIAMOND_OP_DECODE == op)
 		{
 			avlib::CSequence seq(app->getOutputFile());
-			avlib::CBitstream bstr(1000000);
-			bstr.set_fh_fill(app->getInputFile());
+			avlib::CBitstream * bstr = new avlib::CBitstream(10000000);
+			bstr->set_fh_fill(app->getInputFile());
 			avlib::CBasicDecoder dec;
-			dec.Decode(&bstr, &seq);
+			dec.Decode(bstr, &seq);
+			delete bstr;
 		}
 	}
 	catch(diamond::ExitException & e)
