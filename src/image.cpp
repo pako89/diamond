@@ -29,6 +29,15 @@ CImage<T>::CImage(CImageFormat format) :
 }
 
 template <class T>
+CImage<T>::CImage(CSize size) :
+	m_comp_num(0),
+	m_comp(NULL),
+	m_format(IMAGE_TYPE_UNKNOWN, 0, 0)
+{
+	setFormat(IMAGE_TYPE_RGB, size);
+}
+
+template <class T>
 CImage<T>::CImage(enum ImageType type, CSize size) :
 	m_comp_num(0),
 	m_comp(NULL),
@@ -119,6 +128,14 @@ bool CImage<T>::setFormat(CImageFormat format)
 	}
 	switch(format.Type)
 	{
+	case IMAGE_TYPE_RGB:
+		m_comp = new CComponent<T>[3];
+		m_comp_num = 3;
+		for(int i=0;i<m_comp_num;i++)
+		{
+			m_comp[i].setSize(format.Size.Height, format.Size.Width);
+		}
+	break;
 	case IMAGE_TYPE_YUV420:
 		m_comp = new CComponent<T>[3];
 		m_comp_num = 3;

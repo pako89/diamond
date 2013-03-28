@@ -34,16 +34,18 @@ bool CBasicDecoder::Decode(CBitstream * pBstr, CSequence * pSeq)
 	CImage<int32_t> * img = new CImage<int32_t>(pSeq->getFormat());
 	CHuffmanTree<int32_t> * htree = new CHuffmanTree<int32_t>();
 	CIDCT * idct = new CIDCT();
+	CIQuant * iquant = new CIQuant();
+	CIZigZag<int32_t, float> * izigzag = new CIZigZag<int32_t, float>();
 	for(uint32_t n = 0 ; n < sos.frames_number; n++)
 	{
 		dbg("\rDecoding frame: %d", n);
 		for(int i=0;i<img->getComponents(); i++)
 		{
-			//pBstr->read_block(&(*img)[i][0][0], (*img)[i].getBytesCount());
 			htree->DecodeBlock(&(*img)[i][0][0], (*img)[i].getPointsCount(), pBstr);
 			pBstr->fill();
 		}
-		(*imgDCT) = (*img);
+		izigzag->Transform(img, imgDCT);
+		iquant->Transform(imgDCT, imgDCT);
 		idct->Transform(imgDCT, imgOut);
 		if(n != 0)
 		{
@@ -64,6 +66,7 @@ bool CBasicDecoder::Decode(CBitstream * pBstr, CSequence * pSeq)
 	delete img;
 	delete imgLast;
 	delete htree;
+	delete izigzag;
 	return false;
 }
 

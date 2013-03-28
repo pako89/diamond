@@ -16,24 +16,43 @@ CTransform<S, D>::~CTransform()
 }
 
 template <class S, class D>
-void CTransform<S, D>::Transform(CImage<S> & src, CImage<D> & dst)
+void CTransform<S, D>::TransformBlock(S * pSrc, D * pDst, CPoint p, CSize s)
 {
-	for(int k=0;k<src.getComponents(); k++)
+	for(int y=0;y<8;y++)
 	{
-		for(int y=0; y < src[k].getHeight(); y+=8)
+		for(int x=0;x<8;x++)
 		{
-			for(int x=0; x < src[k].getWidth(); x+=8)
+			int i = (p.Y+y)*s.Width+p.X+x;	
+			pDst[i] = pSrc[i]; 
+		}
+	}
+}
+
+
+template <class S, class D>
+void CTransform<S, D>::Transform(CImage<S> * src, CImage<D> * dst)
+{
+	if(src->getFormat() != dst->getFormat())
+	{
+		throw utils::StringFormatException("formats does not match\n");
+	}
+	for(int k=0;k<src->getComponents(); k++)
+	{
+		CSize size((*src)[k].getHeight(), (*src)[k].getWidth());
+		for(int y=0; y < (*src)[k].getHeight(); y+=8)
+		{
+			for(int x=0; x < (*src)[k].getWidth(); x+=8)
 			{
-				Transform8x8(&src[k][y][x], &dst[k][y][x], src[k].getWidth());
+				TransformBlock(&(*src)[k][0][0], &(*dst)[k][0][0], CPoint(k, y, x), size);
 			}
 		}
 	}
 }
 
-INSTANTIATE2(CTransform, uint8_t, float);
-INSTANTIATE2(CTransform, float, uint8_t);
-INSTANTIATE2(CTransform, uint16_t, float);
-INSTANTIATE2(CTransform, float, uint16_t);
 INSTANTIATE2(CTransform, float, float);
+INSTANTIATE2(CTransform, float, int16_t);
+INSTANTIATE2(CTransform, int16_t, float);
+INSTANTIATE2(CTransform, float, int32_t);
+INSTANTIATE2(CTransform, int32_t, float);
 
 }

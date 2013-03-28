@@ -4,6 +4,18 @@
 namespace avlib
 {
 
+class CPoint
+{
+public:
+	CPoint();
+	CPoint(int y, int x);
+	CPoint(int z, int y, int x);
+	~CPoint();
+	int X;
+	int Y;
+	int Z;
+};
+
 class CSize
 {
 public:

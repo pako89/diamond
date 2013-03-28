@@ -19,43 +19,19 @@ CDCT::~CDCT()
 {
 }
 
-void CDCT::Transform(CImage<float> * src, CImage<float> * dst)
-{
-	if(src->getFormat() != dst->getFormat())
-	{
-		throw utils::StringFormatException("formats does not match to perform DCT\n");
-	}
-	for(int k=0;k<src->getComponents(); k++)
-	{
-		for(int y=0; y < (*src)[k].getHeight(); y+=8)
-		{
-			for(int x=0; x < (*src)[k].getWidth(); x+=8)
-			{
-				Transform8x8(&(*src)[k][y][x], &(*dst)[k][y][x], (*src)[k].getWidth());
-			}
-		}
-	}
-}
-
-void CDCT::Transform8x8(float * pSrc, float * pDst, int width)
+void CDCT::TransformBlock(float * pSrc, float * pDst, CPoint p, CSize s)
 {
 	float temp[64];
+	float * src = &pSrc[p.Y*s.Width+p.X];
+	float * dst = &pDst[p.Y*s.Width+p.X];
 	for(int i=0;i<8;i++)
 	{
-		Transform8(&pSrc[i*width], 1, &temp[i*8], 1);
+		Transform8(&src[i*s.Width], 1, &temp[i*8], 1);
 	}
 	for(int i=0;i<8;i++)
 	{	
-		Transform8(&temp[i], 8, &pDst[i], width);
+		Transform8(&temp[i], 8, &dst[i], s.Width);
 	}
-	/*for(int i=0;i<8;i++)
-	{
-		Transform8(&pSrc[i], width, &temp[i], 8);
-	}
-	for(int i=0;i<8;i++)
-	{	
-		Transform8(&temp[i*8], 1, &pDst[i*width], 1);
-	}*/
 }
 
 void CDCT::Transform8(float * pSrc, int srcStep, float * pdst, int dstStep)
@@ -138,34 +114,18 @@ CIDCT::~CIDCT()
 {
 }
 
-void CIDCT::Transform(CImage<float> * src, CImage<float> * dst)
-{
-	if(src->getFormat() != dst->getFormat())
-	{
-		throw utils::StringFormatException("formats does not match to perform DCT\n");
-	}
-	for(int k=0;k<src->getComponents(); k++)
-	{
-		for(int y=0; y < (*src)[k].getHeight(); y+=8)
-		{
-			for(int x=0; x < (*src)[k].getWidth(); x+=8)
-			{
-				Transform8x8(&(*src)[k][y][x], &(*dst)[k][y][x], (*src)[k].getWidth());
-			}
-		}
-	}
-}
-
-void CIDCT::Transform8x8(float * pSrc, float * pDst, int width)
+void CIDCT::TransformBlock(float * pSrc, float * pDst, CPoint p, CSize s)
 {
 	float temp[64];
+	float * src = &pSrc[p.Y*s.Width+p.X];
+	float * dst = &pDst[p.Y*s.Width+p.X];
 	for(int i=0;i<8;i++)
 	{
-		Transform8(&pSrc[i], width, &temp[i], 8);
+		Transform8(&src[i], s.Width, &temp[i], 8);
 	}
 	for(int i=0;i<8;i++)
 	{	
-		Transform8(&temp[i*8], 1, &pDst[i*width], 1);
+		Transform8(&temp[i*8], 1, &dst[i*s.Width], 1);
 	}
 }
 

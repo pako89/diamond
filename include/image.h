@@ -15,6 +15,7 @@ class CImage
 {
 public:
 	CImage();
+	CImage(CSize size);
 	CImage(CImageFormat format);
 	CImage(ImageType type, CSize size);
 	CImage(ImageType type, int height, int width);

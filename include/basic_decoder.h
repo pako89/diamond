@@ -5,6 +5,8 @@
 #include <proto.h>
 #include <huffman.h>
 #include <dct.h>
+#include <quantizer.h>
+#include <zigzag.h>
 
 namespace avlib
 {

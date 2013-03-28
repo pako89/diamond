@@ -7,13 +7,12 @@
 namespace avlib
 {
 
-class CDCT 
+class CDCT : public CTransform<float, float>
 {
 public:
 	CDCT();
 	virtual ~CDCT();
-	virtual void Transform(CImage<float> * src, CImage<float> * dst);
-	virtual void Transform8x8(float * pSrc, float * pDst, int width);
+	virtual void TransformBlock(float * pSrc, float * pDst, CPoint p, CSize s);
 	virtual void Transform8(float * pSrc, int srcStep, float * pDst, int dstStep);
 protected:
 	static const float s1;
@@ -25,13 +24,12 @@ protected:
 	static const float c4;
 };
 
-class CIDCT
+class CIDCT : public CTransform<float, float>
 {
 public:
 	CIDCT();
 	virtual ~CIDCT();
-	virtual void Transform(CImage<float> * src, CImage<float> * dst);
-	virtual void Transform8x8(float * pSrc, float * pDst, int width);
+	virtual void TransformBlock(float * pSrc, float * pDst, CPoint p, CSize s);
 	virtual void Transform8(float * pSrc, int srcStep, float * pDst, int dstStep);
 protected:
 	static const float c1;

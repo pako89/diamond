@@ -27,6 +27,8 @@ bool CBasicEncoder::Encode(CSequence * pSeq, CBitstream * pBstr)
 	CImage<int32_t> * img = new CImage<int32_t>(pSeq->getFormat());
 	CHuffmanTree<int32_t> * htree = new CHuffmanTree<int32_t>();
 	CDCT * dct = new CDCT();
+	CQuant * quant = new CQuant();
+	CZigZag<float, int32_t> * zigzag = new CZigZag<float, int32_t>();
 	int n=0;
 	struct sof_marker sof;
 	sof.type = MARKER_TYPE_SOF;
@@ -48,14 +50,13 @@ bool CBasicEncoder::Encode(CSequence * pSeq, CBitstream * pBstr)
 			(*imgDCT) -= (*imgLast);
 		}
 		dct->Transform(imgDCT, imgDCT);
-		(*img) = (*imgDCT);
+		quant->Transform(imgDCT, imgDCT);
+		zigzag->Transform(imgDCT, img);
 		for(int i=0;i<img->getComponents();i++)
 		{
-			//pBstr->write_block(&(*img)[i][0][0], (*img)[i].getBytesCount());
 			htree->EncodeBlock(&(*img)[i][0][0], (*img)[i].getPointsCount(), pBstr);
 			pBstr->flush();
 		}
-		//utils::swap<CImage<float>*>(imgLast, imgIn);
 		(*imgLast) = (*imgIn);
 		n++;
 	}
@@ -66,6 +67,8 @@ bool CBasicEncoder::Encode(CSequence * pSeq, CBitstream * pBstr)
 	delete dct;
 	delete img;
 	delete htree;
+	delete quant;
+	delete zigzag;
 	return false;
 }
 

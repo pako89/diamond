@@ -12,8 +12,8 @@ class CTransform
 public:
 	CTransform();
 	~CTransform();
-	virtual void Transform8x8(S * pSrc, D * pDst, int width) = 0;
-	virtual void Transform(CImage<S> & src, CImage<D> & dst);
+	virtual void TransformBlock(S * pSrc, D * pDst, CPoint p, CSize s);
+	virtual void Transform(CImage<S> * src, CImage<D> * dst);
 private:
 
 };
