@@ -15,6 +15,8 @@ typedef uint16_t format_t;
 typedef uint16_t image_format_t;
 typedef uint8_t frame_type_t;
 typedef uint16_t marker_size_t;
+typedef uint8_t macroblock_type_t;
+
 #define MARKER_DEF(name)	typedef struct name##_marker 		\
 				{					\
 					marker_type_t type;		\
@@ -48,5 +50,11 @@ MARKER_DEF(sof)
 	frame_type_t frame_type;
 	uint16_t quant_coeff;
 MARKER_END(sof)	
-
+/*
+MARKER_DEF(som)
+	macroblock_type_t type;
+	int8_t mx;
+	int8_t my;	
+MARKED_END(som)
+*/
 #endif //_PROTO_H

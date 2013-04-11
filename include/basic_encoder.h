@@ -7,6 +7,7 @@
 #include <dct.h>
 #include <quantizer.h>
 #include <zigzag.h>
+#include <rlc.h>
 
 namespace avlib
 {

@@ -28,45 +28,56 @@ bool CBasicDecoder::Decode(CBitstream * pBstr, CSequence * pSeq)
 	dbg("Height: %d\n", sos.height);
 	pSeq->setFormat(IMAGE_TYPE_YUV420, sos.height, sos.width);
 	pBstr->fill();
-	CImage<float> * imgOut = new CImage<float>(pSeq->getFormat());
-	CImage<float> * imgDCT = new CImage<float>(pSeq->getFormat());
+	CImage<float> * imgF = new CImage<float>(pSeq->getFormat());
 	CImage<float> * imgLast = new CImage<float>(pSeq->getFormat());
-	CImage<int32_t> * img = new CImage<int32_t>(pSeq->getFormat());
-	CHuffmanTree<int32_t> * htree = new CHuffmanTree<int32_t>();
+	CImage<int16_t> * img = new CImage<int16_t>(pSeq->getFormat());
+	CHuffmanTree<int16_t> * htree = new CHuffmanTree<int16_t>();
 	CIDCT * idct = new CIDCT();
 	CIQuant * iquant = new CIQuant();
-	CIZigZag<int32_t, float> * izigzag = new CIZigZag<int32_t, float>();
+	CIZigZag<int16_t, float> * izigzag = new CIZigZag<int16_t, float>();
+	CIRLC<int16_t> * irlc = new CIRLC<int16_t>();
+	sof_marker_t sof;
 	for(uint32_t n = 0 ; n < sos.frames_number; n++)
 	{
 		dbg("\rDecoding frame: %d", n);
-		for(int i=0;i<img->getComponents(); i++)
+		pBstr->fill();
+		pBstr->read_block(&sof, sizeof(sof));
+		if(sof.type != MARKER_TYPE_SOF || sof.size != sizeof(sof_marker_t))
 		{
-			htree->DecodeBlock(&(*img)[i][0][0], (*img)[i].getPointsCount(), pBstr);
-			pBstr->fill();
+			throw utils::StringFormatException("can not sync frame");
 		}
-		izigzag->Transform(img, imgDCT);
-		iquant->Transform(imgDCT, imgDCT);
-		idct->Transform(imgDCT, imgOut);
-		if(n != 0)
+		irlc->Decode(pBstr, img);
+		izigzag->Transform(img, imgF);
+		iquant->Transform(imgF, imgF);
+		idct->Transform(imgF, imgF);
+		if(sof.frame_type == FRAME_TYPE_I)
 		{
-			(*imgOut) += (*imgLast);
+			
 		}
-		CImage<uint8_t> & frame = pSeq->getFrame();
-		frame = *imgOut;
+		else if(sof.frame_type == FRAME_TYPE_P)
+		{
+			(*imgF) += (*imgLast);
+		}
+		else
+		{
+			throw utils::StringFormatException("unknown frame type: 0x%x\n", sof.frame_type);
+		}
+		pSeq->getFrame() = *imgF;
 		if(!pSeq->WriteNext())
 		{
 			throw utils::StringFormatException("can not write frame to file");
 		}
-		(*imgLast) = (*imgOut);
+		(*imgLast) = (*imgF);
 	}
 	dbg("\n");
-	delete idct;
-	delete imgOut;
-	delete imgDCT;
 	delete img;
+	delete imgF;
 	delete imgLast;
+	delete idct;
 	delete htree;
 	delete izigzag;
+	delete iquant;
+	delete irlc;
 	return false;
 }
 

@@ -6,6 +6,8 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <exception>
+#include <limits>
+#include <image.h>
 
 #define INSTANTIATE(t_class, t_arg)		template class t_class<t_arg>
 #define INSTANTIATE2(t_class, t_arg1, t_arg2)	template class t_class<t_arg1, t_arg2>
@@ -47,6 +49,38 @@ template <class T> void swap(T x1, T x2)
 	T temp = x1;
 	x1 = x2;
 	x2 = temp;
+}
+
+template <class T, class U> 
+T clamp(U val)
+{
+	if(val > std::numeric_limits<T>::max()) {
+		return std::numeric_limits<T>::max();
+	}
+	if(val < std::numeric_limits<T>::min()) {
+		return std::numeric_limits<T>::min();
+	}
+	return (T)val;
+}
+
+template <class T, class U> 
+void clampImg(avlib::CImage<T> * src, avlib::CImage<U> * dst)
+{
+	if(src->getFormat() != dst->getFormat())
+	{
+		throw utils::StringFormatException("formats does not match\n");
+	}
+	for(int k=0;k<src->getComponents(); k++)
+	{
+		for(int y=0; y < (*src)[k].getHeight(); y++)
+		{
+			for(int x=0; x < (*src)[k].getWidth(); x++)
+			{
+				(*dst)[k][y][x] = clamp<U,T>((*src)[k][y][x]);
+			}
+		}
+		
+	}
 }
 
 }

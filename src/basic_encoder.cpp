@@ -21,54 +21,66 @@ bool CBasicEncoder::Encode(CSequence * pSeq, CBitstream * pBstr)
 	sos.width = pSeq->getWidth();
 	sos.height = pSeq->getHeight();
 	pBstr->write_block(&sos, sizeof(sos));
-	CImage<float> * imgIn = new CImage<float>(pSeq->getFormat());
-	CImage<float> * imgDCT = new CImage<float>(pSeq->getFormat());
+	CImage<float> * imgF = new CImage<float>(pSeq->getFormat());
 	CImage<float> * imgLast = new CImage<float>(pSeq->getFormat());
-	CImage<int32_t> * img = new CImage<int32_t>(pSeq->getFormat());
-	CHuffmanTree<int32_t> * htree = new CHuffmanTree<int32_t>();
+	CImage<int16_t> * img = new CImage<int16_t>(pSeq->getFormat());
+	CHuffmanTree<int16_t> * htree = new CHuffmanTree<int16_t>();
 	CDCT * dct = new CDCT();
+	CIDCT * idct = new CIDCT();
 	CQuant * quant = new CQuant();
-	CZigZag<float, int32_t> * zigzag = new CZigZag<float, int32_t>();
-	int n=0;
-	struct sof_marker sof;
+	CIQuant * iquant = new CIQuant();
+	CZigZag<float, int16_t> * zigzag = new CZigZag<float, int16_t>();
+	CRLC<int16_t> * rlc = new CRLC<int16_t>();
+	sof_marker_t sof;
 	sof.type = MARKER_TYPE_SOF;
-	sof.size = sizeof(struct sof_marker);
+	sof.size = sizeof(sof_marker_t);
 	sof.quant_coeff = 1;
-	while(pSeq->ReadNext())
+	int gop = 4;
+	for(int i=0;i<sos.frames_number;i++)
 	{
-		dbg("\rEncoding frame: %d", n);
-		CImage<uint8_t> & frame = pSeq->getFrame(); 
-		(*imgIn) = frame;
-		(*imgDCT) = (*imgIn);
-		if(n == 0)
+		if(!pSeq->ReadNext())
+		{
+			throw utils::StringFormatException("can not read frame from file");
+		}
+		dbg("\rEncoding frame: %d", i);
+		(*imgF) = pSeq->getFrame();
+		if(i%gop == 0 || i == sos.frames_number-1)
 		{
 			sof.frame_type = FRAME_TYPE_I;
 		}
 		else
 		{
 			sof.frame_type = FRAME_TYPE_P;
-			(*imgDCT) -= (*imgLast);
-		}
-		dct->Transform(imgDCT, imgDCT);
-		quant->Transform(imgDCT, imgDCT);
-		zigzag->Transform(imgDCT, img);
-		for(int i=0;i<img->getComponents();i++)
+			(*imgF) -= (*imgLast);
+		}	
+		pBstr->write_block(&sof, sizeof(sof));
+		dct->Transform(imgF, imgF);
+		quant->Transform(imgF, imgF);
+		zigzag->Transform(imgF, img);
+		rlc->Encode(img, pBstr);
+		pBstr->flush();
+		iquant->Transform(imgF, imgF);
+		idct->Transform(imgF, imgF);
+		if(sof.frame_type == FRAME_TYPE_P)
 		{
-			htree->EncodeBlock(&(*img)[i][0][0], (*img)[i].getPointsCount(), pBstr);
-			pBstr->flush();
+			(*imgLast) += (*imgF);
 		}
-		(*imgLast) = (*imgIn);
-		n++;
+		else
+		{
+			(*imgLast) = (*imgF);
+		}
 	}
 	dbg("\n");
-	delete imgIn;
-	delete imgDCT;
+	delete imgF;
 	delete imgLast;
-	delete dct;
 	delete img;
+	delete dct;
+	delete idct;
 	delete htree;
 	delete quant;
+	delete iquant;
 	delete zigzag;
+	delete rlc;
 	return false;
 }
 
