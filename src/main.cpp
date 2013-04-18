@@ -8,6 +8,7 @@
 #include <sequence.h>
 #include <basic_encoder.h>
 #include <basic_decoder.h>
+#include <cl_encoder.h>
 #include <log.h>
 
 
@@ -33,6 +34,7 @@ int main(int argc,char * argv[])
 		dbg("Image type : %s\n", app->getImageTypeStr());
 		dbg("Height     : %d\n", app->getHeight());
 		dbg("Width      : %d\n", app->getWidth());
+		dbg("OpenCL     : %s\n", app->UseOpenCL()?"True":"False");
 		diamond::DiamondOperation op = app->getOperation();
 		if(diamond::DIAMOND_OP_ENCODE == op)
 		{
@@ -44,9 +46,18 @@ int main(int argc,char * argv[])
 			);
 			avlib::CBitstream * bstr = new avlib::CBitstream(10000000);
 			bstr->set_fh(app->getOutputFile());
-			avlib::CBasicEncoder enc;
-			enc.Encode(seq, bstr);
+			avlib::CBasicEncoder * enc = NULL;
+			if(app->UseOpenCL())
+			{
+				enc = new avlib::CCLEncoder();
+			}
+			else
+			{
+		       		enc = new avlib::CBasicEncoder();
+			}
+			enc->Encode(seq, bstr);
 			bstr->flush_all();
+			delete enc;
 			delete bstr;
 			delete seq;
 		}

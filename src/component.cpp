@@ -41,13 +41,13 @@ CComponent<T>::CComponent(const CComponent<T> & src) :
 template <class T>
 CComponent<T> & CComponent<T>::operator=(const CComponent & src)
 {
-	if(m_size != src.m_size)
+	if(this->m_size != src.m_size)
 	{
 		setSize(src.m_size.Height, src.m_size.Width);
 	}
 	for(int i=0;i<getPointsCount();i++)
 	{
-		m_data[i] = (T)src.m_data[i];
+		this->m_data[i] = (T)src.m_data[i];
 	}
 	return *this;
 }
@@ -63,13 +63,13 @@ template <class U> CComponent<T>::CComponent(const CComponent<U> & src) :
 template <class T>
 template <class U> CComponent<T> & CComponent<T>::operator=(const CComponent<U> & src)
 {
-	if(m_size != src.m_size)
+	if(this->m_size != src.m_size)
 	{
 		setSize(src.m_size.Height, src.m_size.Width);
 	}
 	for(int i=0;i<getPointsCount();i++)
 	{
-		m_data[i] = (T)src.m_data[i];
+		this->m_data[i] = (T)src.m_data[i];
 	}
 	return *this;
 }
@@ -83,43 +83,43 @@ CComponent<T>::~CComponent(void)
 template <class T>
 void CComponent<T>::release(void)
 {
-	if(NULL != m_data)
+	if(NULL != this->m_data)
 	{
-		delete [] m_data;
+		delete [] this->m_data;
 	}
-	m_data = NULL;
-	m_size.Width = 0;
-	m_size.Height = 0;
+	this->m_data = NULL;
+	this->m_size.Width = 0;
+	this->m_size.Height = 0;
 }
 
 template <class T>
 int CComponent<T>::getWidth(void)
 {
-	return m_size.Width;
+	return this->m_size.Width;
 }
 
 template <class T>
 int CComponent<T>::getHeight(void)
 {
-	return m_size.Height;
+	return this->m_size.Height;
 }
 
 template <class T>
 int CComponent<T>::getPointsCount(void)
 {
-	return m_size.Height*m_size.Width;
+	return this->m_size.Height*this->m_size.Width;
 }
 
 template <class T>
 CSize CComponent<T>::getSize(void)
 {
-	return m_size;
+	return this->m_size;
 }
 
 template <class T>
 size_t CComponent<T>::getBytesCount(void)
 {
-	return m_bytes;
+	return this->m_bytes;
 }
 
 
@@ -136,33 +136,33 @@ bool CComponent<T>::setSize(CSize size)
 	{
 		return false;
 	}
-	if(NULL != m_data)
+	if(NULL != this->m_data)
 	{
 		release();
 	}
-	m_size = size;
-	m_bytes = m_size.Height*m_size.Width*sizeof(T);
-	m_data = new T[m_size.Height*m_size.Width];
+	this->m_size = size;
+	this->m_bytes = this->m_size.Height*this->m_size.Width*sizeof(T);
+	this->m_data = new T[this->m_size.Height*this->m_size.Width];
 	return true;
 }
 
 template <class T>
 T * CComponent<T>::operator[](int h)
 {
-	return &m_data[h * m_size.Width];
+	return &this->m_data[h * this->m_size.Width];
 }
 
 template <class T>
 CComponent<T> & CComponent<T>::operator-=(const CComponent<T> & src)
 {
-	if(m_size != src.m_size)
+	if(this->m_size != src.m_size)
 	{
 		throw utils::StringFormatException("wrong sizes\n");
 	}
 	int count = getPointsCount();
 	for(int i=0;i<count;i++)
 	{
-		m_data[i] -= src.m_data[i];
+		this->m_data[i] -= src.m_data[i];
 	}
 
 	return *this;
@@ -171,14 +171,14 @@ CComponent<T> & CComponent<T>::operator-=(const CComponent<T> & src)
 template <class T>
 CComponent<T> & CComponent<T>::operator+=(const CComponent<T> & src)
 {
-	if(m_size != src.m_size)
+	if(this->m_size != src.m_size)
 	{
 		throw utils::StringFormatException("wrong sizes\n");
 	}
 	int count = getPointsCount();
 	for(int i=0;i<count;i++)
 	{
-		m_data[i] += src.m_data[i];
+		this->m_data[i] += src.m_data[i];
 	}
 
 	return *this;

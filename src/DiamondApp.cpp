@@ -46,7 +46,8 @@ CDiamondApp::CDiamondApp(void) :
 	m_imageType(avlib::IMAGE_TYPE_UNKNOWN),
 	m_imageTypeStr("unknown"),
 	m_imageHeight(0),
-	m_imageWidth(0)
+	m_imageWidth(0),
+	m_opencl(false)
 {
 }
 
@@ -155,7 +156,8 @@ const struct option CDiamondApp::common_options[] = {
 	{"input",		required_argument,	NULL, 	'o'},
 	{"type",		required_argument,	NULL,	't'},
 	{"height",		required_argument,	NULL,	'H'},
-	{"width",		required_argument,	NULL,	'W'},	
+	{"width",		required_argument,	NULL,	'W'},
+	{"opencl",		no_argument,		NULL, 	'C'},
 };
 
 #define COMMON_OPTS_SIZE	ARRAY_SIZE(common_options)
@@ -232,6 +234,9 @@ void CDiamondApp::ParseArgs(int argc, char * argv[])
 		case 'H':
 			m_imageHeight = parseInt(optarg);
 			break;
+		case 'C':
+			m_opencl = true;
+			break;
 		case '?':
 			break;
 		default:
@@ -302,4 +307,8 @@ DiamondOperation CDiamondApp::getOperation(void)
 	return m_op;
 }
 
+bool CDiamondApp::UseOpenCL(void)
+{
+	return m_opencl;
+}
 }

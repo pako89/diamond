@@ -70,7 +70,7 @@ CImage<T> & CImage<T>::operator=(const CImage<T> & src)
 	}
 	for(int i=0;i<m_comp_num;i++)
 	{
-		m_comp[i] = src.m_comp[i];
+		*m_comp[i] = *src.m_comp[i];
 	}
 	return *this;
 }
@@ -93,7 +93,7 @@ template <class U> CImage<T> & CImage<T>::operator=(const CImage<U> & src)
 	}
 	for(int i=0;i<m_comp_num;i++)
 	{
-		m_comp[i] = src.m_comp[i];
+		*m_comp[i] = *src.m_comp[i];
 	}
 	return *this;
 }
@@ -103,7 +103,7 @@ CImage<T>::~CImage()
 {
 	if(NULL != m_comp)
 	{
-		delete [] m_comp;
+		release();
 	}
 }
 
@@ -120,28 +120,67 @@ bool CImage<T>::setFormat(enum ImageType type, int height, int width)
 }
 
 template <class T>
+void CImage<T>::release()
+{
+	for(int i=0;i<m_comp_num;i++)
+	{
+		delete m_comp[i];
+	}
+	delete [] m_comp;
+	m_comp_num = 0;
+	m_comp = NULL;
+}
+
+template <class T>
+void CImage<T>::alloc(int num)
+{
+	m_comp_num = num;
+	m_comp = new CComponent<T>*[m_comp_num];
+	for(int i=0;i<m_comp_num;i++)
+	{
+		m_comp[i] = new CComponent<T>();
+	}
+}
+
+template <class T>
 bool CImage<T>::setFormat(CImageFormat format)
 {
-	if(NULL != m_comp)
+	if(NULL != m_comp && m_format == format)
 	{
-		delete [] m_comp;
+		return true;
+	} 
+	else if(NULL != m_comp && m_format != format)
+	{
+		release();
+	}
+	if(NULL == m_comp)
+	{
+		switch(format.Type)
+		{
+		case IMAGE_TYPE_RGB:
+		case IMAGE_TYPE_YUV420:
+			alloc(3);
+		break;
+		default:
+			throw utils::StringFormatException("unknown image type: %d\n", format.Type);
+		}
 	}
 	switch(format.Type)
 	{
 	case IMAGE_TYPE_RGB:
-		m_comp = new CComponent<T>[3];
-		m_comp_num = 3;
 		for(int i=0;i<m_comp_num;i++)
 		{
-			m_comp[i].setSize(format.Size.Height, format.Size.Width);
+			m_comp[i]->setSize(format.Size.Height, format.Size.Width);
 		}
 	break;
 	case IMAGE_TYPE_YUV420:
-		m_comp = new CComponent<T>[3];
-		m_comp_num = 3;
-		m_comp[0].setSize(format.Size.Height, format.Size.Width);
-		m_comp[1].setSize(format.Size.Height/2, format.Size.Width/2);
-		m_comp[2].setSize(format.Size.Height/2, format.Size.Width/2);
+		if(m_comp_num != 3)
+		{
+			throw utils::StringFormatException("IMAGE_TYPE_YUV420 and m_comp_num == %d\n", m_comp_num);
+		}
+		m_comp[0]->setSize(format.Size.Height, format.Size.Width);
+		m_comp[1]->setSize(format.Size.Height/2, format.Size.Width/2);
+		m_comp[2]->setSize(format.Size.Height/2, format.Size.Width/2);
 	break;
 	default:
 		return false;
@@ -161,7 +200,7 @@ CComponent<T> & CImage<T>::operator[](int index)
 {
 	if(index >= 0 && index < m_comp_num)
 	{
-		return m_comp[index];
+		return *m_comp[index];
 	}
 	else
 	{
@@ -184,7 +223,7 @@ CImage<T> & CImage<T>::operator-=(const CImage<T> & src)
 	}
 	for(int i=0;i<m_comp_num; i++)
 	{
-		m_comp[i] -= src.m_comp[i];
+		*m_comp[i] -= *src.m_comp[i];
 	}
 	return *this;
 }
@@ -198,7 +237,7 @@ CImage<T> & CImage<T>::operator+=(const CImage<T> & src)
 	}
 	for(int i=0;i<m_comp_num; i++)
 	{
-		m_comp[i] += src.m_comp[i];
+		*m_comp[i] += *src.m_comp[i];
 	}
 	return *this;
 }

@@ -4,37 +4,72 @@
 namespace avlib
 {
 
-CBasicEncoder::CBasicEncoder()
+CBasicEncoder::CBasicEncoder() :
+	m_imgF(NULL),
+	m_imgLast(NULL),
+	m_img(NULL),
+	m_htree(NULL),
+	m_dct(NULL),
+	m_quant(NULL),
+	m_zz(NULL),
+	m_rlc(NULL)
 {
 }
+
+#define RELEASE(p)	if(NULL != (p)) delete (p);
 
 CBasicEncoder::~CBasicEncoder()
 {
+	RELEASE(m_imgF);
+	RELEASE(m_imgLast);
+	RELEASE(m_img);
+	RELEASE(m_htree);
+	RELEASE(m_dct);
+	RELEASE(m_quant);
+	RELEASE(m_rlc);
 }
 
-bool CBasicEncoder::Encode(CSequence * pSeq, CBitstream * pBstr)
+void CBasicEncoder::init(CImageFormat fmt)
 {
-	struct sos_marker sos;
+	if(NULL == m_imgF) m_imgF = new CImage<float>(fmt);
+	if(NULL == m_imgLast) m_imgLast = new CImage<float>(fmt);
+	if(NULL == m_img) m_img = new CImage<int16_t>(fmt);
+	if(NULL == m_htree) m_htree = new CHuffmanTree<int16_t>();
+	if(NULL == m_dct) m_dct = new CDCT();
+	if(NULL == m_quant) m_quant = new CQuant();
+	if(NULL == m_zz) m_zz = new CZigZag<float, int16_t>();
+	if(NULL == m_rlc) m_rlc = new CRLC<int16_t>();
+}
+
+sos_marker_t CBasicEncoder::write_sos(CSequence * pSeq, CBitstream * pBstr)
+{
+	sos_marker_t sos;
 	sos.type = MARKER_TYPE_SOS;
 	sos.size = sizeof(struct sos_marker);
 	sos.frames_number = pSeq->getFramesCount();
 	sos.width = pSeq->getWidth();
 	sos.height = pSeq->getHeight();
 	pBstr->write_block(&sos, sizeof(sos));
-	CImage<float> * imgF = new CImage<float>(pSeq->getFormat());
-	CImage<float> * imgLast = new CImage<float>(pSeq->getFormat());
-	CImage<int16_t> * img = new CImage<int16_t>(pSeq->getFormat());
-	CHuffmanTree<int16_t> * htree = new CHuffmanTree<int16_t>();
-	CDCT * dct = new CDCT();
-	CIDCT * idct = new CIDCT();
-	CQuant * quant = new CQuant();
-	CIQuant * iquant = new CIQuant();
-	CZigZag<float, int16_t> * zigzag = new CZigZag<float, int16_t>();
-	CRLC<int16_t> * rlc = new CRLC<int16_t>();
+	return sos;
+}
+
+sof_marker_t CBasicEncoder::write_sof(CBitstream * pBstr, frame_type_t frame_type)
+{
 	sof_marker_t sof;
 	sof.type = MARKER_TYPE_SOF;
 	sof.size = sizeof(sof_marker_t);
 	sof.quant_coeff = 1;
+	sof.frame_type = frame_type;
+	pBstr->write_block(&sof, sizeof(sof));
+	return sof;
+}
+
+bool CBasicEncoder::Encode(CSequence * pSeq, CBitstream * pBstr)
+{
+	init(pSeq->getFormat());
+	sos_marker_t sos = write_sos(pSeq, pBstr);
+	CIDCT * idct = new CIDCT();
+	CIQuant * iquant = new CIQuant();
 	int gop = 4;
 	for(int i=0;i<sos.frames_number;i++)
 	{
@@ -43,44 +78,36 @@ bool CBasicEncoder::Encode(CSequence * pSeq, CBitstream * pBstr)
 			throw utils::StringFormatException("can not read frame from file");
 		}
 		dbg("\rEncoding frame: %d", i);
-		(*imgF) = pSeq->getFrame();
+		(*m_imgF) = pSeq->getFrame();
+		sof_marker_t sof;
 		if(i%gop == 0 || i == sos.frames_number-1)
 		{
-			sof.frame_type = FRAME_TYPE_I;
+			sof = write_sof(pBstr, FRAME_TYPE_I);
 		}
 		else
 		{
-			sof.frame_type = FRAME_TYPE_P;
-			(*imgF) -= (*imgLast);
+			sof = write_sof(pBstr, FRAME_TYPE_P);
+			(*m_imgF) -= (*m_imgLast);
 		}	
-		pBstr->write_block(&sof, sizeof(sof));
-		dct->Transform(imgF, imgF);
-		quant->Transform(imgF, imgF);
-		zigzag->Transform(imgF, img);
-		rlc->Encode(img, pBstr);
+		m_dct->Transform(m_imgF, m_imgF);
+		m_quant->Transform(m_imgF, m_imgF);
+		m_zz->Transform(m_imgF, m_img);
+		m_rlc->Encode(m_img, pBstr);
 		pBstr->flush();
-		iquant->Transform(imgF, imgF);
-		idct->Transform(imgF, imgF);
+		iquant->Transform(m_imgF, m_imgF);
+		idct->Transform(m_imgF, m_imgF);
 		if(sof.frame_type == FRAME_TYPE_P)
 		{
-			(*imgLast) += (*imgF);
+			(*m_imgLast) += (*m_imgF);
 		}
 		else
 		{
-			(*imgLast) = (*imgF);
+			(*m_imgLast) = (*m_imgF);
 		}
 	}
 	dbg("\n");
-	delete imgF;
-	delete imgLast;
-	delete img;
-	delete dct;
 	delete idct;
-	delete htree;
-	delete quant;
 	delete iquant;
-	delete zigzag;
-	delete rlc;
 	return false;
 }
 

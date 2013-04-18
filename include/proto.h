@@ -13,7 +13,6 @@ enum marker_type
 typedef uint16_t marker_type_t;
 typedef uint16_t format_t;
 typedef uint16_t image_format_t;
-typedef uint8_t frame_type_t;
 typedef uint16_t marker_size_t;
 typedef uint8_t macroblock_type_t;
 
@@ -39,15 +38,15 @@ MARKER_DEF(sos)
 	uint32_t height;
 MARKER_END(sos)
 	
-enum frame_type 
+typedef enum frame_type
 {
 	FRAME_TYPE_I	= 0x00,
 	FRAME_TYPE_P	= 0x01,
 	FRAME_TYPE_B	= 0x02
-};
+} frame_type_t;
 
 MARKER_DEF(sof)
-	frame_type_t frame_type;
+	uint8_t frame_type;
 	uint16_t quant_coeff;
 MARKER_END(sof)	
 /*

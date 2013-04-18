@@ -8,6 +8,7 @@
 #include <exception>
 #include <limits>
 #include <image.h>
+#include <log.h>
 
 #define INSTANTIATE(t_class, t_arg)		template class t_class<t_arg>
 #define INSTANTIATE2(t_class, t_arg1, t_arg2)	template class t_class<t_arg1, t_arg2>

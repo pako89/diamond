@@ -5,11 +5,14 @@ TARGET	= diamond
 CC	= g++
 
 # Compiler flags
-INCDIR	= -Iinclude
+INCDIR	= -Iinclude -I/usr/local/cuda/include
 CFLAGS	= -g $(INCDIR) -DDEBUG
 
 # Linker flags
-LDFLAGS	= -Llib
+LDFLAGS	= -L/usr/lib
+
+# Libs
+LIB = -lOpenCL
 
 # Source files
 SRC	= $(wildcard src/*.cpp)
@@ -18,7 +21,7 @@ SRC	= $(wildcard src/*.cpp)
 OBJ	= $(SRC:.cpp=.o)
 
 default: $(OBJ)
-	$(CC) $(LDFLAGS) -o $(TARGET) $(OBJ)
+	$(CC) $(LDFLAGS) -o $(TARGET) $(OBJ) $(LIB)
 
 %.o : %.cpp
 	$(CC) $(CFLAGS) -c $< -o $@

@@ -67,6 +67,7 @@ public:
 	const char * getImageTypeStr(void);
 	int getHeight(void);
 	int getWidth(void);
+	bool UseOpenCL(void);
 	DiamondOperation getOperation(void);
 protected:
 	CDiamondApp(void);
@@ -85,6 +86,7 @@ protected:
 	const char * m_imageTypeStr;
 	int m_imageHeight;
 	int m_imageWidth;
+	bool m_opencl;
 };
 
 }
