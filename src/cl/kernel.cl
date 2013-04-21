@@ -97,3 +97,15 @@ __kernel void dct_transform(__global float * pSrc, __global float * pDst, int he
 	}
 }
 
+__kernel void quant_transform(__global float * pSrc, __global float * pDst, __global float * pQ, int height, int width)
+{
+	int ly = get_local_id(0);
+	int lx = get_local_id(1);
+	int gy = get_global_id(0);
+	int gx = get_global_id(1);
+
+	float q = pQ[ly*8+lx];
+	int index = gy*width+gx;
+	pDst[index] = q*pSrc[index];
+}
+

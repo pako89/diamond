@@ -4,6 +4,8 @@
 #include <basic_encoder.h>
 #include <cl_common.h>
 #include <cl_image.h>
+#include <cl_dct.h>
+#include <cl_quantizer.h>
 #include <CL/opencl.h>
 #include <fstream>
 #include <string>

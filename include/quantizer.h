@@ -12,12 +12,12 @@ class CQuant : public CTransform<float, float>
 {
 public:
 	CQuant();
-	CQuant(int qp);
 	virtual ~CQuant();
 	virtual void TransformBlock(float * pSrc, float * pDst, CPoint p, CSize s);
+	virtual void setTables(int qp);
 	virtual void setTables(const uint8_t * YQ, const uint8_t * UQ, const uint8_t * VQ, int qp);
 protected:
-	CImage<float> m_q;
+	CImage<float> * m_q;
 };
 
 class CIQuant : public CQuant

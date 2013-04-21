@@ -71,6 +71,7 @@ bool CBasicEncoder::Encode(CSequence * pSeq, CBitstream * pBstr)
 	CIDCT * idct = new CIDCT();
 	CIQuant * iquant = new CIQuant();
 	int gop = 4;
+	m_quant->setTables(1);
 	for(int i=0;i<sos.frames_number;i++)
 	{
 		if(!pSeq->ReadNext())
