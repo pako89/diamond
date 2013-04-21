@@ -4,25 +4,28 @@ namespace avlib
 {
 
 template <class T>
-CCLComponent<T>::CCLComponent(cl_handle h) :
+CCLComponent<T>::CCLComponent(cl_handle h, cl_mem_flags mem_flags) :
 	m_clh(h),
-	m_cldata(0)
+	m_cldata(0),
+	m_mem_flags(mem_flags)
 {
 }
 
 template <class T>
-CCLComponent<T>::CCLComponent(cl_handle h, CSize size) :
-	CComponent<T>(size),
+CCLComponent<T>::CCLComponent(cl_handle h, CSize size, cl_mem_flags mem_flags) :
 	m_clh(h),
-	m_cldata(0)
+	m_cldata(0),
+	m_mem_flags(mem_flags)
 {
+	this->setSize(size, mem_flags);
 }
 
 template <class T>
-CCLComponent<T>::CCLComponent(cl_handle h, int height, int width) :
+CCLComponent<T>::CCLComponent(cl_handle h, int height, int width, cl_mem_flags mem_flags) :
 	CComponent<T>(height, width),
 	m_clh(h),
-	m_cldata(0)
+	m_cldata(0),
+	m_mem_flags(mem_flags)
 {
 }
 
@@ -38,6 +41,19 @@ CCLComponent<T>::~CCLComponent()
 template <class T>
 bool CCLComponent<T>::setSize(CSize size)
 {
+	if(!this->m_mem_flags)
+	{
+		setSize(size, CL_MEM_READ_WRITE);
+	}
+	else
+	{
+		setSize(size, this->m_mem_flags);
+	}
+}
+
+template <class T>
+bool CCLComponent<T>::setSize(CSize size, cl_mem_flags mem_flags)
+{
 	if(CComponent<T>::setSize(size))
 	{
 		if(this->m_size != size)
@@ -45,17 +61,19 @@ bool CCLComponent<T>::setSize(CSize size)
 			clReleaseMemObject(this->m_cldata);
 		}
 		cl_int err;
-		this->m_cldata = clCreateBuffer(this->m_clh.context, CL_MEM_READ_WRITE, this->getBytesCount(), NULL, &err);
+		this->m_cldata = clCreateBuffer(this->m_clh.context, mem_flags, this->getBytesCount(), NULL, &err);
 		if(!this->m_cldata || CL_SUCCESS != err)
 		{
-			throw utils::StringFormatException("clCreatebuffer(%d)\n", err);
+			throw utils::StringFormatException("clCreatebuffer(%d)[cl_mem_flags=%x]\n", err, mem_flags);
 		}
+		this->m_mem_flags = mem_flags;
 		return true;
 	}
 	else
 	{
 		return false;
 	}
+
 }
 
 template <class T>

@@ -36,29 +36,31 @@ const uint8_t default_VQTable[] = {
 	0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c
 };
 
-CQuant::CQuant() : 
-	m_q(CSize(8, 8))
+CQuant::CQuant() 
 {
-	setTables(default_YQTable, default_UQTable, default_VQTable, 1);
-}
-
-CQuant::CQuant(int qp) :
-	m_q(CSize(8, 8))
-{
-	setTables(default_YQTable, default_UQTable, default_VQTable, qp);
+	this->m_q = new CImage<float>(CSize(8, 8));
 }
 
 CQuant::~CQuant()
 {
+	if(NULL != this->m_q)
+	{
+		delete this->m_q;
+	}
+}
+
+void CQuant::setTables(int qp)
+{
+	setTables(default_YQTable, default_UQTable, default_VQTable, qp);
 }
 
 void CQuant::setTables(const uint8_t * YQ, const uint8_t * UQ, const uint8_t * VQ, int qp)
 {
 	for(int i=0;i<64;i++)
 	{
-		m_q[0][0][i] = 1.0f/((float)YQ[i]*qp);
-		m_q[1][0][i] = 1.0f/((float)UQ[i]*qp);
-		m_q[2][0][i] = 1.0f/((float)VQ[i]*qp);
+		(*m_q)[0][0][i] = 1.0f/((float)YQ[i]*qp);
+		(*m_q)[1][0][i] = 1.0f/((float)UQ[i]*qp);
+		(*m_q)[2][0][i] = 1.0f/((float)VQ[i]*qp);
 	}
 }
 
@@ -66,11 +68,11 @@ void CQuant::TransformBlock(float * pSrc, float * pDst, CPoint p, CSize s)
 {
 	float * src = &pSrc[p.Y*s.Width+p.X];
 	float * dst = &pDst[p.Y*s.Width+p.X];
-	for(int y=0;y<m_q[p.Z].getHeight();y++)
+	for(int y=0;y<(*m_q)[p.Z].getHeight();y++)
 	{
-		for(int x=0;x<m_q[p.Z].getWidth();x++)
+		for(int x=0;x<(*m_q)[p.Z].getWidth();x++)
 		{
-			dst[y*s.Width+x] = src[y*s.Width+x]*m_q[p.Z][y][x];
+			dst[y*s.Width+x] = src[y*s.Width+x]*(*m_q)[p.Z][y][x];
 		}
 	}
 }
@@ -89,9 +91,9 @@ void CIQuant::setTables(const uint8_t * YQ, const uint8_t * UQ, const uint8_t * 
 {
 	for(int i=0;i<64;i++)
 	{
-		m_q[0][0][i] = (float)YQ[i]*qp;
-		m_q[1][0][i] = (float)UQ[i]*qp;
-		m_q[2][0][i] = (float)VQ[i]*qp;
+		(*m_q)[0][0][i] = (float)YQ[i]*qp;
+		(*m_q)[1][0][i] = (float)UQ[i]*qp;
+		(*m_q)[2][0][i] = (float)VQ[i]*qp;
 	}
 }
 

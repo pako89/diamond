@@ -13,11 +13,12 @@ template <class T>
 class CCLComponent : public CComponent<T>
 {
 public:
-	CCLComponent(cl_handle h);
-	CCLComponent(cl_handle h, CSize size);
-	CCLComponent(cl_handle h, int height, int width);
+	CCLComponent(cl_handle h, cl_mem_flags mem_flags = CL_MEM_READ_WRITE);
+	CCLComponent(cl_handle h, CSize size, cl_mem_flags mem_flags = CL_MEM_READ_WRITE);
+	CCLComponent(cl_handle h, int height, int width, cl_mem_flags mem_flags = CL_MEM_READ_WRITE);
 	virtual ~CCLComponent();
 	virtual bool setSize(CSize size);
+	virtual bool setSize(CSize size, cl_mem_flags mem_flags);
 	virtual void setHandle(cl_handle h);
 	virtual void CopyToDevice();
 	virtual void CopyToHost();
@@ -25,6 +26,7 @@ public:
 protected:
 	cl_handle m_clh;
 	cl_mem m_cldata;
+	cl_mem_flags m_mem_flags;
 };
 
 }

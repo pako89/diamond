@@ -68,6 +68,8 @@ void CCLEncoder::init(CImageFormat fmt)
 	}
 	this->m_imgF = new CCLImage<float>(this->m_h, fmt);
 	this->m_dct = new CCLDCT(this->m_h, m_program, "dct_transform");
+	this->m_quant = new CCLQuant(this->m_h, m_program, "quant_transform");
+	this->m_quant->setTables(1);
 	CBasicEncoder::init(fmt);
 }
 
@@ -125,9 +127,11 @@ bool CCLEncoder::Encode(CSequence * pSeq, CBitstream * pBstr)
 		{
 			sof = write_sof(pBstr, FRAME_TYPE_P);
 			(*m_imgF) -= (*m_imgLast);
-		}	
+		}
+		dynamic_cast<CCLImage<float>*>(m_imgF)->CopyToDevice();
 		m_dct->Transform(m_imgF, m_imgF);
 		m_quant->Transform(m_imgF, m_imgF);
+		dynamic_cast<CCLImage<float>*>(m_imgF)->CopyToHost();
 		m_zz->Transform(m_imgF, m_img);
 		m_rlc->Encode(m_img, pBstr);
 		pBstr->flush();
