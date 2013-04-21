@@ -6,36 +6,25 @@ __constant float c2 = 0.9238795325f;
 __constant float c3 = 0.8314696123f;
 __constant float c4 = 0.7071067812f;
 
-__kernel void dct_transform8(__global float * pSrc, int srcStep, __global float * pDst, int dstStep, int width)
+__kernel void dct8x8(__local float *pSrc, int srcStep, __local float * pDst, dstStep)
 {
-	int ly = get_local_id(0);
-	int lx = get_local_id(1);
-	int lsy = get_local_size(0);
-	int lsx = get_local_size(1);
-	int gy = get_global_id(0);
-	int gx = get_global_id(1);
-	int oy = srcStep == 1 ? 1 : 8;
-	int ox = srcStep == 1 ? 8 : 1;
+	__local float * srcVector0 = pSrc;
+	__local float * srcVector1 = srcVector0 + srcStep;
+        __local float * srcVector2 = srcVector1 + srcStep;
+        __local float * srcVector3 = srcVector2 + srcStep;
+        __local float * srcVector4 = srcVector3 + srcStep;
+        __local float * srcVector5 = srcVector4 + srcStep;
+        __local float * srcVector6 = srcVector5 + srcStep;
+        __local float * srcVector7 = srcVector6 + srcStep;
 
-	int index = (gy*lsy+ly)*oy*width + (gx*lsx+lx)*ox;
-	
-	__global float * srcVector0 = pSrc + index;
-	__global float * srcVector1 = srcVector0 + srcStep;
-        __global float * srcVector2 = srcVector1 + srcStep;
-        __global float * srcVector3 = srcVector2 + srcStep;
-        __global float * srcVector4 = srcVector3 + srcStep;
-        __global float * srcVector5 = srcVector4 + srcStep;
-        __global float * srcVector6 = srcVector5 + srcStep;
-        __global float * srcVector7 = srcVector6 + srcStep;
-
-	__global float * dstVector0 = pDst + index;
-	__global float * dstVector1 = dstVector0 + dstStep;
-        __global float * dstVector2 = dstVector1 + dstStep;
-        __global float * dstVector3 = dstVector2 + dstStep;
-        __global float * dstVector4 = dstVector3 + dstStep;
-        __global float * dstVector5 = dstVector4 + dstStep;
-        __global float * dstVector6 = dstVector5 + dstStep;
-        __global float * dstVector7 = dstVector6 + dstStep;
+	__local float * dstVector0 = pDst;
+	__local float * dstVector1 = dstVector0 + dstStep;
+        __local float * dstVector2 = dstVector1 + dstStep;
+        __local float * dstVector3 = dstVector2 + dstStep;
+        __local float * dstVector4 = dstVector3 + dstStep;
+        __local float * dstVector5 = dstVector4 + dstStep;
+        __local float * dstVector6 = dstVector5 + dstStep;
+        __local float * dstVector7 = dstVector6 + dstStep;
 	
         float X07P = (*srcVector0) + (*srcVector7);
         float X07M = (*srcVector0) - (*srcVector7);
@@ -74,3 +63,37 @@ __kernel void dct_transform8(__global float * pSrc, int srcStep, __global float 
         (*dstVector5) = ( c3 * X34Mc4X16M25MMM + s3 * X07Mc4X16M25MPM );
         (*dstVector7) = ( s1 * X07Mc4X16M25MPP - c1 * X34Mc4X16M25MMP );
 }
+
+__kernel void dct_transform(__global float * pSrc, __global float * pDst, int height, int width)
+{
+	__local float tmp[64];
+	__local float src[64];
+	
+	int lid = get_local_id(0);
+	int gy = get_group_id(0);
+	int gx = get_group_id(1);
+	int lsy = get_local_size(0);
+	int lsx = get_local_size(1);
+	
+	int srcIndex = gy*8*width + gx*8;
+	
+	__local float * localPtr = &src[lid*8];
+	__global float * srcPtr = &pSrc[srcIndex + lid*width];
+	for(int i=0;i<8;i++)
+	{
+		*(localPtr++) = *(srcPtr++);
+	}
+	
+	dct8x8(&src[8*lid], 1, &tmp[8*lid], 1);
+	barrier(CLK_LOCAL_MEM_FENCE);
+	dct8x8(&tmp[lid], 8, &src[lid], 8);
+	barrier(CLK_LOCAL_MEM_FENCE);
+	
+	localPtr = &src[lid*8];
+	__global float * dstPtr = &pDst[srcIndex + lid*width];
+	for(int i=0;i<8;i++)
+	{
+		*(dstPtr++) = *(localPtr++);
+	}
+}
+

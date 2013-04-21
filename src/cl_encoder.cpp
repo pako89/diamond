@@ -67,7 +67,7 @@ void CCLEncoder::init(CImageFormat fmt)
 		}
 	}
 	this->m_imgF = new CCLImage<float>(this->m_h, fmt);
-	this->m_dct = new CCLDCT(this->m_h, m_program, "dct_transform8");
+	this->m_dct = new CCLDCT(this->m_h, m_program, "dct_transform");
 	CBasicEncoder::init(fmt);
 }
 
@@ -107,6 +107,7 @@ bool CCLEncoder::Encode(CSequence * pSeq, CBitstream * pBstr)
 	CIDCT * idct = new CIDCT();
 	CIQuant * iquant = new CIQuant();
 	int gop = 4;
+	CCLImage<float> * tmpF = new CCLImage<float>(m_h, m_imgF->getFormat());
 	for(int i=0;i<sos.frames_number;i++)
 	{
 		if(!pSeq->ReadNext())
@@ -142,6 +143,7 @@ bool CCLEncoder::Encode(CSequence * pSeq, CBitstream * pBstr)
 		}
 	}
 	dbg("\n");
+	delete tmpF;
 	delete idct;
 	delete iquant;
 	return false;
