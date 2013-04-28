@@ -64,6 +64,32 @@ T clamp(U val)
 	return (T)val;
 }
 
+template <class T>
+T max(T v1, T v2)
+{
+	return (v1 > v2) ? v1 : v2;
+}
+
+template <class T>
+T min(T v1, T v2)
+{
+	return (v1 < v2) ? v1 : v2;
+}
+
+template <class T>
+T product(T * ptr, int num)
+{
+	if(num > 0)
+	{
+		T ret = ptr[0];
+		for(int i=1; i < num; i++)
+		{
+			ret *= ptr[i];
+		}
+		return ret;
+	}
+}
+
 template <class T, class U> 
 void clampImg(avlib::CImage<T> * src, avlib::CImage<U> * dst)
 {

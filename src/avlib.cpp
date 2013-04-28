@@ -33,15 +33,33 @@ CSize::CSize() :
 	Width(0)
 {
 }
-
-CSize::CSize(int height, int width) : 
-	Height(height),
-	Width(width)
+	
+CSize::CSize(const CSize & size, bool align)
 {
+	setSize(size.Height, size.Width, align);
+}
+
+CSize::CSize(int height, int width, bool align)
+{
+	setSize(height, width, align);
 }
 
 CSize::~CSize()
 {
+}
+
+void CSize::setSize(int height, int width, bool align)
+{
+	if(align)
+	{
+		this->Height = height/8*8;
+		this->Width = width/8*8;
+	}
+	else
+	{
+		this->Height = height;
+		this->Width = width;
+	}
 }
 
 bool CSize::operator==(int val)

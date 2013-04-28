@@ -3,16 +3,15 @@
 namespace avlib
 {
 
-CCLQuant::CCLQuant(cl_handle h, cl_program program, const char * kernel) : 
-	ICLKernel(h, program, kernel)
+CCLQuant::CCLQuant(CCLDevice * dev, cl_program program, const char * kernel) : 
+	ICLKernel(dev, program, kernel)
 {
-	this->m_q = new CCLImage<float>(m_h, CSize(8, 8), CL_MEM_READ_ONLY);
+	this->m_q = new CCLImage<float>(this->m_dev, CSize(8, 8), CL_MEM_READ_ONLY);
 }
 
 void CCLQuant::setTables(const uint8_t * YQ, const uint8_t * UQ, const uint8_t * VQ, int qp)
 {
 	CQuant::setTables(YQ, UQ, VQ, qp);
-	dbg("dupa\n");
 	dynamic_cast<CCLImage<float>*>(m_q)->CopyToDevice();
 }
 
@@ -58,10 +57,9 @@ void CCLQuant::Transform(CImage<float> * src, CImage<float> * dst)
 			err = clSetKernelArg(m_kernel, 4, sizeof(width), &width);
 			if(CL_SUCCESS != err) throw utils::StringFormatException("clSetKernelArg(%d)\n", err);
 			
-			err = clEnqueueNDRangeKernel(m_h.queue, m_kernel, 2, NULL, global_work_size, local_work_size, 0, NULL, NULL);
-			if(CL_SUCCESS != err) throw utils::StringFormatException("clEnqueueNDRangeKernel(%d)\n", err);
+			EnqueueNDRangeKernel(2, global_work_size, local_work_size, 0, NULL, NULL);
 			
-			err = clFinish(m_h.queue);
+			err = clFinish(m_dev->getCommandQueue());
 			if(CL_SUCCESS != err) throw utils::StringFormatException("clFinish(%d)\n", err);
 		}
 	}

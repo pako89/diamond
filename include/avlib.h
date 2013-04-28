@@ -20,8 +20,10 @@ class CSize
 {
 public:
 	CSize();
-	CSize(int height, int width);
+	CSize(const CSize & size, bool align = false);
+	CSize(int height, int width, bool align=false);
 	~CSize();
+	void setSize(int height, int width, bool align=false);
 	bool operator==(int val);
 	bool operator==(const CSize src);
 	bool operator!=(int val);

@@ -1,6 +1,8 @@
 #include <basic_encoder.h>
 #include <log.h>
 
+module("BasicEncoder");
+
 namespace avlib
 {
 

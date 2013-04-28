@@ -4,16 +4,16 @@ namespace avlib
 {
 
 template <class T>
-CCLComponent<T>::CCLComponent(cl_handle h, cl_mem_flags mem_flags) :
-	m_clh(h),
+CCLComponent<T>::CCLComponent(CCLDevice * dev, cl_mem_flags mem_flags) :
+	m_dev(dev),
 	m_cldata(0),
 	m_mem_flags(mem_flags)
 {
 }
 
 template <class T>
-CCLComponent<T>::CCLComponent(cl_handle h, CSize size, cl_mem_flags mem_flags) :
-	m_clh(h),
+CCLComponent<T>::CCLComponent(CCLDevice * dev, CSize size, cl_mem_flags mem_flags) :
+	m_dev(dev),
 	m_cldata(0),
 	m_mem_flags(mem_flags)
 {
@@ -21,9 +21,9 @@ CCLComponent<T>::CCLComponent(cl_handle h, CSize size, cl_mem_flags mem_flags) :
 }
 
 template <class T>
-CCLComponent<T>::CCLComponent(cl_handle h, int height, int width, cl_mem_flags mem_flags) :
+CCLComponent<T>::CCLComponent(CCLDevice * dev, int height, int width, cl_mem_flags mem_flags) :
+	m_dev(dev),
 	CComponent<T>(height, width),
-	m_clh(h),
 	m_cldata(0),
 	m_mem_flags(mem_flags)
 {
@@ -61,7 +61,7 @@ bool CCLComponent<T>::setSize(CSize size, cl_mem_flags mem_flags)
 			clReleaseMemObject(this->m_cldata);
 		}
 		cl_int err;
-		this->m_cldata = clCreateBuffer(this->m_clh.context, mem_flags, this->getBytesCount(), NULL, &err);
+		this->m_cldata = clCreateBuffer(this->m_dev->getContext(), mem_flags, this->getBytesCount(), NULL, &err);
 		if(!this->m_cldata || CL_SUCCESS != err)
 		{
 			throw utils::StringFormatException("clCreatebuffer(%d)[cl_mem_flags=%x]\n", err, mem_flags);
@@ -77,16 +77,10 @@ bool CCLComponent<T>::setSize(CSize size, cl_mem_flags mem_flags)
 }
 
 template <class T>
-void CCLComponent<T>::setHandle(cl_handle h)
-{
-	this->m_clh = h;
-}
-
-template <class T>
 void CCLComponent<T>::CopyToDevice()
 {
 	cl_int err;
-	err = clEnqueueWriteBuffer(this->m_clh.queue, this->m_cldata, CL_TRUE, 0, this->getBytesCount(), this->m_data, 0, NULL, NULL);
+	err = clEnqueueWriteBuffer(this->m_dev->getCommandQueue(), this->m_cldata, CL_TRUE, 0, this->getBytesCount(), this->m_data, 0, NULL, NULL);
 	if(CL_SUCCESS != err)
 	{
 		throw utils::StringFormatException("clEnqueueWriteBuffer(%d)\n", err);
@@ -103,7 +97,7 @@ template <class T>
 void CCLComponent<T>::CopyToHost()
 {
 	cl_int err;
-	err = clEnqueueReadBuffer(this->m_clh.queue, this->m_cldata, CL_TRUE, 0, this->getBytesCount(), this->m_data, 0, NULL, NULL);
+	err = clEnqueueReadBuffer(this->m_dev->getCommandQueue(), this->m_cldata, CL_TRUE, 0, this->getBytesCount(), this->m_data, 0, NULL, NULL);
 	if(CL_SUCCESS != err)
 	{
 		throw utils::StringFormatException("clEnqueueReadBuffer(%d)\n", err);

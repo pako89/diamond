@@ -5,53 +5,40 @@ namespace avlib
 
 CCLEncoder::CCLEncoder()
 {
+	m_clPolicy = new CCLFirstGPUDevicePolicy();
 }
 
 CCLEncoder::~CCLEncoder()
 {
-	if(m_h.context)
+	if(NULL != m_clPolicy)
 	{
-		clReleaseContext(m_h.context);
-	}
-	if(m_h.queue)
-	{
-		clReleaseCommandQueue(m_h.queue);
+		delete m_clPolicy;
 	}
 }
 
 void CCLEncoder::init(CImageFormat fmt)
 {
-	cl_int dev_type = CL_DEVICE_TYPE_GPU;
+	m_dev = this->m_clPolicy->getDevice();
+	if(!m_dev.isValid())
+	{
+		throw utils::StringFormatException("can not get device due to policy\n");
+	}
+	m_dev.createContext();
+	m_dev.createCommandQueue();
 	cl_int err;
-	if(CL_SUCCESS != (err = clGetPlatformIDs(1, &m_h.platform_id, NULL))) 
-	{
-		throw utils::StringFormatException("clGetPlatformIDs(%d)\n", err);
-	}
-	if(CL_SUCCESS != (err = clGetDeviceIDs(m_h.platform_id, dev_type, 1, &m_h.device_id, NULL)))
-	{
-		throw utils::StringFormatException("clGetDeviceIDs(%d)\n", err);
-	}
-	if((m_h.context = clCreateContext(NULL, 1, &m_h.device_id, NULL, NULL, &err)) == 0 || CL_SUCCESS != err)
-	{
-		throw utils::StringFormatException("clCreateContext(%d)\n", err);
-	}
-	if((m_h.queue = clCreateCommandQueue(m_h.context, m_h.device_id, 0, &err)) == 0 || CL_SUCCESS != err)
-	{
-		throw utils::StringFormatException("clCreateCommandQueue(%d)\n", err);
-	}
-	std::string src = get_src_from_file((char*)"src/cl/kernel.cl");
+	std::string src = this->get_src_from_file((char*)"src/cl/kernel.cl");
 	const char * csrc = src.c_str();
-	if((m_program = clCreateProgramWithSource(m_h.context, 1, &csrc, NULL, &err)) == 0 || CL_SUCCESS != err)
+	if((m_program = clCreateProgramWithSource(m_dev.getContext(), 1, &csrc, NULL, &err)) == 0 || CL_SUCCESS != err)
 	{
 		throw utils::StringFormatException("clCreateProgramWithSource(%d)\n", err);
 	}
 	if(CL_SUCCESS != (err = clBuildProgram(m_program, 0, NULL, NULL, NULL, NULL)))
 	{
 		size_t len;
-		if(CL_SUCCESS == (err = clGetProgramBuildInfo(m_program, m_h.device_id, CL_PROGRAM_BUILD_LOG, 0, NULL, &len)))
+		if(CL_SUCCESS == (err = clGetProgramBuildInfo(m_program, m_dev.getId(), CL_PROGRAM_BUILD_LOG, 0, NULL, &len)))
 		{
 			char * build_log = new char[len];
-			if(CL_SUCCESS == (err = clGetProgramBuildInfo(m_program, m_h.device_id, CL_PROGRAM_BUILD_LOG, len, build_log, NULL)))
+			if(CL_SUCCESS == (err = clGetProgramBuildInfo(m_program, m_dev.getId(), CL_PROGRAM_BUILD_LOG, len, build_log, NULL)))
 			{
 				throw utils::StringFormatException("Build log: %s\n", build_log);
 			}
@@ -66,9 +53,9 @@ void CCLEncoder::init(CImageFormat fmt)
 			throw utils::StringFormatException("clGetProgramBuildInfo(%d)\n", err);
 		}
 	}
-	this->m_imgF = new CCLImage<float>(this->m_h, fmt);
-	this->m_dct = new CCLDCT(this->m_h, m_program, "dct_transform");
-	this->m_quant = new CCLQuant(this->m_h, m_program, "quant_transform");
+	this->m_imgF = new CCLImage<float>(&this->m_dev, fmt);
+	this->m_dct = new CCLDCT(&this->m_dev, m_program, "dct_transform");
+	this->m_quant = new CCLQuant(&this->m_dev, m_program, "quant_transform");
 	this->m_quant->setTables(1);
 	CBasicEncoder::init(fmt);
 }
@@ -109,7 +96,7 @@ bool CCLEncoder::Encode(CSequence * pSeq, CBitstream * pBstr)
 	CIDCT * idct = new CIDCT();
 	CIQuant * iquant = new CIQuant();
 	int gop = 4;
-	CCLImage<float> * tmpF = new CCLImage<float>(m_h, m_imgF->getFormat());
+	CCLImage<float> * tmpF = new CCLImage<float>(&m_dev, m_imgF->getFormat());
 	for(int i=0;i<sos.frames_number;i++)
 	{
 		if(!pSeq->ReadNext())

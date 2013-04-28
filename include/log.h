@@ -6,9 +6,14 @@
 #define _LOG(...)	fprintf(_FILE, __VA_ARGS__)
 
 #ifdef DEBUG
+
+#define module(name)	
 #define dbg(...)	_LOG(__VA_ARGS__)
+#define dbgf(...)	_LOG("%s: ", __FUNCTION__);	\
+			_LOG(__VA_ARGS__)
 #else
-#define dbg(...)	
+#define module(name)	do{}while(0)
+#define dbg(...)	do{}while(0)
 #endif
 
 #endif //_LOG_H

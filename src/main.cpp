@@ -11,7 +11,7 @@
 #include <cl_encoder.h>
 #include <log.h>
 
-
+module("Main");
 
 #ifdef WIN32
 #define exit(v)		{system("pause"); exit((v));}

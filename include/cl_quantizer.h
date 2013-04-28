@@ -4,7 +4,7 @@
 #include <utils.h>
 #include <avlib.h>
 #include <quantizer.h>
-#include <cl_common.h>
+
 #include <cl_kernel.h>
 #include <cl_image.h>
 
@@ -14,7 +14,7 @@ namespace avlib
 class CCLQuant : public CQuant, public ICLKernel
 {
 public:
-	CCLQuant(cl_handle h, cl_program program, const char * kernel);
+	CCLQuant(CCLDevice * dev, cl_program program, const char * kernel);
 	virtual void Transform(CImage<float> * src, CImage<float> * dst);
 	virtual void setTables(const uint8_t * YQ, const uint8_t * UQ, const uint8_t * VQ, int qp);
 protected:

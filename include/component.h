@@ -24,6 +24,8 @@ public:
 	virtual CComponent & operator+=(const CComponent & src);
 	virtual int getWidth(void);
 	virtual int getHeight(void);
+	virtual int getOriginalWidth(void);
+	virtual int getOriginalHeight(void);
 	virtual CSize getSize(void);
 	virtual int getPointsCount(void);
 	virtual bool setSize(CSize size);
@@ -32,6 +34,7 @@ public:
 protected:
 	T * m_data;
 	CSize m_size;
+	CSize m_original_size;
 	size_t m_bytes;
 	void release();
 

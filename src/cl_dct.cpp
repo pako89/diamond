@@ -4,8 +4,8 @@
 namespace avlib
 {
 
-CCLDCT::CCLDCT(cl_handle h, cl_program program, const char * kernel) :
-	ICLKernel(h, program, kernel)
+CCLDCT::CCLDCT(CCLDevice * dev, cl_program program, const char * kernel) :
+	ICLKernel(dev, program, kernel)
 {
 }
 
@@ -50,10 +50,9 @@ void CCLDCT::Transform(CImage<float> * src, CImage<float> * dst)
 			err = clSetKernelArg(m_kernel, 3, sizeof(width), &width);
 			if(CL_SUCCESS != err) throw utils::StringFormatException("clSetKernelArg(%d)\n", err);
 			
-			err = clEnqueueNDRangeKernel(m_h.queue, m_kernel, 2, NULL, global_work_size, local_work_size, 0, NULL, NULL);
-			if(CL_SUCCESS != err) throw utils::StringFormatException("clEnqueueNDRangeKernel(%d)\n", err);
+			EnqueueNDRangeKernel(2, global_work_size, local_work_size, 0, NULL, NULL);
 			
-			err = clFinish(m_h.queue);
+			err = clFinish(m_dev->getCommandQueue());
 			if(CL_SUCCESS != err) throw utils::StringFormatException("clFinish(%d)\n", err);
 		}
 	}

@@ -9,14 +9,16 @@ namespace avlib
 template <class T>
 CComponent<T>::CComponent(void) : 
 	m_data(NULL),
-	m_size(0, 0)
+	m_size(0, 0),
+	m_original_size(0, 0)
 {
 }
 
 template <class T>
 CComponent<T>::CComponent(CSize size) :
 	m_data(NULL),
-	m_size(0, 0)
+	m_size(0, 0),
+	m_original_size(0, 0)
 {
 	setSize(size);
 }
@@ -25,7 +27,8 @@ CComponent<T>::CComponent(CSize size) :
 template <class T>
 CComponent<T>::CComponent(int height, int width) :
 	m_data(NULL),
-	m_size(0, 0)
+	m_size(0, 0),
+	m_original_size(0, 0)
 {
 	setSize(height, width);
 }
@@ -33,7 +36,8 @@ CComponent<T>::CComponent(int height, int width) :
 template <class T>
 CComponent<T>::CComponent(const CComponent<T> & src) :
 	m_data(NULL),
-	m_size(0, 0)
+	m_size(0, 0),
+	m_original_size(0, 0)
 {
 	operator=(src);
 }
@@ -102,6 +106,18 @@ template <class T>
 int CComponent<T>::getHeight(void)
 {
 	return this->m_size.Height;
+}
+
+template <class T>
+int CComponent<T>::getOriginalWidth(void)
+{
+	return this->m_original_size.Width;
+}
+
+template <class T>
+int CComponent<T>::getOriginalHeight(void)
+{
+	return this->m_original_size.Height;
 }
 
 template <class T>
