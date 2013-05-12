@@ -8,17 +8,6 @@
 namespace avlib
 {
 
-template<class T>
-class CHuffmanQuad
-{
-public:
-	CHuffmanQuad();
-	virtual ~CHuffmanQuad();
-       	CHuffman<T> * DCValue;
-	CHuffman<uint8_t> * ACRun;
-       	CHuffman<T> * ACValue;
-};
-
 template <class T>
 class CRLC : public utils::ITimer
 {
@@ -26,9 +15,9 @@ public:
 	CRLC();
 	virtual ~CRLC();
 	virtual void Encode(CImage<T> * pImg, CBitstream * pBstr);
-	virtual void EncodeBlock(T * pSrc, CPoint p, CSize s, CBitstream * pBstr);
+	virtual void EncodeBlock(T * pSrc, CPoint p, CSize s, CBitstream * pBstr) = 0;
 protected:
-	CHuffmanQuad<T> m_quads[3];
+	virtual void doEncode(CImage<T> * pImg, CBitstream * pBstr);
 };
 
 template <class T>
@@ -38,9 +27,8 @@ public:
 	CIRLC();
 	virtual ~CIRLC();
 	virtual void Decode(CBitstream * pBstr, CImage<T> * pImg);
-	virtual void DecodeBlock(CBitstream * pBstr, T * pDst, CPoint p, CSize s);
+	virtual void DecodeBlock(CBitstream * pBstr, T * pDst, CPoint p, CSize s) = 0;
 protected:
-	CHuffmanQuad<T> m_quads[3];
 };
 
 }

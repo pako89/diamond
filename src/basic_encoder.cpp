@@ -40,7 +40,7 @@ void CBasicEncoder::init(CImageFormat fmt)
 	if(NULL == m_dct) m_dct = new CDCT();
 	if(NULL == m_quant) m_quant = new CQuant();
 	if(NULL == m_zz) m_zz = new CZigZag<float, int16_t>();
-	if(NULL == m_rlc) m_rlc = new CRLC<int16_t>();
+	if(NULL == m_rlc) m_rlc = new CDynamicRLC<int16_t>();
 }
 
 sos_marker_t CBasicEncoder::write_sos(CSequence * pSeq, CBitstream * pBstr)

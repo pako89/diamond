@@ -8,6 +8,7 @@
 #include <quantizer.h>
 #include <zigzag.h>
 #include <rlc.h>
+#include <dynamic_rlc.h>
 
 namespace avlib
 {

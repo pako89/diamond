@@ -35,7 +35,7 @@ bool CBasicDecoder::Decode(CBitstream * pBstr, CSequence * pSeq)
 	CIDCT * idct = new CIDCT();
 	CIQuant * iquant = new CIQuant();
 	CIZigZag<int16_t, float> * izigzag = new CIZigZag<int16_t, float>();
-	CIRLC<int16_t> * irlc = new CIRLC<int16_t>();
+	CIRLC<int16_t> * irlc = new CDynamicIRLC<int16_t>();
 	sof_marker_t sof;
 	for(uint32_t n = 0 ; n < sos.frames_number; n++)
 	{
