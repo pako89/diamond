@@ -7,11 +7,13 @@
 #include <cl_image.h>
 #include <cl_dct.h>
 #include <cl_quantizer.h>
+#include <cl_zigzag.h>
 #include <cl_base.h>
 #include <cl_policy.h>
 #include <CL/opencl.h>
 #include <fstream>
 #include <string>
+#include <mtimer.h>
 
 namespace avlib
 {
@@ -28,6 +30,8 @@ protected:
 	CCLDevice m_dev;
 	cl_program m_program;
 	CCLDevicePolicy * m_clPolicy;
+	utils::CTimer m_timerCopyToDevice;
+	utils::CTimer m_timerCopyToHost;
 };
 
 }

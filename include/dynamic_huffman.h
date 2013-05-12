@@ -1,10 +1,11 @@
-#ifndef _HUFFMAN_TREE_H
-#define _HUFFMAN_TREE_H
+#ifndef _DYNAMIC_HUFFMAN_TREE_H
+#define _DYNAMIC_HUFFMAN_TREE_H
 
 #include <bitstream.h>
 #include <stdio.h>
 #include <stdint.h>
 #include <utils.h>
+#include <huffman.h>
 
 namespace avlib
 {
@@ -25,26 +26,18 @@ public:
 
 };
 
-enum HuffmanItemType
-{
-	None = 0,
-	Leaf = 1,
-	Node = 2,
-	New = 3,
-	EOB = 4,
-	ERROR
-};
-
 template <class T> 
-class CHuffmanTree
+class CDynamicHuffman : public CHuffman<T>
 {
 public:
-	CHuffmanTree();
-	CHuffmanTree(const CHuffmanTree & source);
-	~CHuffmanTree(void);
-	bool EncodeBlock(T * ptr,uint32_t size,CBitstream * bstr= NULL,bool inc_new = true);
+	CDynamicHuffman();
+	CDynamicHuffman(const CDynamicHuffman & source);
+	~CDynamicHuffman(void);
+	bool EncodeBlock(T * ptr,uint32_t size,CBitstream * bstr, bool inc_new);
+	bool EncodeBlock(T * ptr,uint32_t size,CBitstream * bstr= NULL);
 	HuffmanItemType DecodeBlock(T * ptr,uint32_t size,CBitstream * bstr= NULL);
-	bool Encode(T symbol,CBitstream * bitstream = NULL,bool inc_new = true);
+	bool Encode(T symbol,CBitstream * bitstream, bool inc_new);
+	bool Encode(T symbol,CBitstream * bitstream = NULL);
 	bool EncodeCtl(HuffmanItemType itemtype,CBitstream * bitstream = NULL);
 	HuffmanItemType Decode(CBitstream * bitstream,T * symbol);
 	void Reset();
@@ -68,7 +61,7 @@ public:
 	void Init();
 
 	void Insert(T symbol,HuffmanItemType itemtype = Leaf);
-	void Copy(const CHuffmanTree & source);
+	void Copy(const CDynamicHuffman & source);
 };
 
 template <class T> 
@@ -96,7 +89,7 @@ public:
 	CHuffmanItem * Parent;		
 	HuffmanItemType ItemType;	
 
-friend class CHuffmanTree<T>;
+friend class CDynamicHuffman<T>;
 };
 
 

@@ -15,10 +15,9 @@ class CCLQuant : public CQuant, public ICLKernel
 {
 public:
 	CCLQuant(CCLDevice * dev, cl_program program, const char * kernel);
-	virtual void Transform(CImage<float> * src, CImage<float> * dst);
 	virtual void setTables(const uint8_t * YQ, const uint8_t * UQ, const uint8_t * VQ, int qp);
 protected:
-	
+	virtual void doTransform(CImage<float> * src, CImage<float> * dst);
 };
 
 

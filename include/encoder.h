@@ -4,11 +4,13 @@
 
 #include <sequence.h>
 #include <bitstream.h>
+#include <mtimer.h>
+#include <utils.h>
 
 namespace avlib
 {
 
-class CEncoder
+class CEncoder : public utils::ITimer
 {
 public:
 	CEncoder();

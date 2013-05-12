@@ -105,4 +105,5 @@ void CCLComponent<T>::CopyToHost()
 }
 
 INSTANTIATE(CCLComponent, float);
+INSTANTIATE(CCLComponent, int16_t);
 }

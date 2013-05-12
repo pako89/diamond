@@ -54,8 +54,10 @@ void CCLEncoder::init(CImageFormat fmt)
 		}
 	}
 	this->m_imgF = new CCLImage<float>(&this->m_dev, fmt);
+	this->m_img = new CCLImage<int16_t>(&this->m_dev, fmt);
 	this->m_dct = new CCLDCT(&this->m_dev, m_program, "dct_transform");
 	this->m_quant = new CCLQuant(&this->m_dev, m_program, "quant_transform");
+	this->m_zz = new CCLZigZag<float, int16_t>(&this->m_dev, m_program, "lut_transform_float_int16");
 	this->m_quant->setTables(1);
 	CBasicEncoder::init(fmt);
 }
@@ -91,9 +93,14 @@ std::string CCLEncoder::get_src_from_file(char * file_name)
 
 bool CCLEncoder::Encode(CSequence * pSeq, CBitstream * pBstr)
 {
+#if 0
 	init(pSeq->getFormat());
 	sos_marker_t sos = write_sos(pSeq, pBstr);
-	CIDCT * idct = new CIDCT();
+#else
+	m_timer.start();
+	init(pSeq->getFormat());
+	sos_marker_t sos = write_sos(pSeq, pBstr);
+	CIDCT * idct = new CCLIDCT(&this->m_dev, m_program, "idct_transform");
 	CIQuant * iquant = new CIQuant();
 	int gop = 4;
 	CCLImage<float> * tmpF = new CCLImage<float>(&m_dev, m_imgF->getFormat());
@@ -115,13 +122,18 @@ bool CCLEncoder::Encode(CSequence * pSeq, CBitstream * pBstr)
 			sof = write_sof(pBstr, FRAME_TYPE_P);
 			(*m_imgF) -= (*m_imgLast);
 		}
+		m_timerCopyToDevice.start();
 		dynamic_cast<CCLImage<float>*>(m_imgF)->CopyToDevice();
+		m_timerCopyToDevice.stop();
 		m_dct->Transform(m_imgF, m_imgF);
 		m_quant->Transform(m_imgF, m_imgF);
-		dynamic_cast<CCLImage<float>*>(m_imgF)->CopyToHost();
+		m_timerCopyToHost.start();
 		m_zz->Transform(m_imgF, m_img);
+		dynamic_cast<CCLImage<int16_t>*>(m_img)->CopyToHost();
+		m_timerCopyToHost.stop();
 		m_rlc->Encode(m_img, pBstr);
 		pBstr->flush();
+		dynamic_cast<CCLImage<float>*>(m_imgF)->CopyToHost();
 		iquant->Transform(m_imgF, m_imgF);
 		idct->Transform(m_imgF, m_imgF);
 		if(sof.frame_type == FRAME_TYPE_P)
@@ -134,10 +146,19 @@ bool CCLEncoder::Encode(CSequence * pSeq, CBitstream * pBstr)
 		}
 	}
 	dbg("\n");
+	m_timer.stop();
+	dbg("Timer total         : %f\n", m_timer.getTotalSeconds());
+	dbg("Timer Copy To Device: %f\n", m_timerCopyToDevice.getTotalSeconds());
+	dbg("Timer Copy To Host  : %f\n", m_timerCopyToHost.getTotalSeconds());
+	dbg("Timer DCT           : %f\n", m_dct->getTimer().getTotalSeconds());
+	dbg("Timer Quant         : %f\n", m_quant->getTimer().getTotalSeconds());
+	dbg("Timer Zig Zag       : %f\n", m_zz->getTimer().getTotalSeconds());
+	dbg("Timer RLC           : %f\n", m_rlc->getTimer().getTotalSeconds());
 	delete tmpF;
 	delete idct;
 	delete iquant;
 	return false;
+#endif
 }
 
 }

@@ -17,12 +17,12 @@ CHuffmanQuad<T>::~CHuffmanQuad()
 template <class T>
 CRLC<T>::CRLC()
 {
-	m_quads[0].DCValue = new CHuffmanTree<T>();
-	m_quads[0].ACRun = new CHuffmanTree<uint8_t>();
-	m_quads[0].ACValue = new CHuffmanTree<T>();
-	m_quads[2].ACRun = m_quads[1].ACRun = new CHuffmanTree<uint8_t>();
-	m_quads[2].DCValue = m_quads[1].DCValue = new CHuffmanTree<T>();
-	m_quads[2].ACValue = m_quads[1].ACValue = new CHuffmanTree<T>();
+	m_quads[0].DCValue = new CDynamicHuffman<T>();
+	m_quads[0].ACRun = new CDynamicHuffman<uint8_t>();
+	m_quads[0].ACValue = new CDynamicHuffman<T>();
+	m_quads[2].ACRun = m_quads[1].ACRun = new CDynamicHuffman<uint8_t>();
+	m_quads[2].DCValue = m_quads[1].DCValue = new CDynamicHuffman<T>();
+	m_quads[2].ACValue = m_quads[1].ACValue = new CDynamicHuffman<T>();
 }
 
 template <class T>
@@ -39,6 +39,7 @@ CRLC<T>::~CRLC()
 template <class T>
 void CRLC<T>::Encode(CImage<T> * pImg, CBitstream * pBstr)
 {
+	m_timer.start();
 	for(int k=0;k<pImg->getComponents(); k++)
 	{
 		CSize size((*pImg)[k].getHeight(), (*pImg)[k].getWidth());
@@ -51,31 +52,15 @@ void CRLC<T>::Encode(CImage<T> * pImg, CBitstream * pBstr)
 		}
 		pBstr->flush();
 	}
-	
+	m_timer.stop();
 }
 
 template <class T>
 void CRLC<T>::EncodeBlock(T * pSrc, CPoint p, CSize s, CBitstream * pBstr)
 {
-#ifdef PASS_THROUGH
-	T * src = &pSrc[p.Y*s.Width + p.X];
-	for(int y=0;y<8;y++)
-	{
-		for(int x = 0; x<8; x++)
-		{
-			if(y == 0 && x == 0)
-			{
-				m_quads[p.Z].DCValue->Encode(src[y*s.Width+x], pBstr);
-			}
-			else
-			{
-				m_quads[p.Z].ACValue->Encode(src[y*s.Width+x], pBstr);
-			}
-		}
-	}
-#else
 	T * src = &pSrc[p.Y*s.Width + p.X];
 	uint8_t run=0;
+	int counter = 0;
 	for(int y=0;y<8;y++)
 	{
 		for(int x = 0; x<8; x++)
@@ -105,19 +90,17 @@ void CRLC<T>::EncodeBlock(T * pSrc, CPoint p, CSize s, CBitstream * pBstr)
 		m_quads[p.Z].ACRun->Encode(run-1, pBstr);
 		m_quads[p.Z].ACValue->Encode(0, pBstr);
 	}
-
-#endif
 }
 
 template <class T>
 CIRLC<T>::CIRLC()
 {
-	m_quads[0].DCValue = new CHuffmanTree<T>();
-	m_quads[0].ACRun = new CHuffmanTree<uint8_t>();
-	m_quads[0].ACValue = new CHuffmanTree<T>();
-	m_quads[2].DCValue = m_quads[1].DCValue = new CHuffmanTree<T>();
-	m_quads[2].ACRun = m_quads[1].ACRun = new CHuffmanTree<uint8_t>();
-	m_quads[2].ACValue = m_quads[1].ACValue = new CHuffmanTree<T>();
+	m_quads[0].DCValue = new CDynamicHuffman<T>();
+	m_quads[0].ACRun = new CDynamicHuffman<uint8_t>();
+	m_quads[0].ACValue = new CDynamicHuffman<T>();
+	m_quads[2].DCValue = m_quads[1].DCValue = new CDynamicHuffman<T>();
+	m_quads[2].ACRun = m_quads[1].ACRun = new CDynamicHuffman<uint8_t>();
+	m_quads[2].ACValue = m_quads[1].ACValue = new CDynamicHuffman<T>();
 }
 
 template <class T>

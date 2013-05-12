@@ -1,4 +1,5 @@
 #include <avlib.h>
+#include <utils.h>
 
 namespace avlib
 {
@@ -52,8 +53,22 @@ void CSize::setSize(int height, int width, bool align)
 {
 	if(align)
 	{
-		this->Height = height/8*8;
-		this->Width = width/8*8;
+		if(height%8)
+		{
+			this->Height = height + 8-(height%8);
+		}
+		else
+		{
+			this->Height = height;
+		}
+		if(width%8)
+		{
+			this->Width = width + 8-(width%8);
+		}
+		else
+		{
+			this->Width = width;
+		}
 	}
 	else
 	{

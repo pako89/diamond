@@ -3,11 +3,12 @@
 
 #include <encoder.h>
 #include <proto.h>
-#include <huffman.h>
+#include <dynamic_huffman.h>
 #include <dct.h>
 #include <quantizer.h>
 #include <zigzag.h>
 #include <rlc.h>
+#include <mtimer.h>
 
 namespace avlib
 {
@@ -25,7 +26,7 @@ protected:
 	CImage<float> * m_imgF;
 	CImage<float> * m_imgLast;
 	CImage<int16_t> * m_img;
-	CHuffmanTree<int16_t> * m_htree;
+	CDynamicHuffman<int16_t> * m_htree;
 	CDCT * m_dct;
 	CQuant * m_quant;
 	CZigZag<float, int16_t> * m_zz;

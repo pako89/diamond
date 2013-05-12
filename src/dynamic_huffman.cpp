@@ -35,14 +35,14 @@ void CHuffmanCode::Write(CBitstream * bitstream)
 }
 
 template <class T> 
-CHuffmanTree<T>::CHuffmanTree() 
+CDynamicHuffman<T>::CDynamicHuffman() 
 {
 	this->symbol_size = 8*sizeof(T);
 	this->Init();
 }
 
 template <class T> 
-CHuffmanTree<T>::CHuffmanTree(const CHuffmanTree<T> & source)
+CDynamicHuffman<T>::CDynamicHuffman(const CDynamicHuffman<T> & source)
 {
 	this->symbol_size = source.symbol_size;
 	this->First = NULL;
@@ -51,25 +51,25 @@ CHuffmanTree<T>::CHuffmanTree(const CHuffmanTree<T> & source)
 }
 
 template <class T> 
-CHuffmanTree<T>::~CHuffmanTree(void) 
+CDynamicHuffman<T>::~CDynamicHuffman(void) 
 {
 	this->DeleteAll();
 }
 
 template <class T>
-void CHuffmanTree<T>::setSymbolSize(uint8_t ss)
+void CDynamicHuffman<T>::setSymbolSize(uint8_t ss)
 {
 	this->symbol_size = ss;
 }
 
 template <class T>
-uint8_t CHuffmanTree<T>::getSymbolSize()
+uint8_t CDynamicHuffman<T>::getSymbolSize()
 {
 	return this->symbol_size;
 }
 
 template <class T> 
-void CHuffmanTree<T>::Copy(const CHuffmanTree<T> & source)
+void CDynamicHuffman<T>::Copy(const CDynamicHuffman<T> & source)
 {
 	if(this->First || this->Last)
 		this->DeleteAll();
@@ -92,7 +92,7 @@ void CHuffmanTree<T>::Copy(const CHuffmanTree<T> & source)
 }
 
 template <class T> 
-void CHuffmanTree<T>::Init()				//one node and two leafs: EOB and New at the beggining
+void CDynamicHuffman<T>::Init()				//one node and two leafs: EOB and New at the beggining
 {
 	CHuffmanItem<T> * iEOB = new CHuffmanItem<T>(0,1,NULL,NULL,NULL,NULL,EOB,NULL,3);
 	CHuffmanItem<T> * iNew = new CHuffmanItem<T>(0,1,NULL,NULL,NULL,NULL,New,NULL,2);
@@ -108,7 +108,7 @@ void CHuffmanTree<T>::Init()				//one node and two leafs: EOB and New at the beg
 }
 
 template <class T> 
-void CHuffmanTree<T>::DeleteAll()
+void CDynamicHuffman<T>::DeleteAll()
 {
 	CHuffmanItem<T> * p = NULL;
 	CHuffmanItem<T> * next = NULL;
@@ -123,14 +123,14 @@ void CHuffmanTree<T>::DeleteAll()
 }
 
 template <class T> 
-void CHuffmanTree<T>::Reset()
+void CDynamicHuffman<T>::Reset()
 {
 	this->DeleteAll();
 	this->Init();
 }
 
 template <class T> 
-void CHuffmanTree<T>::Insert(T symbol,HuffmanItemType itemtype)
+void CDynamicHuffman<T>::Insert(T symbol,HuffmanItemType itemtype)
 {
 	this->leafCounter++;
 	CHuffmanItem<T> * u = new CHuffmanItem<T>(First->Value,First->Weight,First,First,First->Left,First->Right,First->ItemType,NULL,First->SN+1);
@@ -150,7 +150,7 @@ void CHuffmanTree<T>::Insert(T symbol,HuffmanItemType itemtype)
 }
 
 template <class T> 
-bool CHuffmanTree<T>::EncodeCtl(HuffmanItemType itemtype,CBitstream * bitstream)
+bool CDynamicHuffman<T>::EncodeCtl(HuffmanItemType itemtype,CBitstream * bitstream)
 {
 	CHuffmanItem<T> * v = this->FindItemType(itemtype);
 	if(v==NULL)
@@ -169,7 +169,13 @@ bool CHuffmanTree<T>::EncodeCtl(HuffmanItemType itemtype,CBitstream * bitstream)
 }
 
 template <class T> 
-bool CHuffmanTree<T>::EncodeBlock(T * ptr,uint32_t size,CBitstream * bstr,bool inc_new)
+bool CDynamicHuffman<T>::EncodeBlock(T * ptr,uint32_t size,CBitstream * bstr)
+{
+	EncodeBlock(ptr, size, bstr, true);
+}
+
+template <class T> 
+bool CDynamicHuffman<T>::EncodeBlock(T * ptr,uint32_t size,CBitstream * bstr,bool inc_new)
 {
 	while(size--)
 		this->Encode(*(ptr++),bstr,inc_new);
@@ -177,7 +183,7 @@ bool CHuffmanTree<T>::EncodeBlock(T * ptr,uint32_t size,CBitstream * bstr,bool i
 }
 
 template <class T> 
-HuffmanItemType CHuffmanTree<T>::DecodeBlock(T * ptr,uint32_t size,CBitstream * bstr)
+HuffmanItemType CDynamicHuffman<T>::DecodeBlock(T * ptr,uint32_t size,CBitstream * bstr)
 {
 	HuffmanItemType itype;
 	T symbol;
@@ -192,7 +198,13 @@ HuffmanItemType CHuffmanTree<T>::DecodeBlock(T * ptr,uint32_t size,CBitstream * 
 }
 
 template <class T> 
-bool CHuffmanTree<T>::Encode(T symbol,CBitstream * bitstream,bool inc_new)	
+bool CDynamicHuffman<T>::Encode(T symbol,CBitstream * bitstream)
+{
+	Encode(symbol, bitstream, true);
+}
+
+template <class T> 
+bool CDynamicHuffman<T>::Encode(T symbol,CBitstream * bitstream,bool inc_new)	
 {
 	CHuffmanItem<T> * v = this->FindLeafValue(symbol);
 	if(v == NULL)
@@ -221,7 +233,7 @@ bool CHuffmanTree<T>::Encode(T symbol,CBitstream * bitstream,bool inc_new)
 }
 
 template <class T> 
-HuffmanItemType CHuffmanTree<T>::Decode(CBitstream * bitstream,T * ret)		
+HuffmanItemType CDynamicHuffman<T>::Decode(CBitstream * bitstream,T * ret)		
 {
 	CHuffmanItem<T> * p = Last;
 	while( p!=NULL && p->ItemType == Node)
@@ -238,7 +250,7 @@ HuffmanItemType CHuffmanTree<T>::Decode(CBitstream * bitstream,T * ret)
 	}
 	if(p == NULL)
 	{
-		fprintf(stderr,"CHuffmanTree: Decode: p == NULL\n");
+		fprintf(stderr,"CDynamicHuffman: Decode: p == NULL\n");
 		return ERROR;
 	}
 	if(p->ItemType == EOB)
@@ -262,7 +274,7 @@ HuffmanItemType CHuffmanTree<T>::Decode(CBitstream * bitstream,T * ret)
 }
 
 template <class T> 
-CHuffmanCode * CHuffmanTree<T>::GetCode(CHuffmanItem<T> * symbol)
+CHuffmanCode * CDynamicHuffman<T>::GetCode(CHuffmanItem<T> * symbol)
 {
 	CHuffmanCode * code = new CHuffmanCode();
 	CHuffmanItem<T> * p = symbol->Parent;
@@ -276,7 +288,7 @@ CHuffmanCode * CHuffmanTree<T>::GetCode(CHuffmanItem<T> * symbol)
 }
 
 template <class T> 
-CHuffmanItem<T> * CHuffmanTree<T>::FindLeafValue(T value)
+CHuffmanItem<T> * CDynamicHuffman<T>::FindLeafValue(T value)
 {
 	CHuffmanItem<T> * p  = this->Last->Prev;
 	while(p && ((p->ItemType == Leaf && p->Value != value) || p->ItemType == EOB || p->ItemType == New || p->ItemType == Node ))
@@ -291,7 +303,7 @@ CHuffmanItem<T> * CHuffmanTree<T>::FindLeafValue(T value)
 }
 
 template <class T> 
-CHuffmanItem<T> * CHuffmanTree<T>::FindItemType(HuffmanItemType itemtype)
+CHuffmanItem<T> * CDynamicHuffman<T>::FindItemType(HuffmanItemType itemtype)
 {
 	if(itemtype == EOB)
 	{
@@ -322,7 +334,7 @@ CHuffmanItem<T> * CHuffmanTree<T>::FindItemType(HuffmanItemType itemtype)
 }
 
 template <class T> 
-void CHuffmanTree<T>::PrintAll() 
+void CDynamicHuffman<T>::PrintAll() 
 {
 	Last->Print();
 }
@@ -356,7 +368,7 @@ CHuffmanItem<T> * CHuffmanItem<T>::FindN(uint32_t n)
 }
 
 template <class T> 
-void CHuffmanTree<T>::Leak()
+void CDynamicHuffman<T>::Leak()
 {
 	CHuffmanItem<T> * p = this->First;
 	CHuffmanItem<T> * next = NULL;
@@ -383,19 +395,19 @@ void CHuffmanTree<T>::Leak()
 }
 
 template <class T> 
-uint32_t CHuffmanTree<T>::ItemCounter()
+uint32_t CDynamicHuffman<T>::ItemCounter()
 {
 	return this->First->SN;
 }
 
 template <class T> 
-uint32_t CHuffmanTree<T>::SymbolCounter()
+uint32_t CDynamicHuffman<T>::SymbolCounter()
 {
 	return this->leafCounter;
 }
 
 template <class T> 
-uint64_t CHuffmanTree<T>::Counter()
+uint64_t CDynamicHuffman<T>::Counter()
 {
 	return this->Last->Weight;
 }
@@ -573,10 +585,10 @@ void CHuffmanItem<T>::Print()
 	}
 }
 
-INSTANTIATE(CHuffmanTree, uint8_t);
-INSTANTIATE(CHuffmanTree, uint16_t);
-INSTANTIATE(CHuffmanTree, int16_t);
-INSTANTIATE(CHuffmanTree, uint32_t);
-INSTANTIATE(CHuffmanTree, int32_t);
-INSTANTIATE(CHuffmanTree, float);
+INSTANTIATE(CDynamicHuffman, uint8_t);
+INSTANTIATE(CDynamicHuffman, uint16_t);
+INSTANTIATE(CDynamicHuffman, int16_t);
+INSTANTIATE(CDynamicHuffman, uint32_t);
+INSTANTIATE(CDynamicHuffman, int32_t);
+INSTANTIATE(CDynamicHuffman, float);
 }

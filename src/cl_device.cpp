@@ -33,7 +33,6 @@ CCLDevice::~CCLDevice(void)
 
 bool CCLDevice::isValid()
 {
-	dbg("platform_id = 0x%x, id = 0x%x\n", (int)getPlatformId(), (int)id);
 	return (m_platform != NULL && id != 0);
 }
 

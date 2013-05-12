@@ -77,5 +77,6 @@ CCLComponent<T> & CCLImage<T>::getCLComponent(int index)
 }
 
 INSTANTIATE(CCLImage, float);
+INSTANTIATE(CCLImage, int16_t);
 
 }

@@ -18,13 +18,11 @@ ICLKernel::ICLKernel(CCLDevice * dev, cl_program program, const char * kernel) :
 	}
 	m_max_global_work_size = m_dev->getInfo()->getMaxWorkItemSizes();
 	m_max_work_group_size = m_dev->getInfo()->getMaxWorkGroupSize();
-#ifdef DEBUG
-	for(int i=0;i<m_max_global_work_size.size();i++)
-	{
-		dbgf("Max global work size [%d]: %d\n", i, m_max_global_work_size[i]);
-	}
-	dbgf("Max work group size: %d\n", m_max_work_group_size);
-#endif
+}
+
+
+ICLKernel::~ICLKernel()
+{
 }
 
 void ICLKernel::EnqueueNDRangeKernel(
@@ -44,9 +42,6 @@ void ICLKernel::EnqueueNDRangeKernel(
 		for(int i=0;i<work_dim;i++)
 		{
 			g_work_size[i] = utils::min(global_work_size[i]-global_work_offset[i], m_max_global_work_size[i]);
-			dbgf("%s: global_work_size[%d] = %d\n", m_name.c_str(), i, global_work_size[i]);
-			dbgf("%s: local_work_size[%d] = %d\n", m_name.c_str(), i, local_work_size[i]);
-			dbgf("%s: g_work_size[%d] = %d\n", m_name.c_str(), i, g_work_size[i]);
 		}
 	}while(false);
 	err = clEnqueueNDRangeKernel(
@@ -62,9 +57,17 @@ void ICLKernel::EnqueueNDRangeKernel(
 	if(CL_SUCCESS != err) throw utils::StringFormatException("clEnqueueNDRangeKernel(%d)\n", err);
 }
 
-
-ICLKernel::~ICLKernel()
+void ICLKernel::Finish(void)
 {
+	cl_int err = clFinish(this->m_dev->getCommandQueue());
+	if(CL_SUCCESS != err) throw utils::StringFormatException("clFinish(%d)\n", err);
+}
+
+void ICLKernel::SetArg(cl_uint arg_index, size_t arg_size, const void * arg_value)
+{
+	cl_int err = clSetKernelArg(m_kernel, arg_index, arg_size, arg_value);
+	if(CL_SUCCESS != err) throw utils::StringFormatException("clSetKernelArg(%d)\n", err);
+
 }
 
 cl_program ICLKernel::getProgramId()

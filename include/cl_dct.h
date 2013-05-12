@@ -15,7 +15,14 @@ class CCLDCT : public CDCT, public ICLKernel
 public:
 	CCLDCT(CCLDevice * dev, cl_program program, const char * kernel);
 	virtual ~CCLDCT();
-	virtual void Transform(CImage<float> * src, CImage<float> * dst);
+protected:
+	virtual void doTransform(CImage<float> * src, CImage<float> * dst);
+};
+
+class CCLIDCT : public CCLDCT, public CIDCT
+{
+public:
+	CCLIDCT(CCLDevice * dev, cl_program program, const char * kernel);
 protected:
 };
 

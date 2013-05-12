@@ -1,8 +1,9 @@
 #ifndef _RLC_H
 #define _RLC_H
 
-#include <huffman.h>
+#include <dynamic_huffman.h>
 #include <image.h>
+#include <mtimer.h>
 
 namespace avlib
 {
@@ -13,13 +14,13 @@ class CHuffmanQuad
 public:
 	CHuffmanQuad();
 	virtual ~CHuffmanQuad();
-       	CHuffmanTree<T> * DCValue;
-	CHuffmanTree<uint8_t> * ACRun;
-       	CHuffmanTree<T> * ACValue;
+       	CHuffman<T> * DCValue;
+	CHuffman<uint8_t> * ACRun;
+       	CHuffman<T> * ACValue;
 };
 
 template <class T>
-class CRLC
+class CRLC : public utils::ITimer
 {
 public:
 	CRLC();

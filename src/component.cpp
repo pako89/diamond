@@ -133,6 +133,12 @@ CSize CComponent<T>::getSize(void)
 }
 
 template <class T>
+CSize CComponent<T>::getOriginalSize(void)
+{
+	return this->m_original_size;
+}
+
+template <class T>
 size_t CComponent<T>::getBytesCount(void)
 {
 	return this->m_bytes;
@@ -156,7 +162,8 @@ bool CComponent<T>::setSize(CSize size)
 	{
 		release();
 	}
-	this->m_size = size;
+	this->m_size = CSize(size, true);
+	this->m_original_size = CSize(size, false);
 	this->m_bytes = this->m_size.Height*this->m_size.Width*sizeof(T);
 	this->m_data = new T[this->m_size.Height*this->m_size.Width];
 	return true;

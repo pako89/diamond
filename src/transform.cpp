@@ -36,6 +36,14 @@ void CTransform<S, D>::Transform(CImage<S> * src, CImage<D> * dst)
 	{
 		throw utils::StringFormatException("formats does not match\n");
 	}
+	m_timer.start();
+	doTransform(src, dst);
+	m_timer.stop();
+}
+
+template <class S, class D>
+void CTransform<S, D>::doTransform(CImage<S> * src, CImage<D> * dst)
+{
 	for(int k=0;k<src->getComponents(); k++)
 	{
 		CSize size((*src)[k].getHeight(), (*src)[k].getWidth());
@@ -54,5 +62,6 @@ INSTANTIATE2(CTransform, float, int16_t);
 INSTANTIATE2(CTransform, int16_t, float);
 INSTANTIATE2(CTransform, float, int32_t);
 INSTANTIATE2(CTransform, int32_t, float);
+INSTANTIATE2(CTransform, int16_t, int16_t);
 
 }

@@ -36,7 +36,7 @@ void CBasicEncoder::init(CImageFormat fmt)
 	if(NULL == m_imgF) m_imgF = new CImage<float>(fmt);
 	if(NULL == m_imgLast) m_imgLast = new CImage<float>(fmt);
 	if(NULL == m_img) m_img = new CImage<int16_t>(fmt);
-	if(NULL == m_htree) m_htree = new CHuffmanTree<int16_t>();
+	if(NULL == m_htree) m_htree = new CDynamicHuffman<int16_t>();
 	if(NULL == m_dct) m_dct = new CDCT();
 	if(NULL == m_quant) m_quant = new CQuant();
 	if(NULL == m_zz) m_zz = new CZigZag<float, int16_t>();
@@ -68,6 +68,7 @@ sof_marker_t CBasicEncoder::write_sof(CBitstream * pBstr, frame_type_t frame_typ
 
 bool CBasicEncoder::Encode(CSequence * pSeq, CBitstream * pBstr)
 {
+	m_timer.start();
 	init(pSeq->getFormat());
 	sos_marker_t sos = write_sos(pSeq, pBstr);
 	CIDCT * idct = new CIDCT();
@@ -80,7 +81,7 @@ bool CBasicEncoder::Encode(CSequence * pSeq, CBitstream * pBstr)
 		{
 			throw utils::StringFormatException("can not read frame from file");
 		}
-		dbg("\rEncoding frame: %d", i);
+		dbg("\rEncoding frame: %d/%d", i, sos.frames_number);
 		(*m_imgF) = pSeq->getFrame();
 		sof_marker_t sof;
 		if(i%gop == 0 || i == sos.frames_number-1)
@@ -91,7 +92,7 @@ bool CBasicEncoder::Encode(CSequence * pSeq, CBitstream * pBstr)
 		{
 			sof = write_sof(pBstr, FRAME_TYPE_P);
 			(*m_imgF) -= (*m_imgLast);
-		}	
+		}
 		m_dct->Transform(m_imgF, m_imgF);
 		m_quant->Transform(m_imgF, m_imgF);
 		m_zz->Transform(m_imgF, m_img);
@@ -109,6 +110,12 @@ bool CBasicEncoder::Encode(CSequence * pSeq, CBitstream * pBstr)
 		}
 	}
 	dbg("\n");
+	m_timer.stop();
+	dbg("Timer total         : %f\n", m_timer.getTotalSeconds());
+	dbg("Timer DCT           : %f\n", m_dct->getTimer().getTotalSeconds());
+	dbg("Timer Quant         : %f\n", m_quant->getTimer().getTotalSeconds());
+	dbg("Timer Zig Zag       : %f\n", m_zz->getTimer().getTotalSeconds());
+	dbg("Timer RLC           : %f\n", m_rlc->getTimer().getTotalSeconds());
 	delete idct;
 	delete iquant;
 	return false;

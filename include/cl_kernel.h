@@ -22,6 +22,8 @@ public:
 			const cl_event *event_wait_list = NULL,
 			cl_event *event = NULL
 			);
+	void Finish(void);
+	void SetArg(cl_uint arg_index, size_t arg_size, const void * arg_value);
 	cl_program getProgramId();
 	cl_kernel getKernelId();
 	std::string getName();

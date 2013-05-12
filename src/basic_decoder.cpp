@@ -31,7 +31,7 @@ bool CBasicDecoder::Decode(CBitstream * pBstr, CSequence * pSeq)
 	CImage<float> * imgF = new CImage<float>(pSeq->getFormat());
 	CImage<float> * imgLast = new CImage<float>(pSeq->getFormat());
 	CImage<int16_t> * img = new CImage<int16_t>(pSeq->getFormat());
-	CHuffmanTree<int16_t> * htree = new CHuffmanTree<int16_t>();
+	CDynamicHuffman<int16_t> * htree = new CDynamicHuffman<int16_t>();
 	CIDCT * idct = new CIDCT();
 	CIQuant * iquant = new CIQuant();
 	CIZigZag<int16_t, float> * izigzag = new CIZigZag<int16_t, float>();

@@ -153,9 +153,19 @@ bool CSequence::write(void)
 		int ret = 0;
 		for(int k=0;k<m_image->getComponents(); k++)
 		{
-			ret += fwrite(m_image->operator[](k)[0], m_image->operator[](k).getBytesCount(), 1, m_fh);
+			if((*m_image)[k].getOriginalSize() != (*m_image)[k].getSize())
+			{
+				for(int y = 0 ; y < (*m_image)[k].getOriginalHeight(); y++)
+				{
+					ret += fwrite((*m_image)[k][y], (*m_image)[k].getOriginalWidth(), 1, m_fh);	
+				}
+			}
+			else
+			{
+				ret += fwrite((*m_image)[k][0], m_image->operator[](k).getBytesCount(), 1, m_fh);
+			}
 		}
-		return (ret == m_image->getComponents());
+		return true; //TODO:(ret == m_image->getComponents());
 	}
 	else
 	{
@@ -170,9 +180,24 @@ bool CSequence::read(void)
 		int ret = 0;
 		for(int k=0;k<m_image->getComponents(); k++)
 		{
-			ret += fread(m_image->operator[](k)[0], m_image->operator[](k).getBytesCount(), 1, m_fh);
+			if((*m_image)[k].getOriginalSize() != (*m_image)[k].getSize())
+			{
+				int o_height = (*m_image)[k].getOriginalHeight();
+				int o_width = (*m_image)[k].getOriginalWidth();
+				int width = (*m_image)[k].getWidth();
+				int height = (*m_image)[k].getHeight();
+				for(int y=0;y<o_height; y++)
+				{
+					ret += fread((*m_image)[k][y], o_width, 1, m_fh);
+					//memset(&(*m_image)[k][y][o_width], 0, width-o_width);
+				}
+			}
+			else
+			{
+				ret += fread((*m_image)[k][0], (*m_image)[k].getBytesCount(), 1, m_fh);
+			}
 		}
-		return (ret == m_image->getComponents());
+		return true;//TODO: (ret == m_image->getComponents());
 	}
 	else
 	{

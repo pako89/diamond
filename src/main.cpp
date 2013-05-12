@@ -3,7 +3,7 @@
 
 #include <DiamondApp.h>
 #include <component.h>
-#include <huffman.h>
+#include <dynamic_huffman.h>
 #include <vector>
 #include <sequence.h>
 #include <basic_encoder.h>

@@ -76,4 +76,5 @@ INSTANTIATE2(CZigZag, float, int16_t);
 INSTANTIATE2(CIZigZag, int16_t, float);
 INSTANTIATE2(CZigZag, float, int32_t);
 INSTANTIATE2(CIZigZag, int32_t, float);
+INSTANTIATE2(CIZigZag, int16_t, int16_t);
 }

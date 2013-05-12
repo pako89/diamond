@@ -15,7 +15,7 @@ void CCLQuant::setTables(const uint8_t * YQ, const uint8_t * UQ, const uint8_t *
 	dynamic_cast<CCLImage<float>*>(m_q)->CopyToDevice();
 }
 
-void CCLQuant::Transform(CImage<float> * src, CImage<float> * dst)
+void CCLQuant::doTransform(CImage<float> * src, CImage<float> * dst)
 {
 	CCLImage<float> * clSrc = dynamic_cast<CCLImage<float>*>(src);
 	CCLImage<float> * clDst = dynamic_cast<CCLImage<float>*>(dst);
@@ -42,30 +42,18 @@ void CCLQuant::Transform(CImage<float> * src, CImage<float> * dst)
 			
 			cl_int err;
 
-			err = clSetKernelArg(m_kernel, 0, sizeof(srcMem), &srcMem);
-			if(CL_SUCCESS != err) throw utils::StringFormatException("clSetKernelArg(%d)\n", err);
-			
-			err = clSetKernelArg(m_kernel, 1, sizeof(dstMem), &dstMem);
-			if(CL_SUCCESS != err) throw utils::StringFormatException("clSetKernelArg(%d)\n", err);
-			
-			err = clSetKernelArg(m_kernel, 2, sizeof(qMem), &qMem);
-			if(CL_SUCCESS != err) throw utils::StringFormatException("clSetKernelArg(%d)\n", err);
-			
-			err = clSetKernelArg(m_kernel, 3, sizeof(height), &height);
-			if(CL_SUCCESS != err) throw utils::StringFormatException("clSetKernelArg(%d)\n", err);
-			
-			err = clSetKernelArg(m_kernel, 4, sizeof(width), &width);
-			if(CL_SUCCESS != err) throw utils::StringFormatException("clSetKernelArg(%d)\n", err);
-			
+			SetArg(0, sizeof(srcMem), &srcMem);
+			SetArg(1, sizeof(dstMem), &dstMem);
+			SetArg(2, sizeof(qMem), &qMem);
+			SetArg(3, sizeof(height), &height);
+			SetArg(4, sizeof(width), &width);
 			EnqueueNDRangeKernel(2, global_work_size, local_work_size, 0, NULL, NULL);
-			
-			err = clFinish(m_dev->getCommandQueue());
-			if(CL_SUCCESS != err) throw utils::StringFormatException("clFinish(%d)\n", err);
+			Finish();
 		}
 	}
 	else
 	{
-		CQuant::Transform(src, dst);
+		CQuant::doTransform(src, dst);
 	}
 }
 

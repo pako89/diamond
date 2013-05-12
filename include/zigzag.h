@@ -22,8 +22,7 @@ protected:
 	static const uint8_t s_tul[];
 };
 
-template <class S, class D>
-class CIZigZag : public CZigZag<S, D>
+template <class S, class D>class CIZigZag : public CZigZag<S, D>
 {
 public:
 	CIZigZag();

@@ -27,6 +27,7 @@ public:
 	virtual int getOriginalWidth(void);
 	virtual int getOriginalHeight(void);
 	virtual CSize getSize(void);
+	virtual CSize getOriginalSize(void);
 	virtual int getPointsCount(void);
 	virtual bool setSize(CSize size);
 	virtual bool setSize(int height, int width);
