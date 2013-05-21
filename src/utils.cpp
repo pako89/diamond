@@ -61,4 +61,18 @@ std::string string_format(const char* fmt, ...)
 	return ret;
 }
 
+int log2(int val)
+{
+	int result = 0;
+	if(val == 1)
+	{
+		return 0;
+	}
+	else
+	{
+		while(val>>++result > 1);
+		return result;
+	}
+}
+
 }

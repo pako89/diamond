@@ -12,9 +12,9 @@ class CHuffmanQuad
 public:
 	CHuffmanQuad();
 	virtual ~CHuffmanQuad();
-       	CHuffman<T> * DCValue;
-	CHuffman<uint8_t> * ACRun;
-       	CHuffman<T> * ACValue;
+       	CDynamicHuffman<T> * DCValue;
+	CDynamicHuffman<uint8_t> * ACRun;
+       	CDynamicHuffman<T> * ACValue;
 };
 
 template <class T>
@@ -23,7 +23,7 @@ class CDynamicRLC : public CRLC<T>
 public:
 	CDynamicRLC();
 	virtual ~CDynamicRLC();
-	virtual void EncodeBlock(T * pSrc, CPoint p, CSize s, CBitstream * pBstr);
+	virtual void EncodeBlock(const T * pSrc, CPoint p, CSize s, CBitstream * pBstr);
 protected:
 	CHuffmanQuad<T> m_quads[3];
 };

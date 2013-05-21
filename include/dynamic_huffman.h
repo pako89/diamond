@@ -5,12 +5,21 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <utils.h>
-#include <huffman.h>
 
 namespace avlib
 {
 
 template <class T> class CHuffmanItem;
+
+enum HuffmanItemType
+{
+	None = 0,
+	Leaf = 1,
+	Node = 2,
+	New = 3,
+	EOB = 4,
+	ERROR
+};
 
 class CHuffmanCode
 {
@@ -27,7 +36,7 @@ public:
 };
 
 template <class T> 
-class CDynamicHuffman : public CHuffman<T>
+class CDynamicHuffman
 {
 public:
 	CDynamicHuffman();

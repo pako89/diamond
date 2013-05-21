@@ -9,6 +9,7 @@
 #include <zigzag.h>
 #include <rlc.h>
 #include <dynamic_rlc.h>
+#include <static_rlc.h>
 
 namespace avlib
 {

@@ -15,7 +15,7 @@ public:
 	CRLC();
 	virtual ~CRLC();
 	virtual void Encode(CImage<T> * pImg, CBitstream * pBstr);
-	virtual void EncodeBlock(T * pSrc, CPoint p, CSize s, CBitstream * pBstr) = 0;
+	virtual void EncodeBlock(const T * pSrc, CPoint p, CSize s, CBitstream * pBstr) = 0;
 protected:
 	virtual void doEncode(CImage<T> * pImg, CBitstream * pBstr);
 };
