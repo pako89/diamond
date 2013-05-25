@@ -10,6 +10,8 @@
 #include <utils.h>
 #include <image.h>
 #include <errno.h>
+#include <avlib.h>
+#include <encoder.h>
 
 namespace diamond
 {
@@ -37,6 +39,31 @@ enum DiamondOperation
 	DIAMOND_OP_DECODE
 };
 
+struct DiamondConfig
+{
+	DiamondConfig() :
+		Op(DIAMOND_NOP),
+		InputFileName("stdin"),
+		InputFile(stdin),
+		OutputFileName("stdout"),
+		OutputFile(stdout),
+		ImageType(avlib::IMAGE_TYPE_UNKNOWN),
+		ImageTypeStr("unknown"),
+		ImageSize(0, 0),
+		UseOpenCL(false)
+	{}
+	DiamondOperation Op;
+	const char * InputFileName;
+	FILE * InputFile;
+	const char * OutputFileName;
+	FILE * OutputFile;
+	avlib::ImageType ImageType;
+	const char * ImageTypeStr;
+	avlib::CSize ImageSize;
+	avlib::EncoderConfig EncoderConfig;	
+	bool UseOpenCL;
+};
+
 /**
  * Singleton class DiamondApp
  */
@@ -59,36 +86,18 @@ public:
 	void PrintHelp(void);
 	
 	const char * getName(void);
-	const char * getInputFileName(void);
-	const char * getOutputFileName(void);
-	FILE * getInputFile(void);
-	FILE * getOutputFile(void);
-	avlib::ImageType getImageType(void);
-	const char * getImageTypeStr(void);
-	int getHeight(void);
-	int getWidth(void);
-	bool UseOpenCL(void);
-	DiamondOperation getOperation(void);
+	DiamondConfig getConfig(void);
 protected:
 	CDiamondApp(void);
 	DiamondOperation parseOperation(const char * op);
+	DiamondOperation parseHuffman(const char * op);
 	int parseInt(const char * arg);
 	avlib::ImageType parseImageType(const char * arg);
 	std::string getShortOpts(const struct option long_options[], int size);
 
-	DiamondOperation m_op;
+	DiamondConfig m_config;
 	const char * m_appName;
-	const char * m_inputFileName;
-	FILE * m_inputFile;
-	const char * m_outputFileName;
-	FILE * m_outputFile;
-	avlib::ImageType m_imageType;
-	const char * m_imageTypeStr;
-	int m_imageHeight;
-	int m_imageWidth;
-	bool m_opencl;
 };
-
 }
 #endif //_DIAMOND_APP_H
 

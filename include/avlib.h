@@ -4,6 +4,13 @@
 namespace avlib
 {
 
+enum HUFFMAN_TYPE
+{
+	HUFFMAN_TYPE_UNKNOWN = 0 ,
+	HUFFMAN_TYPE_STATIC,
+	HUFFMAN_TYPE_DYNAMIC
+};
+
 class CPoint
 {
 public:

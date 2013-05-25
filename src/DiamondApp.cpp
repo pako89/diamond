@@ -37,17 +37,7 @@ ParseArgsException::ParseArgsException(const char * fmt, ...)
 CDiamondApp * CDiamondApp::m_instance = NULL;
 
 CDiamondApp::CDiamondApp(void) : 
-	m_op(DIAMOND_NOP),
-	m_appName(NULL),
-	m_inputFileName("stdin"),
-	m_inputFile(stdin),
-	m_outputFileName("stdout"),
-	m_outputFile(stdout),
-	m_imageType(avlib::IMAGE_TYPE_UNKNOWN),
-	m_imageTypeStr("unknown"),
-	m_imageHeight(0),
-	m_imageWidth(0),
-	m_opencl(false)
+	m_appName(NULL)
 {
 }
 
@@ -158,6 +148,7 @@ const struct option CDiamondApp::common_options[] = {
 	{"height",		required_argument,	NULL,	'H'},
 	{"width",		required_argument,	NULL,	'W'},
 	{"opencl",		no_argument,		NULL, 	'C'},
+	{"huffman",		required_argument, 	NULL, 	'e'}
 };
 
 #define COMMON_OPTS_SIZE	ARRAY_SIZE(common_options)
@@ -197,15 +188,13 @@ void CDiamondApp::ParseArgs(int argc, char * argv[])
 		PrintUsage();
 		throw ExitException(0);
 	}
-	if(diamond::DIAMOND_NOP == (m_op = parseOperation(argv[1])))
-	{
-		throw utils::StringFormatException("unknown operation '%s'", argv[1]);
-	}
 	const char * shortopts = getShortOpts(common_options, COMMON_OPTS_SIZE).c_str();
-	argv+=1;
-	argc-=1;
+	m_config.Op = parseOperation(argv[1]);
+	const char * op = argv[1];
+	int _argc = argc-1;
+	char ** _argv = argv+1;
 	int opt, longind;
-	while((opt = getopt_long(argc, argv, shortopts, CDiamondApp::common_options, &longind)) != -1)
+	while((opt = getopt_long(_argc, _argv, shortopts, CDiamondApp::common_options, &longind)) != -1)
 	{
 		switch(opt)
 		{
@@ -214,10 +203,10 @@ void CDiamondApp::ParseArgs(int argc, char * argv[])
 			throw ExitException(0);
 			break;
 		case 'o':
-			m_outputFile = fopen(optarg, "w+");
-			if(NULL != m_outputFile)
+			m_config.OutputFile = fopen(optarg, "w+");
+			if(NULL != m_config.OutputFile)
 			{
-				m_outputFileName = optarg;
+				m_config.OutputFileName = optarg;
 			}
 			else
 			{
@@ -225,17 +214,17 @@ void CDiamondApp::ParseArgs(int argc, char * argv[])
 			}
 			break;
 		case 't':
-			m_imageType = parseImageType(optarg);
-			m_imageTypeStr = optarg;
+			m_config.ImageType = parseImageType(optarg);
+			m_config.ImageTypeStr = optarg;
 			break;
 		case 'W':
-			m_imageWidth = parseInt(optarg);
+			m_config.ImageSize.Width = parseInt(optarg);
 			break;
 		case 'H':
-			m_imageHeight = parseInt(optarg);
+			m_config.ImageSize.Height = parseInt(optarg);
 			break;
 		case 'C':
-			m_opencl = true;
+			m_config.UseOpenCL = true;
 			break;
 		case '?':
 			break;
@@ -243,72 +232,32 @@ void CDiamondApp::ParseArgs(int argc, char * argv[])
             		throw ParseArgsException("?? getopt returned character code 0%o ??\n", opt);
 		}
 	}
-	if(optind < argc)
+	if(diamond::DIAMOND_NOP == m_config.Op)
 	{
-		m_inputFileName = argv[optind];
-		if(strcmp(m_inputFileName, "stdin"))
+		throw utils::StringFormatException("unknown operation '%s'", argv[1]);
+	}
+	if(optind < _argc)
+	{
+		m_config.InputFileName = _argv[optind];
+		if(strcmp(m_config.InputFileName, "stdin"))
 		{
-			m_inputFile = fopen(m_inputFileName, "r");
-			if(NULL == m_inputFile)
+			m_config.InputFile = fopen(m_config.InputFileName, "r");
+			if(NULL == m_config.InputFile)
 			{
 				throw utils::StringFormatException(strerror(errno));
 			}
 		}
 	}
-	if(NULL == m_inputFileName)
+	if(NULL == m_config.InputFileName)
 	{
 		PrintUsage();
 		throw ExitException(1);
 	}
 }
 
-const char * CDiamondApp::getInputFileName(void)
+DiamondConfig CDiamondApp::getConfig(void)
 {
-	return m_inputFileName;
+	return m_config;
 }
 
-const char * CDiamondApp::getOutputFileName(void)
-{
-	return m_outputFileName;
-}
-
-FILE * CDiamondApp::getInputFile(void)
-{
-	return m_inputFile;
-}
-
-FILE * CDiamondApp::getOutputFile(void)
-{
-	return m_outputFile;
-}
-
-avlib::ImageType CDiamondApp::getImageType(void)
-{
-	return m_imageType;
-}
-
-const char * CDiamondApp::getImageTypeStr(void)
-{
-	return m_imageTypeStr;
-}
-
-int CDiamondApp::getHeight(void)
-{
-	return m_imageHeight;
-}
-
-int CDiamondApp::getWidth(void)
-{
-	return m_imageWidth;
-}
-
-DiamondOperation CDiamondApp::getOperation(void)
-{
-	return m_op;
-}
-
-bool CDiamondApp::UseOpenCL(void)
-{
-	return m_opencl;
-}
 }

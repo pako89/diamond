@@ -1,4 +1,5 @@
 #include <cl_encoder.h>
+#include <shift.h>
 
 namespace avlib
 {
@@ -6,6 +7,11 @@ namespace avlib
 CCLEncoder::CCLEncoder()
 {
 	m_clPolicy = new CCLFirstGPUDevicePolicy();
+}
+
+CCLEncoder::CCLEncoder(EncoderConfig cfg) : 
+	CBasicEncoder(cfg)
+{
 }
 
 CCLEncoder::~CCLEncoder()
@@ -104,6 +110,7 @@ bool CCLEncoder::Encode(CSequence * pSeq, CBitstream * pBstr)
 	CIQuant * iquant = new CIQuant();
 	int gop = 4;
 	CCLImage<float> * tmpF = new CCLImage<float>(&m_dev, m_imgF->getFormat());
+	CShift<float> * shift = new CShift<float>(-128.0f);
 	for(int i=0;i<sos.frames_number;i++)
 	{
 		if(!pSeq->ReadNext())
@@ -112,6 +119,7 @@ bool CCLEncoder::Encode(CSequence * pSeq, CBitstream * pBstr)
 		}
 		dbg("\rEncoding frame: %d", i);
 		(*m_imgF) = pSeq->getFrame();
+		//shift->Transform(m_imgF, m_imgF);
 		sof_marker_t sof;
 		if(i%gop == 0 || i == sos.frames_number-1)
 		{
@@ -157,6 +165,7 @@ bool CCLEncoder::Encode(CSequence * pSeq, CBitstream * pBstr)
 	delete tmpF;
 	delete idct;
 	delete iquant;
+	delete shift;
 	return false;
 #endif
 }

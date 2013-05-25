@@ -17,8 +17,7 @@ then
 		OPENCL=""
 		;;
 	*)
-		VIDEO=$1
-
+		OPENCL=""
 		;;
 	esac
 fi
@@ -52,6 +51,6 @@ do
 done
 WIDTH=$(echo $RES | sed 's/\([0-9]\+\)x\([0-9]\+\)/\1/')
 HEIGHT=$(echo $RES | sed 's/\([0-9]\+\)x\([0-9]\+\)/\2/')
-time ./diamond encode $OPENCL -tYUV420 -W $WIDTH -H $HEIGHT -o $TEMP $VIDEO
-time ./diamond decode -o $OUT $TEMP
+./diamond encode $OPENCL -tYUV420 -W $WIDTH -H $HEIGHT -o $TEMP $VIDEO
+./diamond decode -o $OUT $TEMP
 mplayer $OUT -loop 0 -demuxer rawvideo -rawvideo w=$WIDTH:h=$HEIGHT

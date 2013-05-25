@@ -22,6 +22,7 @@ class CCLEncoder : public CBasicEncoder
 {
 public:
 	CCLEncoder();
+	CCLEncoder(EncoderConfig cfg);
 	virtual ~CCLEncoder();
 	virtual bool Encode(CSequence * pSeq, CBitstream * pBstr);
 protected:

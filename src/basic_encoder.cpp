@@ -1,5 +1,6 @@
 #include <basic_encoder.h>
 #include <log.h>
+#include <shift.h>
 
 module("BasicEncoder");
 
@@ -15,6 +16,19 @@ CBasicEncoder::CBasicEncoder() :
 	m_quant(NULL),
 	m_zz(NULL),
 	m_rlc(NULL)
+{
+}
+
+CBasicEncoder::CBasicEncoder(EncoderConfig cfg) :
+	m_imgF(NULL),
+	m_imgLast(NULL),
+	m_img(NULL),
+	m_htree(NULL),
+	m_dct(NULL),
+	m_quant(NULL),
+	m_zz(NULL),
+	m_rlc(NULL),
+	CEncoder(cfg)
 {
 }
 
@@ -73,6 +87,7 @@ bool CBasicEncoder::Encode(CSequence * pSeq, CBitstream * pBstr)
 	sos_marker_t sos = write_sos(pSeq, pBstr);
 	CIDCT * idct = new CIDCT();
 	CIQuant * iquant = new CIQuant();
+	CShift<float> * shift = new CShift<float>(-128.0f);
 	int gop = 4;
 	m_quant->setTables(1);
 	for(int i=0;i<sos.frames_number;i++)
@@ -83,6 +98,7 @@ bool CBasicEncoder::Encode(CSequence * pSeq, CBitstream * pBstr)
 		}
 		dbg("\rEncoding frame: %d/%d", i, sos.frames_number);
 		(*m_imgF) = pSeq->getFrame();
+		//shift->Transform(m_imgF, m_imgF);
 		sof_marker_t sof;
 		if(i%gop == 0 || i == sos.frames_number-1)
 		{
@@ -97,6 +113,7 @@ bool CBasicEncoder::Encode(CSequence * pSeq, CBitstream * pBstr)
 		m_quant->Transform(m_imgF, m_imgF);
 		m_zz->Transform(m_imgF, m_img);
 		m_rlc->Encode(m_img, pBstr);
+		m_rlc->Flush(pBstr);
 		pBstr->flush();
 		iquant->Transform(m_imgF, m_imgF);
 		idct->Transform(m_imgF, m_imgF);
@@ -118,6 +135,7 @@ bool CBasicEncoder::Encode(CSequence * pSeq, CBitstream * pBstr)
 	dbg("Timer RLC           : %f\n", m_rlc->getTimer().getTotalSeconds());
 	delete idct;
 	delete iquant;
+	delete shift;
 	return false;
 }
 

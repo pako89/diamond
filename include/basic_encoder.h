@@ -19,6 +19,7 @@ class CBasicEncoder : public CEncoder
 {
 public:
 	CBasicEncoder();
+	CBasicEncoder(EncoderConfig cfg);
 	virtual ~CBasicEncoder();
 	virtual bool Encode(CSequence * pSeq, CBitstream * pBstr);
 protected:

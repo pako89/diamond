@@ -29,31 +29,31 @@ int main(int argc,char * argv[])
 	try
 	{
 		app->ParseArgs(argc, argv);
-		dbg("Input file : %s\n", app->getInputFileName());
-		dbg("Output file: %s\n", app->getOutputFileName());
-		dbg("Image type : %s\n", app->getImageTypeStr());
-		dbg("Height     : %d\n", app->getHeight());
-		dbg("Width      : %d\n", app->getWidth());
-		dbg("OpenCL     : %s\n", app->UseOpenCL()?"True":"False");
-		diamond::DiamondOperation op = app->getOperation();
-		if(diamond::DIAMOND_OP_ENCODE == op)
+		diamond::DiamondConfig config = app->getConfig();
+		dbg("Input file : %s\n", config.InputFileName);
+		dbg("Output file: %s\n", config.OutputFileName);
+		dbg("Image type : %s\n", config.ImageTypeStr);
+		dbg("Height     : %d\n", config.ImageSize.Height);
+		dbg("Width      : %d\n", config.ImageSize.Width);
+		dbg("OpenCL     : %s\n", config.UseOpenCL?"True":"False");
+		if(diamond::DIAMOND_OP_ENCODE == config.Op)
 		{
 			avlib::CSequence * seq = new avlib::CSequence(
-				app->getInputFile(),
-				app->getImageType(),
-				app->getHeight(),
-				app->getWidth()
+				config.InputFile,
+				config.ImageType,
+				config.ImageSize.Height,
+				config.ImageSize.Width
 			);
 			avlib::CBitstream * bstr = new avlib::CBitstream(10000000);
-			bstr->set_fh(app->getOutputFile());
+			bstr->set_fh(config.OutputFile);
 			avlib::CBasicEncoder * enc = NULL;
-			if(app->UseOpenCL())
+			if(config.UseOpenCL)
 			{
-				enc = new avlib::CCLEncoder();
+				enc = new avlib::CCLEncoder(config.EncoderConfig);
 			}
 			else
 			{
-		       		enc = new avlib::CBasicEncoder();
+		       		enc = new avlib::CBasicEncoder(config.EncoderConfig);
 			}
 			enc->Encode(seq, bstr);
 			bstr->flush_all();
@@ -61,11 +61,11 @@ int main(int argc,char * argv[])
 			delete bstr;
 			delete seq;
 		}
-		else if (diamond::DIAMOND_OP_DECODE == op)
+		else if (diamond::DIAMOND_OP_DECODE == config.Op)
 		{
-			avlib::CSequence seq(app->getOutputFile());
+			avlib::CSequence seq(config.OutputFile);
 			avlib::CBitstream * bstr = new avlib::CBitstream(10000000);
-			bstr->set_fh_fill(app->getInputFile());
+			bstr->set_fh_fill(config.InputFile);
 			avlib::CBasicDecoder dec;
 			dec.Decode(bstr, &seq);
 			delete bstr;

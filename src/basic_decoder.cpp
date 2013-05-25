@@ -2,6 +2,7 @@
 
 #include <utils.h>
 #include <log.h>
+#include <shift.h>
 
 namespace avlib
 {
@@ -36,6 +37,7 @@ bool CBasicDecoder::Decode(CBitstream * pBstr, CSequence * pSeq)
 	CIQuant * iquant = new CIQuant();
 	CIZigZag<int16_t, float> * izigzag = new CIZigZag<int16_t, float>();
 	CIRLC<int16_t> * irlc = new CDynamicIRLC<int16_t>();
+	CShift<float> * shift = new CShift<float>(128.0f);
 	sof_marker_t sof;
 	for(uint32_t n = 0 ; n < sos.frames_number; n++)
 	{
@@ -62,6 +64,7 @@ bool CBasicDecoder::Decode(CBitstream * pBstr, CSequence * pSeq)
 		{
 			throw utils::StringFormatException("unknown frame type: 0x%x\n", sof.frame_type);
 		}
+		//shift->Transform(imgF, imgF);
 		pSeq->getFrame() = *imgF;
 		if(!pSeq->WriteNext())
 		{
@@ -70,6 +73,7 @@ bool CBasicDecoder::Decode(CBitstream * pBstr, CSequence * pSeq)
 		(*imgLast) = (*imgF);
 	}
 	dbg("\n");
+	delete shift;
 	delete img;
 	delete imgF;
 	delete imgLast;
