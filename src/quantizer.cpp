@@ -1,4 +1,5 @@
 #include <quantizer.h>
+#include <utils.h>
 
 namespace avlib
 {
@@ -64,7 +65,25 @@ void CQuant::setTables(const uint8_t * YQ, const uint8_t * UQ, const uint8_t * V
 	}
 }
 
+#define LIMIT(v, l)	( (v) > (l) ? (l) : ((v) < -(l) ? -(l) : (v)) )
+
 void CQuant::TransformBlock(float * pSrc, float * pDst, CPoint p, CSize s)
+{
+	float * src = &pSrc[p.Y*s.Width+p.X];
+	float * dst = &pDst[p.Y*s.Width+p.X];
+	for(int y=0;y<(*m_q)[p.Z].getHeight();y++)
+	{
+		for(int x=0;x<(*m_q)[p.Z].getWidth();x++)
+		{
+			float t = src[y*s.Width+x]*(*m_q)[p.Z][y][x];
+			if(!y && !x)  t = LIMIT(t, 2047.0f);
+			else	      t = LIMIT(t, 1023.0f);
+			dst[y*s.Width+x] = t;
+		}
+	}
+}
+
+void CIQuant::TransformBlock(float * pSrc, float * pDst, CPoint p, CSize s)
 {
 	float * src = &pSrc[p.Y*s.Width+p.X];
 	float * dst = &pDst[p.Y*s.Width+p.X];

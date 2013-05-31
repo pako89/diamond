@@ -51,7 +51,9 @@ struct DiamondConfig
 		ImageTypeStr("unknown"),
 		ImageSize(0, 0),
 		UseOpenCL(false)
-	{}
+	{
+		EncoderConfig.HuffmanType = avlib::HUFFMAN_TYPE_DYNAMIC;//avlib::HUFFMAN_TYPE_STATIC;
+	}
 	DiamondOperation Op;
 	const char * InputFileName;
 	FILE * InputFile;
@@ -90,7 +92,7 @@ public:
 protected:
 	CDiamondApp(void);
 	DiamondOperation parseOperation(const char * op);
-	DiamondOperation parseHuffman(const char * op);
+	avlib::HUFFMAN_TYPE parseHuffman(const char * op);
 	int parseInt(const char * arg);
 	avlib::ImageType parseImageType(const char * arg);
 	std::string getShortOpts(const struct option long_options[], int size);

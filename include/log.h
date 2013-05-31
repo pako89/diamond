@@ -16,7 +16,7 @@ static int logv = 0;
 
 #ifdef DEBUG
 
-#define module(name)	
+#define module(name)	static const char * module = (name)
 #define dbg(...)	_LOG(__VA_ARGS__)
 #define dbgf(...)	_LOG("%s: ", __FUNCTION__);	\
 			_LOG(__VA_ARGS__)

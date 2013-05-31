@@ -24,7 +24,7 @@ public:
 	virtual ~CEncoder();
 	virtual bool Encode(CSequence * pSeq, CBitstream * pBstr) = 0;
 protected:
-	EncoderConfig m_cfg;
+	EncoderConfig m_config;
 };
 
 }

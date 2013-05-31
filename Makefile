@@ -6,19 +6,60 @@ TESTS_DIR = ./unittests
 CC	= g++
 
 # Compiler flags
-INCDIR	= -Iinclude -I/usr/local/cuda/include
-CFLAGS	= -g $(INCDIR) 
+CFLAGS += -g
+CFLAGS += -Iinclude
+CFLAGS += -I/usr/local/cuda/include
+cflags += $(INCDIR) 
 CFLAGS += -DDEBUG
 CFLAGS += -DCHECK_HUFFMAN
+#CFLAGS += -Os
 
 # Linker flags
-LDFLAGS	= -L/usr/lib
+LDFLAGS	+= -L/usr/lib
 
 # Libs
-LIB = -lOpenCL
+LIBS = -lOpenCL
 
 # Source files
-SRC	= $(wildcard src/*.cpp)
+SRC += src/main.cpp
+SRC += src/avlib.cpp
+SRC += src/decoder.cpp
+SRC += src/getopt.cpp
+SRC += src/prediction.cpp
+SRC += src/static_huffman.cpp
+SRC += src/basic_decoder.cpp
+SRC += src/DiamondApp.cpp
+SRC += src/getopt_long.cpp
+SRC += src/quantizer.cpp
+SRC += src/static_rlc.cpp
+SRC += src/basic_encoder.cpp 
+SRC += src/dynamic_huffman.cpp
+SRC += src/image.cpp
+SRC += src/rlc.cpp
+SRC += src/transform.cpp
+SRC += src/bitstream.cpp
+SRC += src/component.cpp
+SRC += src/dynamic_rlc.cpp
+SRC += src/sequence.cpp
+SRC += src/utils.cpp
+SRC += src/dct.cpp
+SRC += src/encoder.cpp
+SRC += src/mtimer.cpp
+SRC += src/shift.cpp
+SRC += src/zigzag.cpp
+SRC += src/cl_base.cpp
+SRC += src/cl_encoder.cpp
+SRC += src/cl_policy.cpp
+SRC += src/cl_component.cpp
+SRC += src/cl_image.cpp
+SRC += src/cl_quantizer.cpp
+SRC += src/cl_dct.cpp
+SRC += src/cl_kernel.cpp
+SRC += src/cl_zigzag.cpp
+SRC += src/cl_device.cpp
+SRC += src/cl_platform.cpp
+SRC += src/cl_device_info.cpp
+SRC += src/cl_platform_info.cpp
 
 # Objects
 OBJ	= $(SRC:.cpp=.o)
@@ -27,8 +68,8 @@ default: $(TARGET)
 
 all: $(TARGET) tests
 
-$(TARGET): $(OBJ)
-	$(CC) $(LDFLAGS) -o $(TARGET) $(OBJ) $(LIB)
+$(TARGET): $(OBJ) 
+	$(CC) $(LDFLAGS) -o $(TARGET) $(OBJ) $(LIBS)
 
 %.o : %.cpp
 	$(CC) $(CFLAGS) -c $< -o $@

@@ -9,7 +9,7 @@ CEncoder::CEncoder()
 }
 
 CEncoder::CEncoder(EncoderConfig cfg) :
-	m_cfg(cfg)
+	m_config(cfg)
 {
 }
 

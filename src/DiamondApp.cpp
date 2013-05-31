@@ -97,6 +97,18 @@ avlib::ImageType CDiamondApp::parseImageType(const char * arg)
 	}
 }
 
+avlib::HUFFMAN_TYPE CDiamondApp::parseHuffman(const char * arg)
+{
+	if(!strcmp(arg, "dynamic"))
+	{
+		return avlib::HUFFMAN_TYPE_DYNAMIC;
+	}
+	else
+	{
+		return avlib::HUFFMAN_TYPE_STATIC;
+	}
+}
+
 DiamondOperation CDiamondApp::parseOperation(const char * op)
 {
 	if(!strcmp(op, "encode"))
@@ -218,6 +230,9 @@ void CDiamondApp::ParseArgs(int argc, char * argv[])
 			break;
 		case 'C':
 			m_config.UseOpenCL = true;
+			break;
+		case 'e':
+			m_config.EncoderConfig.HuffmanType = parseHuffman(optarg);
 			break;
 		case '?':
 			break;

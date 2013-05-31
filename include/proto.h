@@ -29,6 +29,10 @@ MARKER_DEF(sos)
 #define FORMAT_T_DCT		1
 #define FORMAT_T_DHUFFMAN	2	
 #define FORMAT_T_SHUFFMAN	3
+	
+	uint8_t huffman;
+#define HUFFMAN_T_STATIC	0
+#define HUFFMAN_T_DYNAMIC	1
 
 	image_format_t image_format;
 #define IMAGE_F_YUV420		0

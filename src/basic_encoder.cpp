@@ -54,7 +54,23 @@ void CBasicEncoder::init(CImageFormat fmt)
 	if(NULL == m_dct) m_dct = new CDCT();
 	if(NULL == m_quant) m_quant = new CQuant();
 	if(NULL == m_zz) m_zz = new CZigZag<float, int16_t>();
-	if(NULL == m_rlc) m_rlc = new CDynamicRLC<int16_t>();
+	if(NULL == m_rlc)
+	{
+		if(m_config.HuffmanType == HUFFMAN_TYPE_STATIC)
+		{
+			dbg("Creating StaticRLC\n");
+			m_rlc = new CStaticRLC<int16_t>();
+		}
+		else if(m_config.HuffmanType == HUFFMAN_TYPE_DYNAMIC)
+		{
+			dbg("Creating DynamicRLC\n");
+			m_rlc = new CDynamicRLC<int16_t>();
+		}
+		else
+		{
+			throw utils::StringFormatException("Unknown Huffman type\n");
+		}
+	}
 }
 
 sos_marker_t CBasicEncoder::write_sos(CSequence * pSeq, CBitstream * pBstr)
@@ -62,6 +78,16 @@ sos_marker_t CBasicEncoder::write_sos(CSequence * pSeq, CBitstream * pBstr)
 	sos_marker_t sos;
 	sos.type = MARKER_TYPE_SOS;
 	sos.size = sizeof(struct sos_marker);
+	switch(m_config.HuffmanType)
+	{
+	case HUFFMAN_TYPE_DYNAMIC:
+		sos.huffman = HUFFMAN_T_DYNAMIC;
+		break;
+	case HUFFMAN_TYPE_STATIC:
+	default:
+		sos.huffman = HUFFMAN_T_STATIC;
+		break;
+	}
 	sos.frames_number = pSeq->getFramesCount();
 	sos.width = pSeq->getWidth();
 	sos.height = pSeq->getHeight();
@@ -88,6 +114,7 @@ bool CBasicEncoder::Encode(CSequence * pSeq, CBitstream * pBstr)
 	CIDCT * idct = new CIDCT();
 	CIQuant * iquant = new CIQuant();
 	CShift<float> * shift = new CShift<float>(-128.0f);
+	CShift<float> * rshift = new CShift<float>(128.0f);
 	int gop = 4;
 	m_quant->setTables(1);
 	for(int i=0;i<sos.frames_number;i++)
@@ -98,10 +125,10 @@ bool CBasicEncoder::Encode(CSequence * pSeq, CBitstream * pBstr)
 		}
 		dbg("\rEncoding frame: %d/%d", i, sos.frames_number);
 		(*m_imgF) = pSeq->getFrame();
-		//shift->Transform(m_imgF, m_imgF);
 		sof_marker_t sof;
 		if(i%gop == 0 || i == sos.frames_number-1)
 		{
+			shift->Transform(m_imgF, m_imgF);
 			sof = write_sof(pBstr, FRAME_TYPE_I);
 		}
 		else
@@ -113,8 +140,9 @@ bool CBasicEncoder::Encode(CSequence * pSeq, CBitstream * pBstr)
 		m_quant->Transform(m_imgF, m_imgF);
 		m_zz->Transform(m_imgF, m_img);
 		m_rlc->Encode(m_img, pBstr);
-		m_rlc->Flush(pBstr);
+		//m_rlc->Flush(pBstr);
 		pBstr->flush();
+		dbg("Flushing at %d\n", pBstr->getPosition());
 		iquant->Transform(m_imgF, m_imgF);
 		idct->Transform(m_imgF, m_imgF);
 		if(sof.frame_type == FRAME_TYPE_P)
@@ -123,6 +151,7 @@ bool CBasicEncoder::Encode(CSequence * pSeq, CBitstream * pBstr)
 		}
 		else
 		{
+			rshift->Transform(m_imgF, m_imgF);
 			(*m_imgLast) = (*m_imgF);
 		}
 	}
@@ -135,6 +164,7 @@ bool CBasicEncoder::Encode(CSequence * pSeq, CBitstream * pBstr)
 	dbg("Timer RLC           : %f\n", m_rlc->getTimer().getTotalSeconds());
 	delete idct;
 	delete iquant;
+	delete rshift;
 	delete shift;
 	return false;
 }

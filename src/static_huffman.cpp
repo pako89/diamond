@@ -208,7 +208,9 @@ void CStaticHuffman<T>::Put(uint32_t bits, int n, CBitstream * bstr)
 template <class T>
 void CStaticHuffman<T>::Flush(CBitstream * bstr)
 {
+	m_buff_cnt = 8;
 	bstr->putBits(m_buff_cnt, m_buff);
+	dbg("m_buff_cnt=%d m_buff=0x%x\n", m_buff_cnt, 0xff&m_buff);
 	m_buff_cnt = 0;
 }
 
@@ -228,7 +230,6 @@ void CStaticHuffman<T>::feed(CBitstream * bstr)
 		}
 	}
 }
-
 
 template <class T>
 uint32_t CStaticHuffman<T>::Get(int n, CBitstream * bstr)
