@@ -38,6 +38,8 @@ int main(int argc,char * argv[])
 		dbg("OpenCL     : %s\n", config.UseOpenCL?"True":"False");
 		if(diamond::DIAMOND_OP_ENCODE == config.Op)
 		{
+			dbg("Huffman    : %s\n", config.EncoderConfig.HuffmanType==avlib::HUFFMAN_TYPE_DYNAMIC?"dynamic":"static");
+			dbg("GOP        : %d\n", config.EncoderConfig.GOP);
 			avlib::CSequence * seq = new avlib::CSequence(
 				config.InputFile,
 				config.ImageType,

@@ -153,7 +153,8 @@ const struct option CDiamondApp::common_options[] = {
 	{"height",		required_argument,	NULL,	'H'},
 	{"width",		required_argument,	NULL,	'W'},
 	{"opencl",		no_argument,		NULL, 	'C'},
-	{"huffman",		required_argument, 	NULL, 	'e'}
+	{"huffman",		required_argument, 	NULL, 	'e'},
+	{"gop",			required_argument,	NULL, 	'g'}
 };
 
 #define COMMON_OPTS_SIZE	ARRAY_SIZE(common_options)
@@ -233,6 +234,19 @@ void CDiamondApp::ParseArgs(int argc, char * argv[])
 			break;
 		case 'e':
 			m_config.EncoderConfig.HuffmanType = parseHuffman(optarg);
+			break;
+		case 'g':
+			{
+				int gop = parseInt(optarg);
+				if(gop >= 0)
+				{
+					m_config.EncoderConfig.GOP = parseInt(optarg);
+				}
+				else
+				{
+					throw utils::StringFormatException("wrong GOP: '%d'\n", gop);
+				}
+			}
 			break;
 		case '?':
 			break;

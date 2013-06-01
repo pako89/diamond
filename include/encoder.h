@@ -14,6 +14,7 @@ namespace avlib
 struct EncoderConfig
 {
 	HUFFMAN_TYPE HuffmanType;
+	int GOP;
 };
 
 class CEncoder : public utils::ITimer

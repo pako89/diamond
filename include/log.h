@@ -1,12 +1,18 @@
 #ifndef _LOG_H
 #define _LOG_H
 
+#include <stdio.h>
+
 #define RED	"\033[1;91m"
 #define EC	"\033[0m"
 #define YELLOW	"\033[1;93m"
 
 static int logv = 0;
 
+#ifdef DUMP_BITSTREAM
+extern FILE * fh_w;
+extern FILE * fh_r;
+#endif
 
 #define _FILE			stderr
 #define _LOG(...)	fprintf(_FILE, __VA_ARGS__)

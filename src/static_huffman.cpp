@@ -127,7 +127,6 @@ const uint8_t CStaticHuffman<T>::AC_UV_V[] = {
 
 #define AC_UV_V_SIZE ARRAY_SIZE(AC_UV_V)
 
-
 template <class T>
 CStaticHuffman<T>::CStaticHuffman()
 {
@@ -142,6 +141,11 @@ CStaticHuffman<T>::CStaticHuffman()
 	m_items[items_key_t(false, 0)] = &m_ACY;
 	m_items[items_key_t(false, 1)] = &m_ACUV;
 	m_items[items_key_t(false, 2)] = &m_ACUV;
+}
+
+template <class T>
+CStaticHuffman<T>::~CStaticHuffman()
+{
 }
 
 template <class T>
@@ -208,10 +212,20 @@ void CStaticHuffman<T>::Put(uint32_t bits, int n, CBitstream * bstr)
 template <class T>
 void CStaticHuffman<T>::Flush(CBitstream * bstr)
 {
-	m_buff_cnt = 8;
-	bstr->putBits(m_buff_cnt, m_buff);
-	dbg("m_buff_cnt=%d m_buff=0x%x\n", m_buff_cnt, 0xff&m_buff);
+	if(m_buff_cnt)
+	{
+		bstr->putBits(m_buff_cnt, m_buff);
+	}
 	m_buff_cnt = 0;
+}
+
+template <class T>
+void CStaticHuffman<T>::Fill(CBitstream * bstr)
+{
+	int pos = bstr->getPosition();
+	pos -= m_buff_cnt;
+	bstr->setPosition(pos);
+	m_buff_cnt=0;
 }
 
 template <class T>

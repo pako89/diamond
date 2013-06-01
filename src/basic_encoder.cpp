@@ -58,12 +58,10 @@ void CBasicEncoder::init(CImageFormat fmt)
 	{
 		if(m_config.HuffmanType == HUFFMAN_TYPE_STATIC)
 		{
-			dbg("Creating StaticRLC\n");
 			m_rlc = new CStaticRLC<int16_t>();
 		}
 		else if(m_config.HuffmanType == HUFFMAN_TYPE_DYNAMIC)
 		{
-			dbg("Creating DynamicRLC\n");
 			m_rlc = new CDynamicRLC<int16_t>();
 		}
 		else
@@ -115,7 +113,6 @@ bool CBasicEncoder::Encode(CSequence * pSeq, CBitstream * pBstr)
 	CIQuant * iquant = new CIQuant();
 	CShift<float> * shift = new CShift<float>(-128.0f);
 	CShift<float> * rshift = new CShift<float>(128.0f);
-	int gop = 4;
 	m_quant->setTables(1);
 	for(int i=0;i<sos.frames_number;i++)
 	{
@@ -126,7 +123,7 @@ bool CBasicEncoder::Encode(CSequence * pSeq, CBitstream * pBstr)
 		dbg("\rEncoding frame: %d/%d", i, sos.frames_number);
 		(*m_imgF) = pSeq->getFrame();
 		sof_marker_t sof;
-		if(i%gop == 0 || i == sos.frames_number-1)
+		if(!m_config.GOP || i%m_config.GOP == 0 || i == sos.frames_number-1)
 		{
 			shift->Transform(m_imgF, m_imgF);
 			sof = write_sof(pBstr, FRAME_TYPE_I);
@@ -140,9 +137,8 @@ bool CBasicEncoder::Encode(CSequence * pSeq, CBitstream * pBstr)
 		m_quant->Transform(m_imgF, m_imgF);
 		m_zz->Transform(m_imgF, m_img);
 		m_rlc->Encode(m_img, pBstr);
-		//m_rlc->Flush(pBstr);
+		m_rlc->Flush(pBstr);
 		pBstr->flush();
-		dbg("Flushing at %d\n", pBstr->getPosition());
 		iquant->Transform(m_imgF, m_imgF);
 		idct->Transform(m_imgF, m_imgF);
 		if(sof.frame_type == FRAME_TYPE_P)

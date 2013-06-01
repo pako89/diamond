@@ -76,8 +76,8 @@ void CQuant::TransformBlock(float * pSrc, float * pDst, CPoint p, CSize s)
 		for(int x=0;x<(*m_q)[p.Z].getWidth();x++)
 		{
 			float t = src[y*s.Width+x]*(*m_q)[p.Z][y][x];
-			if(!y && !x)  t = LIMIT(t, 2047.0f);
-			else	      t = LIMIT(t, 1023.0f);
+			if(!y && !x)  t = LIMIT(t, 2046.0f);
+			else	      t = LIMIT(t, 1022.0f);
 			dst[y*s.Width+x] = t;
 		}
 	}

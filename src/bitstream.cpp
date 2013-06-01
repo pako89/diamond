@@ -1,4 +1,5 @@
 #include <bitstream.h>
+#include <log.h>
 
 namespace avlib
 {
@@ -16,8 +17,8 @@ CBitstream::CBitstream(int32_t size)
 
 CBitstream::~CBitstream()
 {
-  this->fh=NULL;
-  delete [] this->mBuffer;
+	this->fh=NULL;
+	delete [] this->mBuffer;
 }
 
 int32_t CBitstream::getSize()
@@ -33,10 +34,12 @@ int32_t CBitstream::getPosition()
 bool CBitstream::setPosition(int32_t pos)
 {
 	if(pos < 0 || pos > (this->mSize<<3))
+	{
 		return false;
+	}
 	this->mPosition = pos;
-	this->mBits = pos&0x7;
-	this->mBufferPtr = &this->mBuffer[pos>>8];
+	this->mBits = pos%8;
+	this->mBufferPtr = &this->mBuffer[pos/8];
 	return true;
 }
 
@@ -174,7 +177,9 @@ bool CBitstream::read_block(void * ptr,uint32_t size)
 {
 	uint8_t * bptr = (uint8_t*)ptr;
 	while(size--)
+	{
 		*(bptr++) = (uint8_t)this->getBits(8);
+	}
 	return true;
 }
 

@@ -188,6 +188,11 @@ RunValue<T> CStaticIRLC<T>::decodeAC(int c, CBitstream * bstr)
 	CORRECT_MANT(val, mant, nbits);
 	return RunValue<T>(run, val);
 }
+template <class T>
+void CStaticIRLC<T>::Fill(CBitstream * bstr)
+{
+	m_huff->Fill(bstr);
+}
 
 INSTANTIATE(CStaticRLC, int32_t);
 INSTANTIATE(CStaticIRLC, int32_t);

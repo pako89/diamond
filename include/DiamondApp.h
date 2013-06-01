@@ -13,6 +13,10 @@
 #include <avlib.h>
 #include <encoder.h>
 
+#ifndef DEFAULT_GOP
+#define DEFAULT_GOP	4
+#endif
+
 namespace diamond
 {
 
@@ -53,6 +57,7 @@ struct DiamondConfig
 		UseOpenCL(false)
 	{
 		EncoderConfig.HuffmanType = avlib::HUFFMAN_TYPE_DYNAMIC;//avlib::HUFFMAN_TYPE_STATIC;
+		EncoderConfig.GOP = DEFAULT_GOP;
 	}
 	DiamondOperation Op;
 	const char * InputFileName;

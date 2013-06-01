@@ -54,13 +54,13 @@ bool CBasicDecoder::Decode(CBitstream * pBstr, CSequence * pSeq)
 	{
 		dbg("\rDecoding frame: %d", n);
 		pBstr->fill();
-		dbg("Filling at %d\n", pBstr->getPosition());
 		pBstr->read_block(&sof, sizeof(sof));
 		if(sof.type != MARKER_TYPE_SOF || sof.size != sizeof(sof_marker_t))
 		{
 			throw utils::StringFormatException("can not sync frame");
 		}
 		irlc->Decode(pBstr, img);
+		irlc->Fill(pBstr);
 		izigzag->Transform(img, imgF);
 		iquant->Transform(imgF, imgF);
 		idct->Transform(imgF, imgF);

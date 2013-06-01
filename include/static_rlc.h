@@ -48,6 +48,7 @@ public:
 	virtual void DecodeBlock(CBitstream * pBstr, T * pDst, CPoint p, CSize s);
 	virtual T decodeDC(int c, CBitstream * bstr);
 	virtual RunValue<T> decodeAC(int c, CBitstream * bstr);
+	virtual void Fill(CBitstream * bstr);
 	virtual void Reset();
 protected:
 	CStaticHuffman<T> * m_huff;

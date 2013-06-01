@@ -29,6 +29,7 @@ public:
 	virtual ~CIRLC();
 	virtual void Decode(CBitstream * pBstr, CImage<T> * pImg);
 	virtual void DecodeBlock(CBitstream * pBstr, T * pDst, CPoint p, CSize s) = 0;
+	virtual void Fill(CBitstream * bstr) { }
 protected:
 };
 

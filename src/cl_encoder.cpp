@@ -12,6 +12,7 @@ CCLEncoder::CCLEncoder()
 CCLEncoder::CCLEncoder(EncoderConfig cfg) : 
 	CBasicEncoder(cfg)
 {
+	m_clPolicy = new CCLFirstGPUDevicePolicy();
 }
 
 CCLEncoder::~CCLEncoder()

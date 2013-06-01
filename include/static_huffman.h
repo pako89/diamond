@@ -44,6 +44,7 @@ public:
 	
 public:
 	CStaticHuffman();
+	~CStaticHuffman();
 	virtual void Encode(huffman_code_t val, CBitstream * bstr, bool dc, int c);
 	virtual huffman_code_t Decode(CBitstream * bstr, bool dc, int c);
 	virtual void Reset();
@@ -52,6 +53,7 @@ public:
 	virtual uint32_t Get(int n, CBitstream * bstr);
 	virtual huffman_code_t GetCode(CBitstream * bstr, HuffmanItem * item);
 	virtual void Flush(CBitstream * bstr);
+	virtual void Fill(CBitstream * bstr);
 	virtual bool Contains(huffman_code_t s, bool dc, int c);
 protected:
 	virtual int getNumberOfCodes(const uint8_t * len, int size, const uint8_t * val);
