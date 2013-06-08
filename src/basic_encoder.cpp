@@ -93,7 +93,7 @@ sos_marker_t CBasicEncoder::write_sos(CSequence * pSeq, CBitstream * pBstr)
 	return sos;
 }
 
-sof_marker_t CBasicEncoder::write_sof(CBitstream * pBstr, frame_type_t frame_type)
+sof_marker_t CBasicEncoder::write_sof(CBitstream * pBstr, FRAME_TYPE frame_type)
 {
 	sof_marker_t sof;
 	sof.type = MARKER_TYPE_SOF;
@@ -113,7 +113,12 @@ bool CBasicEncoder::Encode(CSequence * pSeq, CBitstream * pBstr)
 	CIQuant * iquant = new CIQuant();
 	CShift<float> * shift = new CShift<float>(-128.0f);
 	CShift<float> * rshift = new CShift<float>(128.0f);
+	CPredictionInfoTable * predTab = new CPredictionInfoTable(CSize(pSeq->getFormat().Size.Height/8, pSeq->getFormat().Size.Width/8));
+	CPrediction * pred = new CPrediction(pSeq->getFormat());
+	pred->setIFrameTransform(shift);
+	pred->setIFrameITransform(rshift);
 	m_quant->setTables(1);
+	FRAME_TYPE frame_type;
 	for(int i=0;i<sos.frames_number;i++)
 	{
 		if(!pSeq->ReadNext())
@@ -123,33 +128,18 @@ bool CBasicEncoder::Encode(CSequence * pSeq, CBitstream * pBstr)
 		dbg("\rEncoding frame: %d/%d", i, sos.frames_number);
 		(*m_imgF) = pSeq->getFrame();
 		sof_marker_t sof;
-		if(!m_config.GOP || i%m_config.GOP == 0 || i == sos.frames_number-1)
-		{
-			shift->Transform(m_imgF, m_imgF);
-			sof = write_sof(pBstr, FRAME_TYPE_I);
-		}
-		else
-		{
-			sof = write_sof(pBstr, FRAME_TYPE_P);
-			(*m_imgF) -= (*m_imgLast);
-		}
+		frame_type = (!m_config.GOP || i%m_config.GOP == 0 || i == sos.frames_number-1)?FRAME_TYPE_I:FRAME_TYPE_P;
+		sof = write_sof(pBstr, frame_type);
+		pred->Transform(m_imgF, m_imgF, predTab, frame_type);
 		m_dct->Transform(m_imgF, m_imgF);
 		m_quant->Transform(m_imgF, m_imgF);
 		m_zz->Transform(m_imgF, m_img);
-		m_rlc->Encode(m_img, pBstr);
+		m_rlc->Encode(m_img, predTab, pBstr);
 		m_rlc->Flush(pBstr);
 		pBstr->flush();
 		iquant->Transform(m_imgF, m_imgF);
 		idct->Transform(m_imgF, m_imgF);
-		if(sof.frame_type == FRAME_TYPE_P)
-		{
-			(*m_imgLast) += (*m_imgF);
-		}
-		else
-		{
-			rshift->Transform(m_imgF, m_imgF);
-			(*m_imgLast) = (*m_imgF);
-		}
+		pred->ITransform(m_imgF, m_imgF, predTab, frame_type);
 	}
 	dbg("\n");
 	m_timer.stop();
@@ -158,6 +148,8 @@ bool CBasicEncoder::Encode(CSequence * pSeq, CBitstream * pBstr)
 	dbg("Timer Quant         : %f\n", m_quant->getTimer().getTotalSeconds());
 	dbg("Timer Zig Zag       : %f\n", m_zz->getTimer().getTotalSeconds());
 	dbg("Timer RLC           : %f\n", m_rlc->getTimer().getTotalSeconds());
+	delete pred;
+	delete predTab;
 	delete idct;
 	delete iquant;
 	delete rshift;

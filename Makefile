@@ -12,6 +12,7 @@ CFLAGS += -I/usr/local/cuda/include
 cflags += $(INCDIR) 
 CFLAGS += -DDEBUG
 CFLAGS += -DCHECK_HUFFMAN
+#CFLAGS += -DDUMP_BITSTREAM
 #CFLAGS += -Os
 
 # Linker flags
@@ -22,6 +23,7 @@ LIBS = -lOpenCL
 
 # Source files
 SRC += src/main.cpp
+SRC += src/log.cpp
 SRC += src/avlib.cpp
 SRC += src/decoder.cpp
 SRC += src/getopt.cpp

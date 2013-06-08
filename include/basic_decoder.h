@@ -10,6 +10,7 @@
 #include <rlc.h>
 #include <dynamic_rlc.h>
 #include <static_rlc.h>
+#include <prediction.h>
 
 namespace avlib
 {

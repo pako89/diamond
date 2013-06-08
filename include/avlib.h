@@ -4,6 +4,12 @@
 namespace avlib
 {
 
+enum FRAME_TYPE
+{
+	FRAME_TYPE_I = 0,
+	FRAME_TYPE_P
+};
+
 enum HUFFMAN_TYPE
 {
 	HUFFMAN_TYPE_UNKNOWN = 0 ,

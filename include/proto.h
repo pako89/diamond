@@ -41,13 +41,6 @@ MARKER_DEF(sos)
 	uint32_t width;
 	uint32_t height;
 MARKER_END(sos)
-	
-typedef enum frame_type
-{
-	FRAME_TYPE_I	= 0x00,
-	FRAME_TYPE_P	= 0x01,
-	FRAME_TYPE_B	= 0x02
-} frame_type_t;
 
 MARKER_DEF(sof)
 	uint8_t frame_type;

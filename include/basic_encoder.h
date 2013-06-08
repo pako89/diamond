@@ -11,6 +11,7 @@
 #include <dynamic_rlc.h>
 #include <static_rlc.h>
 #include <mtimer.h>
+#include <prediction.h>
 
 namespace avlib
 {
@@ -25,7 +26,7 @@ public:
 protected:
 	virtual void init(CImageFormat fmt);
 	virtual sos_marker_t write_sos(CSequence * pSeq, CBitstream * pBtr);
-	virtual sof_marker_t write_sof(CBitstream * pBstr, frame_type_t frame_type);
+	virtual sof_marker_t write_sof(CBitstream * pBstr, FRAME_TYPE frame_type);
 	CImage<float> * m_imgF;
 	CImage<float> * m_imgLast;
 	CImage<int16_t> * m_img;

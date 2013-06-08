@@ -7,11 +7,13 @@ namespace avlib
 template <class T>
 CRLC<T>::CRLC()
 {
+	m_predHuff = new CDynamicHuffman<int32_t>();
 }
 
 template <class T>
 CRLC<T>::~CRLC()
 {
+	delete m_predHuff;
 }
 
 template <class T>
@@ -19,6 +21,14 @@ void CRLC<T>::Encode(CImage<T> * pImg, CBitstream * pBstr)
 {
 	m_timer.start();
 	doEncode(pImg, pBstr);
+	m_timer.stop();
+}
+
+template <class T>
+void CRLC<T>::Encode(CImage<T> * pImg, CPredictionInfoTable * pPred, CBitstream * pBstr)
+{
+	m_timer.start();
+	doEncode(pImg, pPred, pBstr);
 	m_timer.stop();
 }
 
@@ -39,15 +49,29 @@ void CRLC<T>::doEncode(CImage<T> * pImg, CBitstream * pBstr)
 	}
 }
 
+template <class T>
+void CRLC<T>::doEncode(CImage<T> * pImg, CPredictionInfoTable * pPred, CBitstream * pBstr)
+{
+	for(int y=0;y<pPred->getSize().Height;y++)
+	{
+		for(int x=0;x<pPred->getSize().Width;x++)
+		{
+			(*pPred)[y][x].Encode(m_predHuff, pBstr);
+		}
+	}
+	doEncode(pImg, pBstr);
+}
 
 template <class T>
 CIRLC<T>::CIRLC()
 {
+	m_predHuff = new CDynamicHuffman<int32_t>();
 }
 
 template <class T>
 CIRLC<T>::~CIRLC()
 {
+	delete m_predHuff;
 }
 
 template <class T>
@@ -64,6 +88,19 @@ void CIRLC<T>::Decode(CBitstream * pBstr, CImage<T> * pImg)
 			}
 		}
 	}
+}
+
+template <class T>
+void CIRLC<T>::Decode(CBitstream * pBstr, CImage<T> * pImg, CPredictionInfoTable * pPred)
+{
+	for(int y=0;y<pPred->getSize().Height;y++)
+	{
+		for(int x=0;x<pPred->getSize().Width;x++)
+		{
+			(*pPred)[y][x].Decode(m_predHuff, pBstr);
+		}
+	}
+	Decode(pBstr, pImg);
 }
 
 INSTANTIATE(CRLC, int32_t);

@@ -18,7 +18,7 @@ extern FILE * fh_r;
 #define _LOG(...)	fprintf(_FILE, __VA_ARGS__)
 
 #define inc_logv()	(logv++)
-#define log(...)	if(logv>0) _LOG(__VA_ARGS__)
+#define LOG(...)	if(logv>0) _LOG(__VA_ARGS__)
 
 #ifdef DEBUG
 

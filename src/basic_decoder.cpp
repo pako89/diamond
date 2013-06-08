@@ -38,6 +38,7 @@ bool CBasicDecoder::Decode(CBitstream * pBstr, CSequence * pSeq)
 	CIQuant * iquant = new CIQuant();
 	CIZigZag<int16_t, float> * izigzag = new CIZigZag<int16_t, float>();
 	CIRLC<int16_t> * irlc;
+	CPredictionInfoTable * predTab = new CPredictionInfoTable(CSize(pSeq->getFormat().Size.Height/8, pSeq->getFormat().Size.Width/8));
 	switch(sos.huffman)
 	{
 	case HUFFMAN_T_DYNAMIC:
@@ -49,6 +50,8 @@ bool CBasicDecoder::Decode(CBitstream * pBstr, CSequence * pSeq)
 		break;
 	}
 	CShift<float> * shift = new CShift<float>(128.0f);
+	CPrediction * pred = new CPrediction(pSeq->getFormat());
+	pred->setIFrameITransform(shift);
 	sof_marker_t sof;
 	for(uint32_t n = 0 ; n < sos.frames_number; n++)
 	{
@@ -59,23 +62,12 @@ bool CBasicDecoder::Decode(CBitstream * pBstr, CSequence * pSeq)
 		{
 			throw utils::StringFormatException("can not sync frame");
 		}
-		irlc->Decode(pBstr, img);
+		irlc->Decode(pBstr, img, predTab);
 		irlc->Fill(pBstr);
 		izigzag->Transform(img, imgF);
 		iquant->Transform(imgF, imgF);
 		idct->Transform(imgF, imgF);
-		if(sof.frame_type == FRAME_TYPE_I)
-		{
-			shift->Transform(imgF, imgF);
-		}
-		else if(sof.frame_type == FRAME_TYPE_P)
-		{
-			(*imgF) += (*imgLast);
-		}
-		else
-		{
-			throw utils::StringFormatException("unknown frame type: 0x%x\n", sof.frame_type);
-		}
+		pred->ITransform(imgF, imgF, predTab, (FRAME_TYPE)sof.frame_type);
 		pSeq->getFrame() = *imgF;
 		if(!pSeq->WriteNext())
 		{
@@ -85,6 +77,8 @@ bool CBasicDecoder::Decode(CBitstream * pBstr, CSequence * pSeq)
 	}
 	dbg("\n");
 	delete shift;
+	delete pred;
+	delete predTab;
 	delete img;
 	delete imgF;
 	delete imgLast;

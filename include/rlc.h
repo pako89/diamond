@@ -4,6 +4,7 @@
 #include <dynamic_huffman.h>
 #include <image.h>
 #include <mtimer.h>
+#include <prediction.h>
 
 namespace avlib
 {
@@ -15,10 +16,13 @@ public:
 	CRLC();
 	virtual ~CRLC();
 	virtual void Encode(CImage<T> * pImg, CBitstream * pBstr);
+	virtual void Encode(CImage<T> * pImg, CPredictionInfoTable * pPred, CBitstream * pBstr);
 	virtual void EncodeBlock(const T * pSrc, CPoint p, CSize s, CBitstream * pBstr) = 0;
 	virtual void Flush(CBitstream * bstr) {  }
 protected:
 	virtual void doEncode(CImage<T> * pImg, CBitstream * pBstr);
+	virtual void doEncode(CImage<T> * pImg, CPredictionInfoTable * pPred, CBitstream * pBstr);
+	CDynamicHuffman<int32_t> * m_predHuff;
 };
 
 template <class T>
@@ -28,9 +32,11 @@ public:
 	CIRLC();
 	virtual ~CIRLC();
 	virtual void Decode(CBitstream * pBstr, CImage<T> * pImg);
+	virtual void Decode(CBitstream * pBstr, CImage<T> * pImg, CPredictionInfoTable * pPred);
 	virtual void DecodeBlock(CBitstream * pBstr, T * pDst, CPoint p, CSize s) = 0;
 	virtual void Fill(CBitstream * bstr) { }
 protected:
+	CDynamicHuffman<int32_t> * m_predHuff;
 };
 
 }

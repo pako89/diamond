@@ -100,10 +100,6 @@ std::string CCLEncoder::get_src_from_file(char * file_name)
 
 bool CCLEncoder::Encode(CSequence * pSeq, CBitstream * pBstr)
 {
-#if 0
-	init(pSeq->getFormat());
-	sos_marker_t sos = write_sos(pSeq, pBstr);
-#else
 	m_timer.start();
 	init(pSeq->getFormat());
 	sos_marker_t sos = write_sos(pSeq, pBstr);
@@ -168,7 +164,6 @@ bool CCLEncoder::Encode(CSequence * pSeq, CBitstream * pBstr)
 	delete iquant;
 	delete shift;
 	return false;
-#endif
 }
 
 }
