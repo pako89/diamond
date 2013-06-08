@@ -7,7 +7,7 @@
 #define EC	"\033[0m"
 #define YELLOW	"\033[1;93m"
 
-static int logv = 0;
+extern int logv;
 
 #ifdef DUMP_BITSTREAM
 extern FILE * fh_w;

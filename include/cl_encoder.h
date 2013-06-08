@@ -11,8 +11,6 @@
 #include <cl_base.h>
 #include <cl_policy.h>
 #include <CL/opencl.h>
-#include <fstream>
-#include <string>
 #include <mtimer.h>
 
 namespace avlib
@@ -27,7 +25,6 @@ public:
 	virtual bool Encode(CSequence * pSeq, CBitstream * pBstr);
 protected:
 	virtual void init(CImageFormat fmt);
-	std::string get_src_from_file(char * file_name);
 	CCLDevice m_dev;
 	cl_program m_program;
 	CCLDevicePolicy * m_clPolicy;

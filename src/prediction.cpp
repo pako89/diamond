@@ -3,6 +3,10 @@
 #include <cmath>
 #include <limits>
 
+#ifndef DEFAULT_MAX_PREDICTION
+#define DEFAULT_MAX_PREDICTION	2
+#endif
+
 namespace avlib
 {
 
@@ -152,14 +156,14 @@ CPrediction::CPrediction() :
 	m_last(NULL),
 	m_IFT(NULL),
 	m_IFIT(NULL),
-	m_max(2)
+	m_max(DEFAULT_MAX_PREDICTION)
 {
 }
 
 CPrediction::CPrediction(CImageFormat format) :
 	m_IFT(NULL),
 	m_IFIT(NULL),
-	m_max(2)
+	m_max(DEFAULT_MAX_PREDICTION)
 {
 	m_last = new CImage<float>(format);
 }
@@ -180,21 +184,14 @@ void CPrediction::Transform(CImage<float> * src, CImage<float> * dst, CPredictio
 	}
 	else if(FRAME_TYPE_P == type)
 	{
-		CSize size((*src)[0].getHeight(), (*src)[0].getWidth());
-		for(int y=0; y < size.Height; y+=8)
-		{
-			for(int x=0; x < size.Width; x+=8)
-			{
-				(*pPredInfo)[y/8][x/8] = predict(&(*src)[0][y][x], CPoint(0, y, x), size);
-			}
-		}
 		for(int k=0;k<src->getComponents();k++)
 		{
 			CSize size((*src)[k].getHeight(), (*src)[k].getWidth());
-			for(int y=0; y < (*src)[k].getHeight(); y+=8)
+			for(int y=0; y < size.Height; y+=8)
 			{
-				for(int x=0; x < (*src)[k].getWidth(); x+=8)
+				for(int x=0; x < size.Width; x+=8)
 				{
+					if(k==0) (*pPredInfo)[y/8][x/8] = predict(&(*src)[0][y][x], CPoint(0, y, x), size);
 					TransformBlock(&(*src)[k][y][x], &(*dst)[k][y][x], CPoint(k, y, x), size, (*pPredInfo)[y/8][x/8]);
 				}
 			}
@@ -215,10 +212,9 @@ CPredictionInfo CPrediction::predict(float * pSrc, CPoint p, CSize s)
 	{
 		CPoint p;
 		float d;
-	} min = {
-		{p.Y, p.X},
-		std::numeric_limits<float>::max()
-	};
+	} min;
+	min.p = p;
+	min.d = std::numeric_limits<float>::max();
 	CPoint dp;
 	for(int dy = -m_max ; dy <= m_max ; dy++)
 	{

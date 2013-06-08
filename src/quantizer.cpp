@@ -65,7 +65,6 @@ void CQuant::setTables(const uint8_t * YQ, const uint8_t * UQ, const uint8_t * V
 	}
 }
 
-#define LIMIT(v, l)	( (v) > (l) ? (l) : ((v) < -(l) ? -(l) : (v)) )
 
 void CQuant::TransformBlock(float * pSrc, float * pDst, CPoint p, CSize s)
 {

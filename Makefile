@@ -14,6 +14,7 @@ CFLAGS += -DDEBUG
 CFLAGS += -DCHECK_HUFFMAN
 #CFLAGS += -DDUMP_BITSTREAM
 #CFLAGS += -Os
+CFLAGS += -DDEFAULT_MAX_PREDICTION=1
 
 # Linker flags
 LDFLAGS	+= -L/usr/lib
@@ -62,6 +63,7 @@ SRC += src/cl_device.cpp
 SRC += src/cl_platform.cpp
 SRC += src/cl_device_info.cpp
 SRC += src/cl_platform_info.cpp
+SRC += src/cl_shift.cpp
 
 # Objects
 OBJ	= $(SRC:.cpp=.o)

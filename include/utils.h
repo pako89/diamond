@@ -21,6 +21,8 @@
 #endif
 #define ARRAY_SIZE(x)				(sizeof((x))/sizeof((x)[0]))
 
+#define LIMIT(v, l)	( (v) > (l) ? (l) : ((v) < -(l) ? -(l) : (v)) )
+
 namespace utils
 {
 
@@ -112,6 +114,7 @@ void clampImg(avlib::CImage<T> * src, avlib::CImage<U> * dst)
 
 int log2(int val);
 void printProgressBar(int i, int n);
+std::string get_src_from_file(char * file_name);
 
 
 }

@@ -33,7 +33,7 @@ void CCLEncoder::init(CImageFormat fmt)
 	m_dev.createContext();
 	m_dev.createCommandQueue();
 	cl_int err;
-	std::string src = this->get_src_from_file((char*)"src/cl/kernel.cl");
+	std::string src = utils::get_src_from_file((char*)"src/cl/kernel.cl");
 	const char * csrc = src.c_str();
 	if((m_program = clCreateProgramWithSource(m_dev.getContext(), 1, &csrc, NULL, &err)) == 0 || CL_SUCCESS != err)
 	{
@@ -65,41 +65,66 @@ void CCLEncoder::init(CImageFormat fmt)
 	this->m_dct = new CCLDCT(&this->m_dev, m_program, "dct_transform");
 	this->m_quant = new CCLQuant(&this->m_dev, m_program, "quant_transform");
 	this->m_zz = new CCLZigZag<float, int16_t>(&this->m_dev, m_program, "lut_transform_float_int16");
-	this->m_quant->setTables(1);
+	//this->m_quant->setTables(1);
 	CBasicEncoder::init(fmt);
-}
-
-std::string CCLEncoder::get_src_from_file(char * file_name)
-{
-	std::fstream fs(file_name,(std::fstream::in | std::fstream::binary));
-	std::string s;
-	if(fs.is_open()) 
-	{
-		size_t file_size;
-		fs.seekg(0,std::fstream::end);
-		file_size = (size_t)fs.tellg();
-		fs.seekg(0,std::fstream::beg);
-		char * str = new char[file_size+1];
-		str[file_size] = '\0';
-		if(NULL == str) 
-		{
-			fs.close();
-			return std::string();
-		}
-		fs.read(str,file_size);
-		fs.close();
-		s = str;
-		delete [] str;
-	} 
-	else 
-	{
-		throw utils::StringFormatException("Can not open file: %s\n", file_name);
-	}			            
-	return s;
 }
 
 bool CCLEncoder::Encode(CSequence * pSeq, CBitstream * pBstr)
 {
+	m_timer.start();
+	init(pSeq->getFormat());
+	sos_marker_t sos = write_sos(pSeq, pBstr);
+	CIDCT * idct = new CIDCT();
+	CIQuant * iquant = new CIQuant();
+	CShift<float> * shift = new CShift<float>(-128.0f);
+	CShift<float> * rshift = new CShift<float>(128.0f);
+	CPredictionInfoTable * predTab = new CPredictionInfoTable(CSize(pSeq->getFormat().Size.Height/8, pSeq->getFormat().Size.Width/8));
+	CPrediction * pred = new CPrediction(pSeq->getFormat());
+	pred->setIFrameTransform(shift);
+	pred->setIFrameITransform(rshift);
+	m_quant->setTables(1);
+	FRAME_TYPE frame_type;
+	for(int i=0;i<sos.frames_number;i++)
+	{
+		if(!pSeq->ReadNext())
+		{
+			throw utils::StringFormatException("can not read frame from file");
+		}
+		utils::printProgressBar(i, sos.frames_number);
+		(*m_imgF) = pSeq->getFrame();
+		sof_marker_t sof;
+		frame_type = (!m_config.GOP || i%m_config.GOP == 0 || i == sos.frames_number-1)?FRAME_TYPE_I:FRAME_TYPE_P;
+		sof = write_sof(pBstr, frame_type);
+		pred->Transform(m_imgF, m_imgF, predTab, frame_type);
+		dynamic_cast<CCLImage<float>*>(m_imgF)->CopyToDevice();
+		m_dct->Transform(m_imgF, m_imgF);
+		m_quant->Transform(m_imgF, m_imgF);
+		m_zz->Transform(m_imgF, m_img);
+		dynamic_cast<CCLImage<float>*>(m_imgF)->CopyToHost();
+		dynamic_cast<CCLImage<int16_t>*>(m_img)->CopyToHost();
+		m_rlc->Encode(m_img, predTab, pBstr);
+		m_rlc->Flush(pBstr);
+		pBstr->flush();
+		iquant->Transform(m_imgF, m_imgF);
+		idct->Transform(m_imgF, m_imgF);
+		pred->ITransform(m_imgF, m_imgF, predTab, frame_type);
+	}
+	dbg("\n");
+	m_timer.stop();
+	dbg("Timer total         : %f\n", m_timer.getTotalSeconds());
+	dbg("Timer DCT           : %f\n", m_dct->getTimer().getTotalSeconds());
+	dbg("Timer Quant         : %f\n", m_quant->getTimer().getTotalSeconds());
+	dbg("Timer Zig Zag       : %f\n", m_zz->getTimer().getTotalSeconds());
+	dbg("Timer RLC           : %f\n", m_rlc->getTimer().getTotalSeconds());
+	delete pred;
+	delete predTab;
+	delete idct;
+	delete iquant;
+	delete rshift;
+	delete shift;
+	return false;
+	
+#if 0
 	m_timer.start();
 	init(pSeq->getFormat());
 	sos_marker_t sos = write_sos(pSeq, pBstr);
@@ -108,6 +133,12 @@ bool CCLEncoder::Encode(CSequence * pSeq, CBitstream * pBstr)
 	int gop = 4;
 	CCLImage<float> * tmpF = new CCLImage<float>(&m_dev, m_imgF->getFormat());
 	CShift<float> * shift = new CShift<float>(-128.0f);
+	CShift<float> * rshift = new CShift<float>(128.0f);
+	CPredictionInfoTable * predTab = new CPredictionInfoTable(CSize(pSeq->getFormat().Size.Height/8, pSeq->getFormat().Size.Width/8));
+	CPrediction * pred = new CPrediction(pSeq->getFormat());
+	pred->setIFrameTransform(shift);
+	pred->setIFrameITransform(rshift);
+	m_quant->setTables(1);
 	for(int i=0;i<sos.frames_number;i++)
 	{
 		if(!pSeq->ReadNext())
@@ -116,7 +147,6 @@ bool CCLEncoder::Encode(CSequence * pSeq, CBitstream * pBstr)
 		}
 		dbg("\rEncoding frame: %d", i);
 		(*m_imgF) = pSeq->getFrame();
-		//shift->Transform(m_imgF, m_imgF);
 		sof_marker_t sof;
 		if(i%gop == 0 || i == sos.frames_number-1)
 		{
@@ -164,6 +194,7 @@ bool CCLEncoder::Encode(CSequence * pSeq, CBitstream * pBstr)
 	delete iquant;
 	delete shift;
 	return false;
+#endif
 }
 
 }
