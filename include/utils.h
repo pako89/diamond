@@ -111,6 +111,7 @@ void clampImg(avlib::CImage<T> * src, avlib::CImage<U> * dst)
 }
 
 int log2(int val);
+void printProgressBar(int i, int n);
 
 
 }

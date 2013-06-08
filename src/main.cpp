@@ -26,6 +26,7 @@ int main(int argc,char * argv[])
 	fl=u8;
 	diamond::CDiamondApp * app = diamond::CDiamondApp::getInstance();
 	app->setName(argv[0]);
+	inc_logv();
 	try
 	{
 		app->ParseArgs(argc, argv);

@@ -125,7 +125,7 @@ bool CBasicEncoder::Encode(CSequence * pSeq, CBitstream * pBstr)
 		{
 			throw utils::StringFormatException("can not read frame from file");
 		}
-		dbg("\rEncoding frame: %d/%d", i, sos.frames_number);
+		utils::printProgressBar(i, sos.frames_number);
 		(*m_imgF) = pSeq->getFrame();
 		sof_marker_t sof;
 		frame_type = (!m_config.GOP || i%m_config.GOP == 0 || i == sos.frames_number-1)?FRAME_TYPE_I:FRAME_TYPE_P;
