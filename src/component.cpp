@@ -1,5 +1,6 @@
 #include <component.h>
 #include <utils.h>
+#include <clkernel.h>
 
 using namespace avlib;
 
@@ -181,38 +182,7 @@ T * CComponent<T>::operator[](int h)
 	return &this->m_data[h * this->m_size.Width];
 }
 
-template <class T>
-CComponent<T> & CComponent<T>::operator-=(const CComponent<T> & src)
-{
-	if(this->m_size != src.m_size)
-	{
-		throw utils::StringFormatException("wrong sizes\n");
-	}
-	int count = getPointsCount();
-	for(int i=0;i<count;i++)
-	{
-		this->m_data[i] -= src.m_data[i];
-	}
-
-	return *this;
-}
-
-template <class T>
-CComponent<T> & CComponent<T>::operator+=(const CComponent<T> & src)
-{
-	if(this->m_size != src.m_size)
-	{
-		throw utils::StringFormatException("wrong sizes\n");
-	}
-	int count = getPointsCount();
-	for(int i=0;i<count;i++)
-	{
-		this->m_data[i] += src.m_data[i];
-	}
-
-	return *this;
-}
-
+INSTANTIATE(CComponent, prediction_info_t);
 INSTANTIATE(CComponent, uint8_t);
 INSTANTIATE(CComponent, uint16_t);
 INSTANTIATE(CComponent, int16_t);

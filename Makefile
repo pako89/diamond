@@ -9,13 +9,15 @@ CC	= g++
 CFLAGS += -g
 CFLAGS += -Iinclude
 CFLAGS += -I/usr/local/cuda/include
+CFLAGS += -Isrc/cl
 cflags += $(INCDIR) 
 CFLAGS += -DDEBUG
 CFLAGS += -DCHECK_HUFFMAN
 #CFLAGS += -DDUMP_BITSTREAM
 #CFLAGS += -Os
 CFLAGS += -DDEFAULT_MAX_PREDICTION=1
-
+CFLAGS += -DDEFAULT_CL_SRC_FILE=$(shell find src/cl -name *.cl)
+CFLAGS += -DDEFAULT_PREDICTION_METHOD=PREDICTION_METHOD_MSE
 # Linker flags
 LDFLAGS	+= -L/usr/lib
 
@@ -65,6 +67,7 @@ SRC += src/cl_device_info.cpp
 SRC += src/cl_platform_info.cpp
 SRC += src/cl_shift.cpp
 SRC += src/cl_prediction.cpp
+SRC += src/cl_host.cpp
 
 # Objects
 OBJ	= $(SRC:.cpp=.o)

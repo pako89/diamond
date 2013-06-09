@@ -6,9 +6,12 @@
 #include <prediction.h>
 #include <cl_device.h>
 #include <cl_image.h>
+#include <cl_component.h>
 
 namespace avlib
 {
+
+typedef CCLComponent<prediction_info_t> CCLPredictionInfoTable;
 
 class CCLPrediction : public CPrediction
 {

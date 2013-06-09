@@ -12,13 +12,18 @@
 #include <cl_base.h>
 #include <cl_policy.h>
 #include <cl_prediction.h>
+#include <cl_host.h>
 #include <CL/opencl.h>
 #include <mtimer.h>
+
+#ifndef DEFAULT_CL_SRC_FILE
+#define DEFAULT_CL_SRC_FILE "kernel.cl"
+#endif
 
 namespace avlib
 {
 
-class CCLEncoder : public CBasicEncoder
+class CCLEncoder : public CBasicEncoder, public ICLHost
 {
 public:
 	CCLEncoder();
@@ -27,8 +32,6 @@ public:
 	virtual bool Encode(CSequence * pSeq, CBitstream * pBstr);
 protected:
 	virtual void init(CImageFormat fmt);
-	CCLDevice m_dev;
-	cl_program m_program;
 	CCLDevicePolicy * m_clPolicy;
 	utils::CTimer m_timerCopyToDevice;
 	utils::CTimer m_timerCopyToHost;

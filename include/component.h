@@ -20,8 +20,6 @@ public:
 	virtual CComponent & operator=(const CComponent & src);
 	template <class U> CComponent & operator=(const CComponent<U> & src);
 	virtual T * operator[](int height);
-	virtual CComponent & operator-=(const CComponent & src);
-	virtual CComponent & operator+=(const CComponent & src);
 	virtual int getWidth(void);
 	virtual int getHeight(void);
 	virtual int getOriginalWidth(void);

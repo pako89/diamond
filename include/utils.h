@@ -22,6 +22,7 @@
 #define ARRAY_SIZE(x)				(sizeof((x))/sizeof((x)[0]))
 
 #define LIMIT(v, l)	( (v) > (l) ? (l) : ((v) < -(l) ? -(l) : (v)) )
+#define RELEASE(p)	if(NULL != (p)) delete (p);
 
 namespace utils
 {

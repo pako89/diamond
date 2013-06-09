@@ -27,8 +27,8 @@ void CCLShift<T>::doTransform(CImage<T> * src, CImage<T> * dst)
 		{
 			int height = (*clSrc)[i].getHeight();
 			int width = (*clSrc)[i].getWidth();
-			cl_mem srcMem = clSrc->getCLComponent(i).getCLMem();
-			cl_mem dstMem = clDst->getCLComponent(i).getCLMem();
+			cl_mem srcMem = clSrc->getCLComponent(i).getCLMem(true);
+			cl_mem dstMem = clDst->getCLComponent(i).getCLMem(false);
 			size_t global_work_size[2];
 			global_work_size[0] = height;
 			global_work_size[1] = width;

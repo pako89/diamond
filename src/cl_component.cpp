@@ -1,4 +1,5 @@
 #include <cl_component.h>
+#include <clkernel.h>
 
 namespace avlib
 {
@@ -98,9 +99,16 @@ void CCLComponent<T>::sync(CLMEM_STATE nextState)
 }
 
 template <class T>
-cl_mem CCLComponent<T>::getCLMem()
+cl_mem CCLComponent<T>::getCLMem(bool dosync)
 {
-	sync(CLMEM_STATE_DEVICE);
+	if(dosync)
+	{
+		sync(CLMEM_STATE_DEVICE);
+	}
+	else
+	{
+		m_state = CLMEM_STATE_DEVICE;
+	}
 	return this->m_cldata;
 }
 
@@ -173,6 +181,7 @@ void CCLComponent<T>::CopyToDevice()
 	}
 }
 
+INSTANTIATE(CCLComponent, prediction_info_t);
 INSTANTIATE(CCLComponent, float);
 INSTANTIATE(CCLComponent, int16_t);
 }

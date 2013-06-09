@@ -63,7 +63,8 @@ bool CBasicDecoder::Decode(CBitstream * pBstr, CSequence * pSeq)
 		{
 			throw utils::StringFormatException("can not sync frame");
 		}
-		irlc->Decode(pBstr, img, predTab);
+		pred->Decode(predTab, pBstr);
+		irlc->Decode(pBstr, img);
 		irlc->Fill(pBstr);
 		izigzag->Transform(img, imgF);
 		iquant->Transform(imgF, imgF);

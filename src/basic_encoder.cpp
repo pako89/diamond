@@ -44,8 +44,6 @@ CBasicEncoder::CBasicEncoder(EncoderConfig cfg) :
 {
 }
 
-#define RELEASE(p)	if(NULL != (p)) delete (p);
-
 CBasicEncoder::~CBasicEncoder()
 {
 	RELEASE(m_imgF);
@@ -153,7 +151,8 @@ bool CBasicEncoder::Encode(CSequence * pSeq, CBitstream * pBstr)
 		m_dct->Transform(m_imgF, m_imgF);
 		m_quant->Transform(m_imgF, m_imgF);
 		m_zz->Transform(m_imgF, m_img);
-		m_rlc->Encode(m_img, m_predTab, pBstr);
+		m_pred->Encode(m_predTab, pBstr);
+		m_rlc->Encode(m_img, pBstr);
 		m_rlc->Flush(pBstr);
 		pBstr->flush();
 		m_iquant->Transform(m_imgF, m_imgF);

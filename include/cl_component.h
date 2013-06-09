@@ -22,7 +22,7 @@ public:
 	virtual bool setSize(CSize size, cl_mem_flags mem_flags);
 	virtual void CopyToDevice();
 	virtual void CopyToHost();
-	virtual cl_mem getCLMem();
+	virtual cl_mem getCLMem(bool dosync=true);
 protected:
 	virtual void copy(const CComponent<T> * src);
 	enum CLMEM_STATE

@@ -30,8 +30,6 @@ public:
 	virtual bool setFormat(ImageType type, int height, int width);
 	virtual CImageFormat getFormat(void);
 	virtual CComponent<T> & operator[](int index);
-	virtual CImage & operator-=(const CImage & src);
-	virtual CImage & operator+=(const CImage & src);
 protected:
 	virtual void release();
 	virtual void alloc(int num);

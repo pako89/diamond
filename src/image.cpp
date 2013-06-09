@@ -214,34 +214,6 @@ CImageFormat CImage<T>::getFormat(void)
 	return m_format;
 }
 
-template <class T>
-CImage<T> & CImage<T>::operator-=(const CImage<T> & src)
-{
-	if(m_format != src.m_format)
-	{
-		throw utils::StringFormatException("wrong format\n");
-	}
-	for(int i=0;i<m_comp_num; i++)
-	{
-		*m_comp[i] -= *src.m_comp[i];
-	}
-	return *this;
-}
-
-template <class T>
-CImage<T> & CImage<T>::operator+=(const CImage<T> & src)
-{
-	if(m_format != src.m_format)
-	{
-		throw utils::StringFormatException("wrong format\n");
-	}
-	for(int i=0;i<m_comp_num; i++)
-	{
-		*m_comp[i] += *src.m_comp[i];
-	}
-	return *this;
-}
-
 INSTANTIATE(CImage, uint8_t);
 INSTANTIATE(CImage, uint16_t);
 INSTANTIATE(CImage, int16_t);
