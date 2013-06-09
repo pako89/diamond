@@ -12,6 +12,7 @@
 #include <static_rlc.h>
 #include <mtimer.h>
 #include <prediction.h>
+#include <shift.h>
 
 namespace avlib
 {
@@ -35,6 +36,12 @@ protected:
 	CQuant * m_quant;
 	CZigZag<float, int16_t> * m_zz;
 	CRLC<int16_t> * m_rlc;
+	CShift<float> * m_shift;
+	CShift<float> * m_ishift;
+	CIDCT * m_idct;
+	CIQuant * m_iquant;
+	CPrediction * m_pred;
+	CPredictionInfoTable * m_predTab;
 };
 
 }

@@ -15,10 +15,10 @@ public:
 	CComponent(CSize size);
 	CComponent(int height, int width);
 	CComponent(const CComponent<T> & src);
-	CComponent & operator=(const CComponent & src);
 	template <class U> CComponent(const CComponent<U> & src);
-	template <class U> CComponent & operator=(const CComponent<U> & src);
 	virtual ~CComponent();
+	virtual CComponent & operator=(const CComponent & src);
+	template <class U> CComponent & operator=(const CComponent<U> & src);
 	virtual T * operator[](int height);
 	virtual CComponent & operator-=(const CComponent & src);
 	virtual CComponent & operator+=(const CComponent & src);
@@ -33,11 +33,12 @@ public:
 	virtual bool setSize(int height, int width);
 	virtual size_t getBytesCount(void);
 protected:
+	virtual void copy(const CComponent<T> * src);
+	void release();
 	T * m_data;
 	CSize m_size;
 	CSize m_original_size;
 	size_t m_bytes;
-	void release();
 
 template <class> friend class CComponent;
 };

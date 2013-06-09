@@ -31,6 +31,14 @@ CCLDevice::~CCLDevice(void)
 	}
 }
 
+bool CCLDevice::operator==(CCLDevice & src)
+{
+	return (m_queue == src.m_queue &&
+		m_context == src.m_context &&
+		id == src.id &&
+		m_platform->getID() == src.m_platform->getID());
+}
+
 bool CCLDevice::isValid()
 {
 	return (m_platform != NULL && id != 0);

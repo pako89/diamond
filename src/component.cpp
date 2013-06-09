@@ -43,25 +43,31 @@ CComponent<T>::CComponent(const CComponent<T> & src) :
 }
 
 template <class T>
-CComponent<T> & CComponent<T>::operator=(const CComponent & src)
-{
-	if(this->m_size != src.m_size)
-	{
-		setSize(src.m_size.Height, src.m_size.Width);
-	}
-	for(int i=0;i<getPointsCount();i++)
-	{
-		this->m_data[i] = (T)src.m_data[i];
-	}
-	return *this;
-}
-
-template <class T>
 template <class U> CComponent<T>::CComponent(const CComponent<U> & src) :
 	m_data(NULL),
 	m_size(0, 0)
 {
 	operator=(src);
+}
+
+template <class T>
+CComponent<T> & CComponent<T>::operator=(const CComponent & src)
+{
+	this->copy(&src);
+	return *this;
+}
+
+template <class T>
+void CComponent<T>::copy(const CComponent<T> * src)
+{
+	if(this->m_size != src->m_size)
+	{
+		setSize(src->m_size.Height, src->m_size.Width);
+	}
+	for(int i=0;i<getPointsCount();i++)
+	{
+		this->m_data[i] = (T)src->m_data[i];
+	}
 }
 
 template <class T>

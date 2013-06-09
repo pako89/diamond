@@ -45,7 +45,6 @@ void CRLC<T>::doEncode(CImage<T> * pImg, CBitstream * pBstr)
 				EncodeBlock(&(*pImg)[k][0][0], CPoint(k, y, x), size, pBstr);
 			}
 		}
-		pBstr->flush();
 	}
 }
 

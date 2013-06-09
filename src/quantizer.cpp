@@ -37,9 +37,9 @@ const uint8_t default_VQTable[] = {
 	0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c
 };
 
-CQuant::CQuant() 
+CQuant::CQuant() :
+	m_q(NULL)
 {
-	this->m_q = new CImage<float>(CSize(8, 8));
 }
 
 CQuant::~CQuant()
@@ -57,6 +57,7 @@ void CQuant::setTables(int qp)
 
 void CQuant::setTables(const uint8_t * YQ, const uint8_t * UQ, const uint8_t * VQ, int qp)
 {
+	if(NULL == this->m_q) this->m_q = new CImage<float>(CSize(8, 8));
 	for(int i=0;i<64;i++)
 	{
 		(*m_q)[0][0][i] = 1.0f/((float)YQ[i]*qp);
@@ -97,16 +98,16 @@ void CIQuant::TransformBlock(float * pSrc, float * pDst, CPoint p, CSize s)
 
 CIQuant::CIQuant()
 {
-	setTables(default_YQTable, default_UQTable, default_VQTable, 1);
 }
 
-CIQuant::CIQuant(int qp)
+void CIQuant::setTables(int qp)
 {
 	setTables(default_YQTable, default_UQTable, default_VQTable, qp);
 }
 
 void CIQuant::setTables(const uint8_t * YQ, const uint8_t * UQ, const uint8_t * VQ, int qp)
 {
+	if(NULL == this->m_q) this->m_q = new CImage<float>(CSize(8, 8));
 	for(int i=0;i<64;i++)
 	{
 		(*m_q)[0][0][i] = (float)YQ[i]*qp;

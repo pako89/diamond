@@ -15,11 +15,18 @@ CBasicEncoder::CBasicEncoder() :
 	m_dct(NULL),
 	m_quant(NULL),
 	m_zz(NULL),
-	m_rlc(NULL)
+	m_rlc(NULL),
+	m_shift(NULL),
+	m_ishift(NULL),
+	m_idct(NULL),
+	m_iquant(NULL),
+	m_pred(NULL),
+	m_predTab(NULL)
 {
 }
 
 CBasicEncoder::CBasicEncoder(EncoderConfig cfg) :
+	CEncoder(cfg),
 	m_imgF(NULL),
 	m_imgLast(NULL),
 	m_img(NULL),
@@ -28,7 +35,12 @@ CBasicEncoder::CBasicEncoder(EncoderConfig cfg) :
 	m_quant(NULL),
 	m_zz(NULL),
 	m_rlc(NULL),
-	CEncoder(cfg)
+	m_shift(NULL),
+	m_ishift(NULL),
+	m_idct(NULL),
+	m_iquant(NULL),
+	m_pred(NULL),
+	m_predTab(NULL)
 {
 }
 
@@ -43,6 +55,12 @@ CBasicEncoder::~CBasicEncoder()
 	RELEASE(m_dct);
 	RELEASE(m_quant);
 	RELEASE(m_rlc);
+	RELEASE(m_shift);
+	RELEASE(m_ishift);
+	RELEASE(m_idct);
+	RELEASE(m_iquant);
+	RELEASE(m_pred);
+	RELEASE(m_predTab);
 }
 
 void CBasicEncoder::init(CImageFormat fmt)
@@ -69,6 +87,12 @@ void CBasicEncoder::init(CImageFormat fmt)
 			throw utils::StringFormatException("Unknown Huffman type\n");
 		}
 	}
+	if(NULL == m_shift) m_shift = new CShift<float>(-128.0f);
+	if(NULL == m_ishift) m_ishift = new CShift<float>(128.0f);
+	if(NULL == m_idct) m_idct = new CIDCT();
+	if(NULL == m_iquant) m_iquant = new CIQuant();
+	if(NULL == m_pred) m_pred = new CPrediction(fmt);
+	if(NULL == m_predTab) m_predTab = new CPredictionInfoTable(CSize(fmt.Size.Height/8, fmt.Size.Width/8));
 }
 
 sos_marker_t CBasicEncoder::write_sos(CSequence * pSeq, CBitstream * pBstr)
@@ -109,15 +133,10 @@ bool CBasicEncoder::Encode(CSequence * pSeq, CBitstream * pBstr)
 	m_timer.start();
 	init(pSeq->getFormat());
 	sos_marker_t sos = write_sos(pSeq, pBstr);
-	CIDCT * idct = new CIDCT();
-	CIQuant * iquant = new CIQuant();
-	CShift<float> * shift = new CShift<float>(-128.0f);
-	CShift<float> * rshift = new CShift<float>(128.0f);
-	CPredictionInfoTable * predTab = new CPredictionInfoTable(CSize(pSeq->getFormat().Size.Height/8, pSeq->getFormat().Size.Width/8));
-	CPrediction * pred = new CPrediction(pSeq->getFormat());
-	pred->setIFrameTransform(shift);
-	pred->setIFrameITransform(rshift);
+	m_pred->setIFrameTransform(m_shift);
+	m_pred->setIFrameITransform(m_ishift);
 	m_quant->setTables(1);
+	m_iquant->setTables(1);
 	FRAME_TYPE frame_type;
 	for(int i=0;i<sos.frames_number;i++)
 	{
@@ -130,16 +149,16 @@ bool CBasicEncoder::Encode(CSequence * pSeq, CBitstream * pBstr)
 		sof_marker_t sof;
 		frame_type = (!m_config.GOP || i%m_config.GOP == 0 || i == sos.frames_number-1)?FRAME_TYPE_I:FRAME_TYPE_P;
 		sof = write_sof(pBstr, frame_type);
-		pred->Transform(m_imgF, m_imgF, predTab, frame_type);
+		m_pred->Transform(m_imgF, m_imgF, m_predTab, frame_type);
 		m_dct->Transform(m_imgF, m_imgF);
 		m_quant->Transform(m_imgF, m_imgF);
 		m_zz->Transform(m_imgF, m_img);
-		m_rlc->Encode(m_img, predTab, pBstr);
+		m_rlc->Encode(m_img, m_predTab, pBstr);
 		m_rlc->Flush(pBstr);
 		pBstr->flush();
-		iquant->Transform(m_imgF, m_imgF);
-		idct->Transform(m_imgF, m_imgF);
-		pred->ITransform(m_imgF, m_imgF, predTab, frame_type);
+		m_iquant->Transform(m_imgF, m_imgF);
+		m_idct->Transform(m_imgF, m_imgF);
+		m_pred->ITransform(m_imgF, m_imgF, m_predTab, frame_type);
 	}
 	dbg("\n");
 	m_timer.stop();
@@ -148,12 +167,6 @@ bool CBasicEncoder::Encode(CSequence * pSeq, CBitstream * pBstr)
 	dbg("Timer Quant         : %f\n", m_quant->getTimer().getTotalSeconds());
 	dbg("Timer Zig Zag       : %f\n", m_zz->getTimer().getTotalSeconds());
 	dbg("Timer RLC           : %f\n", m_rlc->getTimer().getTotalSeconds());
-	delete pred;
-	delete predTab;
-	delete idct;
-	delete iquant;
-	delete rshift;
-	delete shift;
 	return false;
 }
 

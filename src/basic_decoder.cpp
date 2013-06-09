@@ -36,6 +36,7 @@ bool CBasicDecoder::Decode(CBitstream * pBstr, CSequence * pSeq)
 	CDynamicHuffman<int16_t> * htree = new CDynamicHuffman<int16_t>();
 	CIDCT * idct = new CIDCT();
 	CIQuant * iquant = new CIQuant();
+	iquant->setTables(1);
 	CIZigZag<int16_t, float> * izigzag = new CIZigZag<int16_t, float>();
 	CIRLC<int16_t> * irlc;
 	CPredictionInfoTable * predTab = new CPredictionInfoTable(CSize(pSeq->getFormat().Size.Height/8, pSeq->getFormat().Size.Width/8));

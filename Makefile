@@ -64,6 +64,7 @@ SRC += src/cl_platform.cpp
 SRC += src/cl_device_info.cpp
 SRC += src/cl_platform_info.cpp
 SRC += src/cl_shift.cpp
+SRC += src/cl_prediction.cpp
 
 # Objects
 OBJ	= $(SRC:.cpp=.o)

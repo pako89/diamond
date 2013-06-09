@@ -100,23 +100,6 @@ CDynamicIRLC<T>::~CDynamicIRLC()
 template <class T>
 void CDynamicIRLC<T>::DecodeBlock(CBitstream * pBstr, T * pDst, CPoint p, CSize s)
 {
-#ifdef PASS_THROUGH
-	T * dst = &pDst[p.Y*s.Width + p.X];
-	for(int y=0;y<8;y++)
-	{
-		for(int x = 0; x<8; x++)
-		{
-			if(y == 0 && x == 0)
-			{
-				m_quads[p.Z].DCValue->Decode(pBstr, &dst[y*s.Width+x]);
-			}
-			else
-			{
-				m_quads[p.Z].ACValue->Decode(pBstr, &dst[y*s.Width+x]);
-			}
-		}
-	}
-#else
 	T * dst = &pDst[p.Y*s.Width + p.X];
 	m_quads[p.Z].DCValue->Decode(pBstr, &dst[0]);
 	int i=1;
@@ -142,7 +125,6 @@ void CDynamicIRLC<T>::DecodeBlock(CBitstream * pBstr, T * pDst, CPoint p, CSize 
 		dst[y*s.Width+x] = val;
 		i++;
 	}while(i<64);
-#endif
 }
 
 INSTANTIATE(CHuffmanQuad, int32_t);

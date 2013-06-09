@@ -97,6 +97,8 @@ __kernel void dct_transform(__global float * pSrc, __global float * pDst, int he
 	}
 }
 
+#define LIMIT(v, l)	( (v) > (l) ? (l) : ((v) < -(l) ? -(l) : (v)) )
+
 __kernel void quant_transform(__global float * pSrc, __global float * pDst, __global float * pQ, int height, int width)
 {
 	int ly = get_local_id(0);
@@ -106,9 +108,24 @@ __kernel void quant_transform(__global float * pSrc, __global float * pDst, __gl
 
 	float q = pQ[ly*8+lx];
 	int index = gy*width+gx;
-	pDst[index] = q*pSrc[index];
+	float d = q*pSrc[index];
+	if(!ly && !lx) d = LIMIT(d, 2047.0f);
+	else d = LIMIT(d, 1023.0f);	
+	pDst[index] = d;
 }
 
+__kernel void iquant_transform(__global float * pSrc, __global float * pDst, __global float * pQ, int height, int width)
+{
+	int ly = get_local_id(0);
+	int lx = get_local_id(1);
+	int gy = get_global_id(0);
+	int gx = get_global_id(1);
+
+	float q = pQ[ly*8+lx];
+	int index = gy*width+gx;
+	float d = pSrc[index]*q;
+	pDst[index] = d;
+}
 
 __constant float idct_c1 = 1.387039845322148f;
 __constant float idct_c2 = 1.306562964876377f;
@@ -245,5 +262,16 @@ __kernel void lut_transform_float_int16(__global float * pSrc, __global short * 
 	struct Point np = getPoint(p);
 	int newindex = (y+np.Y)*width + (x+np.X);
 	pDst[newindex] = (short)pSrc[index];
+}
+
+__kernel void shift(__global float * pSrc, __global float * pDst, int height, int width, float s)
+{
+	int ly = get_local_id(0);
+	int lx = get_local_id(1);
+	int gy = get_global_id(0);
+	int gx = get_global_id(1);
+
+	int index = gy*width+gx;
+	pDst[index] = pSrc[index] + s;
 }
 

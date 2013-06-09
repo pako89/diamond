@@ -24,8 +24,8 @@ class CIQuant : public CQuant
 {
 public:
 	CIQuant();
-	CIQuant(int qp);
 	virtual void TransformBlock(float * pSrc, float * pDst, CPoint p, CSize s);
+	virtual void setTables(int qp);
 	virtual void setTables(const uint8_t * YQ, const uint8_t * UQ, const uint8_t * VQ, int qp);
 protected:
 };

@@ -17,6 +17,7 @@ public:
 	CCLDevice(const CCLDevice & src);
 	CCLDevice(CCLPlatform * platform,cl_device_id device_id);
 	~CCLDevice(void);
+	bool operator==(CCLDevice & src);
 	bool isValid();
 	CCLDeviceInfo * getInfo();
 	cl_platform_id getPlatformId();

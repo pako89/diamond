@@ -75,7 +75,7 @@ CCLComponent<T> & CCLImage<T>::getCLComponent(int index)
 {
 	return *dynamic_cast<CCLComponent<T>*>(this->m_comp[index]);
 }
-
+	
 INSTANTIATE(CCLImage, float);
 INSTANTIATE(CCLImage, int16_t);
 
