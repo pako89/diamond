@@ -24,7 +24,7 @@ public:
 	CCLEncoder();
 	CCLEncoder(EncoderConfig cfg);
 	virtual ~CCLEncoder();
-	//virtual bool Encode(CSequence * pSeq, CBitstream * pBstr);
+	virtual bool Encode(CSequence * pSeq, CBitstream * pBstr);
 protected:
 	virtual void init(CImageFormat fmt);
 	CCLDevice m_dev;

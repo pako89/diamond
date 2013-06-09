@@ -56,4 +56,9 @@ CCLIDCT::CCLIDCT(CCLDevice * dev, cl_program program, const char * kernel) :
 	CCLDCT(dev, program, kernel)
 {}
 
+void CCLIDCT::doTransform(CImage<float> * src, CImage<float> * dst)
+{
+	CCLDCT::doTransform(src, dst);
+}
+
 }

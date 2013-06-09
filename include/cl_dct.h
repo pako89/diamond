@@ -24,6 +24,7 @@ class CCLIDCT : public CCLDCT, public CIDCT
 public:
 	CCLIDCT(CCLDevice * dev, cl_program program, const char * kernel);
 protected:
+	virtual void doTransform(CImage<float> * src, CImage<float> * dst);
 };
 
 }
