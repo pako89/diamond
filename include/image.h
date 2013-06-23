@@ -30,12 +30,14 @@ public:
 	virtual bool setFormat(ImageType type, int height, int width);
 	virtual CImageFormat getFormat(void);
 	virtual CComponent<T> & operator[](int index);
+	virtual int getScale(int index);
 protected:
 	virtual void release();
 	virtual void alloc(int num);
 	int m_comp_num;
 	CComponent<T> ** m_comp;
 	CImageFormat m_format;
+	int * m_scale;
 template <class> friend class CImage;
 
 };

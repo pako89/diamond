@@ -40,8 +40,6 @@ void CCLQuant::doTransform(CImage<float> * src, CImage<float> * dst)
 			local_work_size[0] = 8;
 			local_work_size[1] = 8;
 			
-			cl_int err;
-
 			SetArg(0, sizeof(srcMem), &srcMem);
 			SetArg(1, sizeof(dstMem), &dstMem);
 			SetArg(2, sizeof(qMem), &qMem);
@@ -94,8 +92,6 @@ void CCLIQuant::doTransform(CImage<float> * src, CImage<float> * dst)
 			size_t local_work_size[2];
 			local_work_size[0] = 8;
 			local_work_size[1] = 8;
-			
-			cl_int err;
 
 			SetArg(0, sizeof(srcMem), &srcMem);
 			SetArg(1, sizeof(dstMem), &dstMem);

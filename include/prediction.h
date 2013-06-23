@@ -28,18 +28,21 @@ public:
 	CPrediction();
 	CPrediction(CImageFormat format);
 	virtual ~CPrediction();
-	virtual void Transform(CImage<float> * src, CImage<float> * dst, CPredictionInfoTable * pPred, FRAME_TYPE type);
-	virtual void ITransform(CImage<float> * src, CImage<float> * dst, CPredictionInfoTable * pPred, FRAME_TYPE type);
-	virtual void TransformBlock(float * pSrc, float * pDst, CPoint p, CSize s, prediction_info_t predInfo);
-	virtual void ITransformBlock(float * pSrc, float * pDst, CPoint p, CSize s, prediction_info_t predInfo);
+	virtual void Transform(CImage<float> * pSrc, CImage<float> * pDst, CPredictionInfoTable * pPred, FRAME_TYPE type);
+	virtual void ITransform(CImage<float> * pSrc, CImage<float> * pDst, CPredictionInfoTable * pPred, FRAME_TYPE type);
+	virtual void TransformBlock(float * pSrc, float * pDst, CPoint p, CSize s, prediction_info_t predInfo, int scale);
+	virtual void ITransformBlock(float * pSrc, float * pDst, CPoint p, CSize s, prediction_info_t predInfo, int scale);
 	virtual void setIFrameTransform(CTransform<float, float> * t);
 	virtual void setIFrameITransform(CTransform<float, float> * t);
 	virtual void Encode(CPredictionInfoTable * pPred, CBitstream * pBstr);
 	virtual void Decode(CPredictionInfoTable * pPred, CBitstream * pBstr);
 protected:
+	virtual void doTransformPFrame(CImage<float> * pSrc, CImage<float> * pDst, CPredictionInfoTable * pPred);
+	virtual void doITransformPFrame(CImage<float> * pSrc, CImage<float> * pDst, CPredictionInfoTable * pPred);
+	virtual void doPredict(CComponent<float> * pSrc, CPredictionInfoTable * pPred);
 	virtual void encodePredictionInfo(prediction_info_t, CBitstream * pBstr);
 	virtual prediction_info_t decodePredictionInfo(CBitstream * pBstr);
-	prediction_info_t predict(float * pSrc, CPoint p, CSize s);
+	virtual prediction_info_t predict(float * pSrc, CPoint p, CSize s);
 	float diff_abs(float * src, float * ref, CSize s);
 	float diff_mse(float * src, float * ref, CSize s);
 	CImage<float> * m_last;

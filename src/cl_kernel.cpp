@@ -39,7 +39,7 @@ void ICLKernel::EnqueueNDRangeKernel(
 	size_t global_work_offset[3] = {0,};
 	do
 	{
-		for(int i=0;i<work_dim;i++)
+		for(cl_uint i=0;i<work_dim;i++)
 		{
 			g_work_size[i] = utils::min(global_work_size[i]-global_work_offset[i], m_max_global_work_size[i]);
 		}

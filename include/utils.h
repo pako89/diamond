@@ -19,7 +19,7 @@
 #define CONVERSION(t_class, t_from, t_to) 	template t_class<t_to>::t_class<t_from>(const t_class<t_from> &);	\
 						template t_class<t_to> & t_class<t_to>::operator=(const t_class<t_from> & src)
 #endif
-#define ARRAY_SIZE(x)				(sizeof((x))/sizeof((x)[0]))
+#define ARRAY_SIZE(x)				(sizeof(x)/sizeof((x)[0]))
 
 #define LIMIT(v, l)	( (v) > (l) ? (l) : ((v) < -(l) ? -(l) : (v)) )
 #define RELEASE(p)	if(NULL != (p)) delete (p);

@@ -1,12 +1,15 @@
 #include <utils.h>
-#include <sys/ioctl.h>
 #include <stdio.h>
-#include <unistd.h>
 #include <cmath>
 #include <stdlib.h>
 #include <string.h>
 #include <fstream>
 #include <string>
+
+#ifndef WIN32
+#include <sys/ioctl.h>
+#include <unistd.h>
+#endif
 
 namespace utils
 {
@@ -85,7 +88,7 @@ int log2(int val)
 
 void printProgressBar(int i, int n)
 {
-#if 1
+#ifndef WIN32
 	struct winsize w;
 	i++;
 	ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);

@@ -18,7 +18,7 @@ CCLPlatform::~CCLPlatform(void)
 	}
 	if(NULL != this->devices)
 	{
-		for(int i = 0 ; i < this->num_devices ; i++)
+		for(cl_uint i = 0 ; i < this->num_devices ; i++)
 			delete this->devices[i];
 		delete [] this->devices;
 	}
@@ -46,7 +46,7 @@ void CCLPlatform::fillDevices(cl_device_type type)
 	cl_int err;
 	if(NULL != this->devices)
 	{
-		for(int i = 0 ; i < this->num_devices ; i++)
+		for(cl_uint i = 0 ; i < this->num_devices ; i++)
 			delete this->devices[i];
 		delete [] this->devices;
 		this->num_devices = 0;
@@ -70,7 +70,7 @@ void CCLPlatform::fillDevices(cl_device_type type)
 	}
 	this->devices = new CCLDevice*[num];
 	this->num_devices = num;
-	for(int i = 0 ; i  < num ; i++)
+	for(cl_uint i = 0 ; i  < num ; i++)
 	{
 		this->devices[i] = new CCLDevice(this,device_ids[i]);
 	}

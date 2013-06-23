@@ -15,6 +15,7 @@ template <class T>
 CImage<T>::CImage() :
 	m_comp_num(0),
 	m_comp(NULL),
+	m_scale(NULL),
 	m_format(IMAGE_TYPE_UNKNOWN, 0, 0)
 {
 }
@@ -23,6 +24,7 @@ template <class T>
 CImage<T>::CImage(CImageFormat format) :
 	m_comp_num(0),
 	m_comp(NULL),
+	m_scale(NULL),
 	m_format(IMAGE_TYPE_UNKNOWN, 0, 0)
 {
 	setFormat(format);
@@ -32,6 +34,7 @@ template <class T>
 CImage<T>::CImage(CSize size) :
 	m_comp_num(0),
 	m_comp(NULL),
+	m_scale(NULL),
 	m_format(IMAGE_TYPE_UNKNOWN, 0, 0)
 {
 	setFormat(IMAGE_TYPE_RGB, size);
@@ -41,6 +44,7 @@ template <class T>
 CImage<T>::CImage(enum ImageType type, CSize size) :
 	m_comp_num(0),
 	m_comp(NULL),
+	m_scale(NULL),
 	m_format(IMAGE_TYPE_UNKNOWN, 0, 0)
 {
 	setFormat(type, size);
@@ -50,9 +54,20 @@ template <class T>
 CImage<T>::CImage(enum ImageType type, int height, int width) :
 	m_comp_num(0),
 	m_comp(NULL),
+	m_scale(NULL),
 	m_format(IMAGE_TYPE_UNKNOWN, 0, 0)
 {
 	setFormat(type, height, width);
+}
+
+template <class T>
+template <class U> CImage<T>::CImage(const CImage<U> & src) :
+	m_comp_num(0),
+	m_comp(NULL),
+	m_scale(NULL),
+	m_format(IMAGE_TYPE_UNKNOWN, 0, 0)
+{
+	operator=(src);
 }
 
 template <class T>
@@ -71,17 +86,9 @@ CImage<T> & CImage<T>::operator=(const CImage<T> & src)
 	for(int i=0;i<m_comp_num;i++)
 	{
 		*m_comp[i] = *src.m_comp[i];
+		m_scale[i] = src.m_scale[i];
 	}
 	return *this;
-}
-
-template <class T>
-template <class U> CImage<T>::CImage(const CImage<U> & src) :
-	m_comp_num(0),
-	m_comp(NULL),
-	m_format(IMAGE_TYPE_UNKNOWN, 0, 0)
-{
-	operator=(src);
 }
 
 template <class T>
@@ -94,6 +101,7 @@ template <class U> CImage<T> & CImage<T>::operator=(const CImage<U> & src)
 	for(int i=0;i<m_comp_num;i++)
 	{
 		*m_comp[i] = *src.m_comp[i];
+		m_scale[i] = src.m_scale[i];
 	}
 	return *this;
 }
@@ -127,20 +135,30 @@ void CImage<T>::release()
 		delete m_comp[i];
 	}
 	delete [] m_comp;
-	m_comp_num = 0;
 	m_comp = NULL;
+	delete [] m_scale;
+	m_scale = NULL;
+	m_comp_num = 0;
 }
 
 template <class T>
 void CImage<T>::alloc(int num)
 {
 	m_comp_num = num;
-	m_comp = new CComponent<T>*[m_comp_num];
-	for(int i=0;i<m_comp_num;i++)
+	if(NULL == m_comp)
 	{
-		m_comp[i] = new CComponent<T>();
+		m_comp = new CComponent<T>*[m_comp_num];
+		for(int i=0;i<m_comp_num;i++)
+		{
+			m_comp[i] = new CComponent<T>();
+		}
+	}
+	if(NULL == m_scale)
+	{
+		m_scale = new int[m_comp_num];
 	}
 }
+
 
 template <class T>
 bool CImage<T>::setFormat(CImageFormat format)
@@ -170,7 +188,7 @@ bool CImage<T>::setFormat(CImageFormat format)
 	case IMAGE_TYPE_RGB:
 		for(int i=0;i<m_comp_num;i++)
 		{
-			m_comp[i]->setSize(format.Size.Height, format.Size.Width);
+			m_scale[i] = 1;
 		}
 	break;
 	case IMAGE_TYPE_YUV420:
@@ -178,14 +196,18 @@ bool CImage<T>::setFormat(CImageFormat format)
 		{
 			throw utils::StringFormatException("IMAGE_TYPE_YUV420 and m_comp_num == %d\n", m_comp_num);
 		}
-		m_comp[0]->setSize(format.Size.Height, format.Size.Width);
-		m_comp[1]->setSize(format.Size.Height/2, format.Size.Width/2);
-		m_comp[2]->setSize(format.Size.Height/2, format.Size.Width/2);
+		m_scale[0] = 1;
+		m_scale[1] = 2;
+		m_scale[2] = 2;
 	break;
 	default:
 		return false;
 	}
 	m_format = format;
+	for(int i=0;i<m_comp_num;i++)
+	{
+		m_comp[i]->setSize(format.Size.Height/m_scale[i], format.Size.Width/m_scale[i]);
+	}
 	return true;
 }
 
@@ -198,15 +220,33 @@ int CImage<T>::getComponents(void)
 template <class T>
 CComponent<T> & CImage<T>::operator[](int index)
 {
-	if(index >= 0 && index < m_comp_num)
+#ifdef IMAGE_CHECK_INDEX
+	if(index < 0 || index >= m_comp_num)
+	{
+		throw utils::StringFormatException("Index (%d) out of range [%d, %d]", index, 0, m_comp_num); 
+	}
+	else
+#endif		
 	{
 		return *m_comp[index];
 	}
-	else
+}
+
+template <class T>
+int CImage<T>::getScale(int index)
+{
+#ifdef IMAGE_CHECK_INDEX
+	if(index < 0 || index >= m_comp_num)
 	{
-		throw std::exception();
+		throw utils::StringFormatException("Index (%d) out of range [%d, %d]", index, 0, m_comp_num); 
+	}
+	else
+#endif		
+	{
+		return m_scale[index];
 	}
 }
+
 
 template <class T>
 CImageFormat CImage<T>::getFormat(void)

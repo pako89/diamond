@@ -39,7 +39,7 @@ bool CBasicDecoder::Decode(CBitstream * pBstr, CSequence * pSeq)
 	iquant->setTables(1);
 	CIZigZag<int16_t, float> * izigzag = new CIZigZag<int16_t, float>();
 	CIRLC<int16_t> * irlc;
-	CPredictionInfoTable * predTab = new CPredictionInfoTable(CSize(pSeq->getFormat().Size.Height/8, pSeq->getFormat().Size.Width/8));
+	CPredictionInfoTable * predTab = new CPredictionInfoTable(CSize(pSeq->getFormat().Size.Height/16, pSeq->getFormat().Size.Width/16));
 	switch(sos.huffman)
 	{
 	case HUFFMAN_T_DYNAMIC:

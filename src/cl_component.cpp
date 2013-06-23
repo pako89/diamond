@@ -47,11 +47,11 @@ bool CCLComponent<T>::setSize(CSize size)
 {
 	if(!this->m_mem_flags)
 	{
-		setSize(size, CL_MEM_READ_WRITE);
+		return setSize(size, CL_MEM_READ_WRITE);
 	}
 	else
 	{
-		setSize(size, this->m_mem_flags);
+		return setSize(size, this->m_mem_flags);
 	}
 }
 
@@ -77,7 +77,6 @@ bool CCLComponent<T>::setSize(CSize size, cl_mem_flags mem_flags)
 	{
 		return false;
 	}
-
 }
 
 template <class T>
@@ -184,4 +183,5 @@ void CCLComponent<T>::CopyToDevice()
 INSTANTIATE(CCLComponent, prediction_info_t);
 INSTANTIATE(CCLComponent, float);
 INSTANTIATE(CCLComponent, int16_t);
+INSTANTIATE(CCLComponent, int);
 }

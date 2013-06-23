@@ -179,7 +179,16 @@ bool CComponent<T>::setSize(CSize size)
 template <class T>
 T * CComponent<T>::operator[](int h)
 {
-	return &this->m_data[h * this->m_size.Width];
+#ifdef COMPONENT_CHECK_INDEX
+	if(h < 0 || h >= this->m_size.Height)
+	{
+		throw utils::StringFormatException("Index (%d) out of range [%d, %d]", h, 0, this->m_size.Height); 
+	}
+	else
+#endif
+	{
+		return &this->m_data[h * this->m_size.Width];
+	}
 }
 
 INSTANTIATE(CComponent, prediction_info_t);

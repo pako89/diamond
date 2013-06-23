@@ -90,7 +90,7 @@ void CBasicEncoder::init(CImageFormat fmt)
 	if(NULL == m_idct) m_idct = new CIDCT();
 	if(NULL == m_iquant) m_iquant = new CIQuant();
 	if(NULL == m_pred) m_pred = new CPrediction(fmt);
-	if(NULL == m_predTab) m_predTab = new CPredictionInfoTable(CSize(fmt.Size.Height/8, fmt.Size.Width/8));
+	if(NULL == m_predTab) m_predTab = new CPredictionInfoTable(CSize(fmt.Size.Height/16, fmt.Size.Width/16));
 }
 
 sos_marker_t CBasicEncoder::write_sos(CSequence * pSeq, CBitstream * pBstr)
@@ -136,7 +136,7 @@ bool CBasicEncoder::Encode(CSequence * pSeq, CBitstream * pBstr)
 	m_quant->setTables(1);
 	m_iquant->setTables(1);
 	FRAME_TYPE frame_type;
-	for(int i=0;i<sos.frames_number;i++)
+	for(uint32_t i=0;i<sos.frames_number;i++)
 	{
 		if(!pSeq->ReadNext())
 		{

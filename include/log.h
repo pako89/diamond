@@ -27,8 +27,8 @@ extern FILE * fh_r;
 #define dbgf(...)	_LOG("%s: ", __FUNCTION__);	\
 			_LOG(__VA_ARGS__)
 #else
-#define module(name)	do{}while(0)
-#define dbg(...)	do{}while(0)
+#define module(name)
+#define dbg(...)
 #endif
 
 #endif //_LOG_H

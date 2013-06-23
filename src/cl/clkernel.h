@@ -3,8 +3,8 @@
 
 typedef struct prediction_info
 {
-	int dy;
 	int dx;
+	int dy;
 } prediction_info_t;
 
 

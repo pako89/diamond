@@ -171,7 +171,7 @@ bool CDynamicHuffman<T>::EncodeCtl(HuffmanItemType itemtype,CBitstream * bitstre
 template <class T> 
 bool CDynamicHuffman<T>::EncodeBlock(T * ptr,uint32_t size,CBitstream * bstr)
 {
-	EncodeBlock(ptr, size, bstr, true);
+	return EncodeBlock(ptr, size, bstr, true);
 }
 
 template <class T> 
@@ -200,7 +200,7 @@ HuffmanItemType CDynamicHuffman<T>::DecodeBlock(T * ptr,uint32_t size,CBitstream
 template <class T> 
 bool CDynamicHuffman<T>::Encode(T symbol,CBitstream * bitstream)
 {
-	Encode(symbol, bitstream, true);
+	return Encode(symbol, bitstream, true);
 }
 
 template <class T> 

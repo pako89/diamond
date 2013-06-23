@@ -148,7 +148,7 @@ void CDiamondApp::PrintHelp(void)
 
 const struct option CDiamondApp::common_options[] = {
 	{"help",		no_argument,		NULL,	'h'},
-	{"input",		required_argument,	NULL, 	'o'},
+	{"output",		required_argument,	NULL, 	'o'},
 	{"type",		required_argument,	NULL,	't'},
 	{"height",		required_argument,	NULL,	'H'},
 	{"width",		required_argument,	NULL,	'W'},
@@ -197,8 +197,14 @@ void CDiamondApp::ParseArgs(int argc, char * argv[])
 	const char * shortopts = getShortOpts(common_options, COMMON_OPTS_SIZE).c_str();
 	m_config.Op = parseOperation(argv[1]);
 	const char * op = argv[1];
+	
+#ifdef WIN32
+	int _argc = argc-2;
+	char ** _argv = &argv[2];
+#else
 	int _argc = argc-1;
 	char ** _argv = argv+1;
+#endif
 	int opt, longind;
 	while((opt = getopt_long(_argc, _argv, shortopts, CDiamondApp::common_options, &longind)) != -1)
 	{
@@ -258,9 +264,9 @@ void CDiamondApp::ParseArgs(int argc, char * argv[])
 	{
 		throw utils::StringFormatException("unknown operation '%s'", argv[1]);
 	}
-	if(optind < _argc)
+	//if(optind < _argc)
 	{
-		m_config.InputFileName = _argv[optind];
+		m_config.InputFileName = _argv[_argc-1];
 		if(strcmp(m_config.InputFileName, "stdin"))
 		{
 			m_config.InputFile = fopen(m_config.InputFileName, "r");

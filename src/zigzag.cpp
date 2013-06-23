@@ -5,7 +5,7 @@ namespace avlib
 {
 
 template <class S, class D>
-const uint8_t CZigZag<S, D>::s_lut[] = {
+const uint8_t CZigZag<S, D>::s_lut[64] = {
  0,   1,   5,   6,  14,  15,  27,  28, 
  2,   4,   7,  13,  16,  26,  29,  42, 
  3,   8,  12,  17,  25,  30,  41,  43, 
@@ -16,8 +16,10 @@ const uint8_t CZigZag<S, D>::s_lut[] = {
 35,  36,  48,  49,  57,  58,  62,  63
 };
 
+#define LUT_SIZE	64
+
 template <class S, class D>
-const uint8_t CZigZag<S, D>::s_tul[] = {
+const uint8_t CZigZag<S, D>::s_tul[64] = {
  0,  1,  8, 16,  9,  2,  3, 10, 
 17, 24, 32, 25, 18, 11,  4,  5,  
 12, 19, 26, 33, 40, 48, 41, 34, 
@@ -27,6 +29,8 @@ const uint8_t CZigZag<S, D>::s_tul[] = {
 58, 59, 52, 45, 38, 31, 39, 46, 
 53, 60, 61, 54, 47, 55, 62, 63, 
 };
+
+#define TUL_SIZE		64
 
 template <class S, class D>
 CZigZag<S, D>::CZigZag() :
@@ -49,7 +53,7 @@ void CZigZag<S, D>::TransformBlock(S * pSrc, D * pDst, CPoint p, CSize s)
 		for(int x=0;x<8;x++)
 		{
 			CPoint np = getPoint(CPoint(y, x));
-			dst[np.Y*s.Width + np.X] = src[y*s.Width+x];
+			dst[np.Y*s.Width + np.X] = (D)src[y*s.Width+x];
 		}
 	}
 }
@@ -58,7 +62,7 @@ template <class S, class D>
 CPoint CZigZag<S, D>::getPoint(CPoint p)
 {	
 	int index = p.Y * 8 + p.X;
-	if(index < 0 || index >= sizeof(s_lut))
+	if(index < 0 || index >= LUT_SIZE)
 	{
 		throw utils::StringFormatException("ZigZag: index too large");
 	}

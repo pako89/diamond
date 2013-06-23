@@ -23,7 +23,7 @@ void CTransform<S, D>::TransformBlock(S * pSrc, D * pDst, CPoint p, CSize s)
 		for(int x=0;x<8;x++)
 		{
 			int i = (p.Y+y)*s.Width+p.X+x;	
-			pDst[i] = pSrc[i]; 
+			pDst[i] = (D)pSrc[i]; 
 		}
 	}
 }

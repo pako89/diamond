@@ -12,7 +12,11 @@ CCLEncoder::CCLEncoder()
 CCLEncoder::CCLEncoder(EncoderConfig cfg) : 
 	CBasicEncoder(cfg)
 {
+#ifdef WIN32
+	m_clPolicy = new CCLFirstDevicePolicy();
+#else
 	m_clPolicy = new CCLFirstGPUDevicePolicy();
+#endif
 }
 
 CCLEncoder::~CCLEncoder()
@@ -25,7 +29,7 @@ CCLEncoder::~CCLEncoder()
 
 void CCLEncoder::init(CImageFormat fmt)
 {
-	ICLHost::init(m_clPolicy, (char*)"src/cl/kernel.cl");
+	ICLHost::init(m_clPolicy, (char*)DEFAULT_CL_SRC_FILE);
 	this->m_imgF = new CCLImage<float>(&this->m_dev, fmt);
 	this->m_img = new CCLImage<int16_t>(&this->m_dev, fmt);
 	this->m_dct = new CCLDCT(&this->m_dev, this->m_program, "dct_transform");
@@ -34,16 +38,17 @@ void CCLEncoder::init(CImageFormat fmt)
 	this->m_zz = new CCLZigZag<float, int16_t>(&this->m_dev, this->m_program, "lut_transform_float_int16");
 	this->m_shift = new CCLShift<float>(-128.0f, &this->m_dev, this->m_program, "shift");
 	this->m_ishift = new CCLShift<float>(128.0f, &this->m_dev, this->m_program, "shift");
-	this->m_pred = new CCLPrediction(&this->m_dev, fmt);
+	CCLPrediction * pred = new CCLPrediction(&this->m_dev, fmt);
+	this->m_pred = pred;
+	pred->setTransformKernel(this->m_program, "prediction_transform");
+	pred->setITransformKernel(this->m_program, "prediction_itransform");
+	this->m_predTab = new CCLPredictionInfoTable(&this->m_dev, CSize(fmt.Size.Height/16, fmt.Size.Width/16));
 	this->m_iquant = new CCLIQuant(&this->m_dev, this->m_program, "iquant_transform");
 	CBasicEncoder::init(fmt);
 }
 
 bool CCLEncoder::Encode(CSequence * pSeq, CBitstream * pBstr)
 {
-#ifndef DEBUG
-	return CBasicEncoder::Encode(pSeq, pBstr);
-#else
 	m_timer.start();
 	init(pSeq->getFormat());
 	sos_marker_t sos = write_sos(pSeq, pBstr);
@@ -83,7 +88,6 @@ bool CCLEncoder::Encode(CSequence * pSeq, CBitstream * pBstr)
 	dbg("Timer Zig Zag       : %f\n", m_zz->getTimer().getTotalSeconds());
 	dbg("Timer RLC           : %f\n", m_rlc->getTimer().getTotalSeconds());
 	return false;
-#endif
 }
 
 }

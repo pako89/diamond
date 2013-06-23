@@ -1,3 +1,4 @@
+#include "clkernel.h"
 
 __constant float s1 = 0.195090322f;
 __constant float s2 = 0.3826834324f;
@@ -276,84 +277,11 @@ __kernel void shift(__global float * pSrc, __global float * pDst, int height, in
 	pDst[index] = pSrc[index] + s;
 }
 
-typedef struct prediction_info
+__kernel void prediction_transform(__global float * pSrc, __global float * pDst, __global prediction_info_t * pPred, int height, int width)
 {
-	int dx;
-	int dy;
-} prediction_info_t;
-
-__kernel void copyBlock2Local(__global float * ptr, int width, __local float * dst)
-{
-	for(int y=0;y<8;y++)
-	{
-		for(int x=0;x<8;x++)
-		{
-			dst[y*8+x] = ptr[y*width+x];
-		}
-	}
-
-}
-
-__kernel void copyBlock2Global(__global float * ptr, int width, __local float * dst)
-{
-	for(int y=0;y<8;y++)
-	{
-		for(int x=0;x<8;x++)
-		{
-			ptr[y*width+x] = dst[y*8+x];
-		}
-	}
-
-}
-
-__kernel void prediction_transform(
-		__global float * pSrc, 
-		__global float * pDst, 
-		__global float * pLast,
-		__global prediction_info_t * pPred, 
-		int width,
-		int predWidth,
-		int scale
-		)
-{
+	int ly = get_local_id(0);
+	int lx = get_local_id(1);
 	int gy = get_global_id(0);
 	int gx = get_global_id(1);
-	int index = gy*width + gx;
-	int py = gy/scale;
-	int px = gx/scale;
-	prediction_info_t info = pPred[py*predWidth+px];
-	barrier(CLK_GLOBAL_MEM_FENCE);
-	int y = gy + info.dy*scale;
-	int x = gx + info.dx*scale;
-	int lastIndex = y*width+x;
-	float last = pLast[lastIndex];
-	barrier(CLK_GLOBAL_MEM_FENCE);
-	pDst[index] = pSrc[index] - last;
-}
-
-__kernel void prediction_itransform(
-		__global float * pSrc, 
-		__global float * pDst, 
-		__global float * pLast,
-		__global prediction_info_t * pPred, 
-		int height, 
-		int width,
-		int predHeight,
-		int predWidth,
-		int yscale,
-		int xscale,
-		int c
-		)
-{
-	int gy = get_global_id(0);
-	int gx = get_global_id(1);
-	int index = gy*width + gx;
-	int py = gy/8;
-	int px = gx/8;
-	prediction_info_t info = pPred[py*predWidth+px];
-	int y = gy + info.dy*8;
-	int x = gx + info.dx*8;
-	int lastIndex = y*width+x;
-	pDst[index] = pSrc[index] + pLast[lastIndex];
 }
 

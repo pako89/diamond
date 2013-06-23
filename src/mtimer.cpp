@@ -43,7 +43,9 @@ bool CTimer::stop()
 		break;
 	default:
 		return false;
+		break;
 	}
+	return true;
 }
 
 bool CTimer::isRunning()

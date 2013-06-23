@@ -317,7 +317,7 @@ std::vector<size_t> CCLDeviceInfo::getMaxWorkItemSizes()
 	size_t num;
 	size_t * ptr = getInfo_typeArray<size_t>(this->device_id,CL_DEVICE_MAX_WORK_ITEM_SIZES,&num);
 	std::vector<size_t> sizes(num);
-	for(int i= 0 ; i < num ; i++)
+	for(cl_uint i= 0 ; i < num ; i++)
 		sizes[i] = ptr[i];
 	delete [] ptr;
 	return sizes;

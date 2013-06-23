@@ -50,6 +50,7 @@ void CCLImage<T>::alloc(int num)
 	{
 		this->m_comp[i] = new CCLComponent<T>(this->m_dev, this->m_mem_flags);
 	}
+	CImage<T>::alloc(num);
 }
 
 template <class T>
@@ -78,5 +79,6 @@ CCLComponent<T> & CCLImage<T>::getCLComponent(int index)
 	
 INSTANTIATE(CCLImage, float);
 INSTANTIATE(CCLImage, int16_t);
+INSTANTIATE(CCLImage, int);
 
 }

@@ -83,7 +83,7 @@ void CCLBase::fillPlatforms()
 		return;
 	}
 	this->num_platforms = num;
-	for(int i=0;i<num;i++)
+	for(cl_uint i=0;i<num;i++)
 	{
 		this->platforms[i].setID(platforms[i]);
 	}
@@ -91,6 +91,6 @@ void CCLBase::fillPlatforms()
 
 void CCLBase::fillDevices()
 {
-	for(int i = 0 ; i < this->num_platforms ; i++)
+	for(cl_uint i = 0 ; i < this->num_platforms ; i++)
 		this->platforms[i].fillDevices();
 }

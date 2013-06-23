@@ -34,9 +34,7 @@ void CCLShift<T>::doTransform(CImage<T> * src, CImage<T> * dst)
 			global_work_size[1] = width;
 			size_t local_work_size[2];
 			local_work_size[0] = 8;
-			local_work_size[1] = 8;
-			
-			cl_int err;
+			local_work_size[1] = 8;		
 
 			SetArg(0, sizeof(srcMem), &srcMem);
 			SetArg(1, sizeof(dstMem), &dstMem);

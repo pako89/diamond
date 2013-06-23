@@ -8,7 +8,7 @@ CCLDevice CCLFirstDevicePolicy::getDevice()
 {
 	CCLBase & clBase = CCLBase::getInstance();
 	dbg("number of platforms: %d\n", clBase.getPlatformsCount());
-	for(int i=0;i<clBase.getPlatformsCount();i++)
+	for(cl_uint i=0;i<clBase.getPlatformsCount();i++)
 	{
 		CCLPlatform * p = clBase.getPlatform(i);
 #ifdef DEBUG
@@ -19,7 +19,7 @@ CCLDevice CCLFirstDevicePolicy::getDevice()
 #endif 		
 		if(NULL != p)
 		{
-			for(int j=0;j<p->getDevicesCount();j++)
+			for(cl_uint j=0;j<p->getDevicesCount();j++)
 			{
 				CCLDevice d = p->getDevice(i);
 				if(d.isValid())

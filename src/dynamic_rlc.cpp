@@ -111,8 +111,6 @@ void CDynamicIRLC<T>::DecodeBlock(CBitstream * pBstr, T * pDst, CPoint p, CSize 
 	{
 		m_quads[p.Z].ACRun->Decode(pBstr, &run);
 		m_quads[p.Z].ACValue->Decode(pBstr, &val);
-		if(run>63)
-			printf("run=%d\n", run);
 		while(run--)
 		{
 			y = i/8;

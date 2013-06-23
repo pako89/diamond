@@ -42,21 +42,33 @@ const uint8_t CStaticHuffman<T>::DC_V[] = {
 	0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 
 };
 
+#ifdef WIN32
+#define DC_V_SIZE 12
+#else
 #define DC_V_SIZE ARRAY_SIZE(DC_V)
+#endif
 
 template <class T>
 const uint8_t CStaticHuffman<T>::DC_Y_L[] = {
  0, 0, 1, 5, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0 
 };
 
+#ifdef WIN32
+#define DC_Y_L_SIZE 17
+#else
 #define DC_Y_L_SIZE ARRAY_SIZE(DC_Y_L)
+#endif
 
 template <class T>
 const uint8_t CStaticHuffman<T>::DC_UV_L[] = {
  0, 0, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0 
 };
 
+#ifdef WIN32
+#define DC_UV_L_SIZE 17
+#else
 #define DC_UV_L_SIZE ARRAY_SIZE(DC_UV_L)
+#endif
 
 template <class T>
 const uint8_t CStaticHuffman<T>::AC_Y_V[] = 
@@ -84,21 +96,33 @@ const uint8_t CStaticHuffman<T>::AC_Y_V[] =
 	0xf9, 0xfa
 };
 
+#ifdef WIN32
+#define AC_Y_V_SIZE 162
+#else
 #define AC_Y_V_SIZE ARRAY_SIZE(AC_Y_V)
+#endif
 
 template <class T>
 const uint8_t CStaticHuffman<T>::AC_Y_L[] ={
  0, 0, 2, 1, 3, 3, 2, 4, 3, 5, 5, 4, 4, 0, 0, 1, 0x7d 
 };
 
+#ifdef WIN32
+#define AC_Y_L_SIZE 17
+#else 
 #define AC_Y_L_SIZE ARRAY_SIZE(AC_Y_L)
+#endif
 
 template <class T>
 const uint8_t CStaticHuffman<T>::AC_UV_L[] = {
  0, 0, 2, 1, 2, 4, 4, 3, 4, 7, 5, 4, 4, 0, 1, 2, 0x77
 };
 
+#ifdef WIN32
+#define AC_UV_L_SIZE 17
+#else
 #define AC_UV_L_SIZE ARRAY_SIZE(AC_UV_L)
+#endif
 
 template <class T>
 const uint8_t CStaticHuffman<T>::AC_UV_V[] = {
@@ -125,7 +149,11 @@ const uint8_t CStaticHuffman<T>::AC_UV_V[] = {
 	0xf9, 0xfa
 };
 
+#ifdef WIN32
+#define AC_UV_V_SIZE 162
+#else
 #define AC_UV_V_SIZE ARRAY_SIZE(AC_UV_V)
+#endif
 
 template <class T>
 CStaticHuffman<T>::CStaticHuffman()
