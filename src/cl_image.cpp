@@ -77,6 +77,26 @@ CCLComponent<T> & CCLImage<T>::getCLComponent(int index)
 	return *dynamic_cast<CCLComponent<T>*>(this->m_comp[index]);
 }
 	
+template <class T>
+bool CCLImage<T>::getAutoCopy()
+{
+	bool ret = false;
+	for(int i=0;i<this->m_comp_num;i++)
+	{
+		ret |= dynamic_cast<CCLComponent<T>*>(this->m_comp[i])->getAutoCopy();
+	}
+	return ret;
+}
+
+template <class T>
+void CCLImage<T>::setAutoCopy(bool autoCopy)
+{
+	for(int i=0;i<this->m_comp_num;i++)
+	{
+		dynamic_cast<CCLComponent<T>*>(this->m_comp[i])->setAutoCopy(autoCopy);
+	}
+}
+
 INSTANTIATE(CCLImage, float);
 INSTANTIATE(CCLImage, int16_t);
 INSTANTIATE(CCLImage, int);

@@ -54,8 +54,8 @@ prediction_info_t CPrediction::predict(float * pSrc, CPoint p, CSize s)
 		{
 			for(int dx=-m_max ; dx <= m_max ; dx++)
 			{
-				dp.Y = p.Y + dy*8;
-				dp.X = p.X + dx*8;
+				dp.Y = p.Y + dy*16;
+				dp.X = p.X + dx*16;
 				if(dp.X >= 0 && dp.Y >= 0 && (dp.Y+16) < s.Height && (dp.X+16) < s.Width)
 				{
 					float d;

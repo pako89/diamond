@@ -28,6 +28,7 @@ public:
 	cl_context getContext();
 	void createCommandQueue();
 	cl_command_queue getCommandQueue();
+	void Finish();
 protected:
 	CCLPlatform * m_platform;
 	cl_device_id id;

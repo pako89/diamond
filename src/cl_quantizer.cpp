@@ -46,7 +46,9 @@ void CCLQuant::doTransform(CImage<float> * src, CImage<float> * dst)
 			SetArg(3, sizeof(height), &height);
 			SetArg(4, sizeof(width), &width);
 			EnqueueNDRangeKernel(2, global_work_size, local_work_size, 0, NULL, NULL);
+#ifdef CL_KERNEL_FINISH
 			Finish();
+#endif
 		}
 	}
 	else
@@ -99,7 +101,9 @@ void CCLIQuant::doTransform(CImage<float> * src, CImage<float> * dst)
 			SetArg(3, sizeof(height), &height);
 			SetArg(4, sizeof(width), &width);
 			EnqueueNDRangeKernel(2, global_work_size, local_work_size, 0, NULL, NULL);
+#ifdef CL_KERNEL_FINISH			
 			Finish();
+#endif 
 		}
 	}
 	else

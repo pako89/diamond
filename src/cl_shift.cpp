@@ -42,9 +42,10 @@ void CCLShift<T>::doTransform(CImage<T> * src, CImage<T> * dst)
 			SetArg(3, sizeof(width), &width);
 			SetArg(4, sizeof(this->m_shift), &this->m_shift);
 			EnqueueNDRangeKernel(2, global_work_size, local_work_size, 0, NULL, NULL);
+#ifdef CL_FINISH_KERNEL
 			Finish();
+#endif
 		}
-		//CShift<T>::doTransform(src, dst);
 	}
 	else
 	{

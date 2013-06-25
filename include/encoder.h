@@ -7,6 +7,7 @@
 #include <mtimer.h>
 #include <utils.h>
 #include <avlib.h>
+#include <proto.h>
 
 namespace avlib
 {
@@ -25,6 +26,8 @@ public:
 	virtual ~CEncoder();
 	virtual bool Encode(CSequence * pSeq, CBitstream * pBstr) = 0;
 protected:
+	virtual sos_marker_t write_sos(CSequence * pSeq, CBitstream * pBtr);
+	virtual sof_marker_t write_sof(CBitstream * pBstr, FRAME_TYPE frame_type);
 	EncoderConfig m_config;
 };
 

@@ -24,6 +24,8 @@ public:
 	virtual void CopyToDevice();
 	virtual void CopyToHost();
 	virtual CCLComponent<T> & getCLComponent(int index);
+	virtual bool getAutoCopy();
+	virtual void setAutoCopy(bool autoCopy);
 protected:
 	virtual void alloc(int num);
 	CCLDevice * m_dev;

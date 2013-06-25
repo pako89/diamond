@@ -11,7 +11,6 @@ CBasicEncoder::CBasicEncoder() :
 	m_imgF(NULL),
 	m_imgLast(NULL),
 	m_img(NULL),
-	m_htree(NULL),
 	m_dct(NULL),
 	m_quant(NULL),
 	m_zz(NULL),
@@ -30,7 +29,6 @@ CBasicEncoder::CBasicEncoder(EncoderConfig cfg) :
 	m_imgF(NULL),
 	m_imgLast(NULL),
 	m_img(NULL),
-	m_htree(NULL),
 	m_dct(NULL),
 	m_quant(NULL),
 	m_zz(NULL),
@@ -49,7 +47,6 @@ CBasicEncoder::~CBasicEncoder()
 	RELEASE(m_imgF);
 	RELEASE(m_imgLast);
 	RELEASE(m_img);
-	RELEASE(m_htree);
 	RELEASE(m_dct);
 	RELEASE(m_quant);
 	RELEASE(m_rlc);
@@ -66,7 +63,6 @@ void CBasicEncoder::init(CImageFormat fmt)
 	if(NULL == m_imgF) m_imgF = new CImage<float>(fmt);
 	if(NULL == m_imgLast) m_imgLast = new CImage<float>(fmt);
 	if(NULL == m_img) m_img = new CImage<int16_t>(fmt);
-	if(NULL == m_htree) m_htree = new CDynamicHuffman<int16_t>();
 	if(NULL == m_dct) m_dct = new CDCT();
 	if(NULL == m_quant) m_quant = new CQuant();
 	if(NULL == m_zz) m_zz = new CZigZag<float, int16_t>();
@@ -93,38 +89,6 @@ void CBasicEncoder::init(CImageFormat fmt)
 	if(NULL == m_predTab) m_predTab = new CPredictionInfoTable(CSize(fmt.Size.Height/16, fmt.Size.Width/16));
 }
 
-sos_marker_t CBasicEncoder::write_sos(CSequence * pSeq, CBitstream * pBstr)
-{
-	sos_marker_t sos;
-	sos.type = MARKER_TYPE_SOS;
-	sos.size = sizeof(struct sos_marker);
-	switch(m_config.HuffmanType)
-	{
-	case HUFFMAN_TYPE_DYNAMIC:
-		sos.huffman = HUFFMAN_T_DYNAMIC;
-		break;
-	case HUFFMAN_TYPE_STATIC:
-	default:
-		sos.huffman = HUFFMAN_T_STATIC;
-		break;
-	}
-	sos.frames_number = pSeq->getFramesCount();
-	sos.width = pSeq->getWidth();
-	sos.height = pSeq->getHeight();
-	pBstr->write_block(&sos, sizeof(sos));
-	return sos;
-}
-
-sof_marker_t CBasicEncoder::write_sof(CBitstream * pBstr, FRAME_TYPE frame_type)
-{
-	sof_marker_t sof;
-	sof.type = MARKER_TYPE_SOF;
-	sof.size = sizeof(sof_marker_t);
-	sof.quant_coeff = 1;
-	sof.frame_type = frame_type;
-	pBstr->write_block(&sof, sizeof(sof));
-	return sof;
-}
 
 bool CBasicEncoder::Encode(CSequence * pSeq, CBitstream * pBstr)
 {

@@ -9,6 +9,7 @@ CCLComponent<T>::CCLComponent(CCLDevice * dev, cl_mem_flags mem_flags) :
 	m_dev(dev),
 	m_cldata(0),
 	m_mem_flags(mem_flags),
+	m_autoCopy(true),
 	m_state(CLMEM_STATE_HOST)
 {
 }
@@ -18,6 +19,7 @@ CCLComponent<T>::CCLComponent(CCLDevice * dev, CSize size, cl_mem_flags mem_flag
 	m_dev(dev),
 	m_cldata(0),
 	m_mem_flags(mem_flags),
+	m_autoCopy(true),
 	m_state(CLMEM_STATE_HOST)
 {
 	this->setSize(size, mem_flags);
@@ -29,6 +31,7 @@ CCLComponent<T>::CCLComponent(CCLDevice * dev, int height, int width, cl_mem_fla
 	CComponent<T>(height, width),
 	m_cldata(0),
 	m_mem_flags(mem_flags),
+	m_autoCopy(true),
 	m_state(CLMEM_STATE_HOST)
 {
 }
@@ -82,7 +85,7 @@ bool CCLComponent<T>::setSize(CSize size, cl_mem_flags mem_flags)
 template <class T>
 void CCLComponent<T>::sync(CLMEM_STATE nextState)
 {
-	if(m_state != nextState)
+	if(m_autoCopy && m_state != nextState)
 	{
 		if(CLMEM_STATE_HOST==m_state &&
 		   CLMEM_STATE_DEVICE==nextState)
@@ -178,6 +181,18 @@ void CCLComponent<T>::CopyToDevice()
 		}
 		m_state = CLMEM_STATE_DEVICE;
 	}
+}
+
+template <class T>
+bool CCLComponent<T>::getAutoCopy()
+{
+	return m_autoCopy;
+}
+
+template <class T>
+void CCLComponent<T>::setAutoCopy(bool autoCopy)
+{
+	m_autoCopy = autoCopy;
 }
 
 INSTANTIATE(CCLComponent, prediction_info_t);

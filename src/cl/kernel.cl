@@ -322,12 +322,10 @@ __kernel void prediction_transform(
 	int py = gy/scale;
 	int px = gx/scale;
 	prediction_info_t info = pPred[py*predWidth+px];
-	barrier(CLK_GLOBAL_MEM_FENCE);
 	int y = gy + info.dy*scale;
 	int x = gx + info.dx*scale;
 	int lastIndex = y*width+x;
 	float last = pLast[lastIndex];
-	barrier(CLK_GLOBAL_MEM_FENCE);
 	pDst[index] = pSrc[index] - last;
 }
 
@@ -336,24 +334,109 @@ __kernel void prediction_itransform(
 		__global float * pDst, 
 		__global float * pLast,
 		__global prediction_info_t * pPred, 
-		int height, 
 		int width,
-		int predHeight,
 		int predWidth,
-		int yscale,
-		int xscale,
-		int c
+		int scale
 		)
 {
 	int gy = get_global_id(0);
 	int gx = get_global_id(1);
 	int index = gy*width + gx;
-	int py = gy/8;
-	int px = gx/8;
+	int py = gy/scale;
+	int px = gx/scale;
 	prediction_info_t info = pPred[py*predWidth+px];
-	int y = gy + info.dy*8;
-	int x = gx + info.dx*8;
+	int y = gy + info.dy*scale;
+	int x = gx + info.dx*scale;
 	int lastIndex = y*width+x;
-	pDst[index] = pSrc[index] + pLast[lastIndex];
+	float last = pLast[lastIndex];
+	pDst[index] = pSrc[index] - last;
+}
+
+void copyGlobal2Array(__global float * ptr, int width, float * dst)
+{
+	for(int y=0;y<16;y++)
+	{
+		for(int x=0;x<16;x++)
+		{
+			dst[y*16+x] = ptr[y*width+x];
+		}
+	}
+
+}
+
+void copyArray2Global(__global float * ptr, int width, float * dst)
+{
+	for(int y=0;y<8;y++)
+	{
+		for(int x=0;x<8;x++)
+		{
+			ptr[y*width+x] = dst[y*8+x];
+		}
+	}
+
+}
+
+float diff_mse(float * block, __global float * ref, int width)
+{
+	float ret = 0.0;
+	int index = 0;
+	for(int y=0;y<16;y++)
+	{
+		for(int x=0;x<16;x++)
+		{
+			float d = block[index] - ref[y*width+x];
+			ret += d*d;
+			index++;
+		}
+	}
+	return ret;
+}
+
+__kernel void prediction_predict(
+		__global float * pSrc,
+		__global float * pLast,
+		__global prediction_info_t * pPred,
+		int height,
+		int width,
+		int predHeight,
+		int predWidth,
+		int max_d
+	)
+{
+	float block[16*16];
+	int gy = get_global_id(0);
+	int gx = get_global_id(1);
+	int y = gy*16;
+	int x = gx*16;
+	copyGlobal2Array(&pSrc[y*width+x], width, block);
+	struct 
+	{
+		int dy;
+		int dx;
+		float d;
+	} _min;
+	_min.dy = 0;
+	_min.dx = 0;
+	_min.d = MAXFLOAT;
+	for(int dy = -max_d ; dy <= max_d ; dy++)
+	{
+		for(int dx=-max_d ; dx <= max_d ; dx++)
+		{
+			int dpy = y + dy*16;
+			int dpx = x + dx*16;
+			if(dpx >= 0 && dpy >= 0 && (dpy+16) < height && (dpx+16) < width)
+			{
+				float d = diff_mse(block, &pLast[dpy*width+dpx], width);
+				if(d < _min.d)
+				{
+					_min.d = d;
+					_min.dy = dy;
+					_min.dx = dx;
+				}
+			}
+		}
+	}
+	pPred[gy*predWidth+gx].dy = _min.dy;
+	pPred[gy*predWidth+gx].dx = _min.dx;
 }
 

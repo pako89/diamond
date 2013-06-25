@@ -23,6 +23,8 @@ public:
 	virtual void CopyToDevice();
 	virtual void CopyToHost();
 	virtual cl_mem getCLMem(bool dosync=true);
+	virtual bool getAutoCopy();
+	virtual void setAutoCopy(bool autoCopy);
 protected:
 	virtual void copy(const CComponent<T> * src);
 	enum CLMEM_STATE
@@ -35,8 +37,7 @@ protected:
 	CCLDevice * m_dev;
 	cl_mem m_cldata;
 	cl_mem_flags m_mem_flags;
-
-//template <class> friend class CCLComponent;
+	bool m_autoCopy;
 };
 
 }

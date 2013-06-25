@@ -42,6 +42,7 @@ void CCLEncoder::init(CImageFormat fmt)
 	this->m_pred = pred;
 	pred->setTransformKernel(this->m_program, "prediction_transform");
 	pred->setITransformKernel(this->m_program, "prediction_itransform");
+	pred->setPredictionKernel(this->m_program, "prediction_predict");
 	this->m_predTab = new CCLPredictionInfoTable(&this->m_dev, CSize(fmt.Size.Height/16, fmt.Size.Width/16));
 	this->m_iquant = new CCLIQuant(&this->m_dev, this->m_program, "iquant_transform");
 	CBasicEncoder::init(fmt);

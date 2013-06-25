@@ -43,7 +43,9 @@ void CCLDCT::doTransform(CImage<float> * src, CImage<float> * dst)
 			SetArg(2, sizeof(height), &height);
 			SetArg(3, sizeof(width), &width);
 			EnqueueNDRangeKernel(2, global_work_size, local_work_size, 0, NULL, NULL);
+#ifdef CL_KERNEL_FINISH
 			Finish();
+#endif
 		}
 	}
 	else

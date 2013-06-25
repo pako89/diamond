@@ -117,3 +117,9 @@ CCLPlatform * CCLDevice::getPlatform()
 	return m_platform;
 }
 
+void CCLDevice::Finish()
+{
+	cl_int err = clFinish(this->m_queue);
+	if(CL_SUCCESS != err) throw utils::StringFormatException("clFinish(%d)\n", err);
+}
+
