@@ -156,31 +156,25 @@ void CCLComponent<T>::copy(const CComponent<T> * src)
 template <class T>
 void CCLComponent<T>::CopyToHost()
 {
-	if(CLMEM_STATE_DEVICE == m_state)
+	cl_int err;
+	err = clEnqueueReadBuffer(this->m_dev->getCommandQueue(), this->m_cldata, CL_TRUE, 0, this->getBytesCount(), this->m_data, 0, NULL, NULL);
+	if(CL_SUCCESS != err)
 	{
-		cl_int err;
-		err = clEnqueueReadBuffer(this->m_dev->getCommandQueue(), this->m_cldata, CL_TRUE, 0, this->getBytesCount(), this->m_data, 0, NULL, NULL);
-		if(CL_SUCCESS != err)
-		{
-			throw utils::StringFormatException("clEnqueueReadBuffer(%d)\n", err);
-		}
-		m_state = CLMEM_STATE_HOST;
+		throw utils::StringFormatException("clEnqueueReadBuffer(%d)\n", err);
 	}
+	m_state = CLMEM_STATE_HOST;
 }
 
 template <class T>
 void CCLComponent<T>::CopyToDevice()
 {
-	if(CLMEM_STATE_HOST == m_state)
+	cl_int err;
+	err = clEnqueueWriteBuffer(this->m_dev->getCommandQueue(), this->m_cldata, CL_TRUE, 0, this->getBytesCount(), this->m_data, 0, NULL, NULL);
+	if(CL_SUCCESS != err)
 	{
-		cl_int err;
-		err = clEnqueueWriteBuffer(this->m_dev->getCommandQueue(), this->m_cldata, CL_TRUE, 0, this->getBytesCount(), this->m_data, 0, NULL, NULL);
-		if(CL_SUCCESS != err)
-		{
-			throw utils::StringFormatException("clEnqueueWriteBuffer(%d)\n", err);
-		}
-		m_state = CLMEM_STATE_DEVICE;
+		throw utils::StringFormatException("clEnqueueWriteBuffer(%d)\n", err);
 	}
+	m_state = CLMEM_STATE_DEVICE;
 }
 
 template <class T>

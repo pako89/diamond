@@ -78,7 +78,7 @@ void CCLPrediction::doITransformPFrame(CImage<float> * pSrc, CImage<float> * pDs
 {
 	if(NULL != m_kernelITransform)
 	{
-		CPrediction::doITransformPFrame(pSrc, pDst, pPred);
+		clTransform(m_kernelITransform, pSrc, pDst, pPred);
 	}
 	else
 	{
@@ -193,6 +193,11 @@ void CCLPrediction::clPredict(CCLComponent<float> * pSrc, CCLComponent<float> * 
 #ifdef CL_KERNEL_FINISH
 	m_kernelPrediction->Finish();
 #endif
+}
+	
+CCLImage<float> * CCLPrediction::getLastImage()
+{
+	return dynamic_cast<CCLImage<float>*>(m_last);
 }
 
 

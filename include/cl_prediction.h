@@ -25,6 +25,7 @@ public:
 	virtual void setPredictionKernel(cl_program program, const char * kernel);
 	virtual void Transform(CImage<float> * pSrc, CImage<float> * pDst, CPredictionInfoTable * pPred, FRAME_TYPE type);
 	virtual void ITransform(CImage<float> * pSrc, CImage<float> * pDst, CPredictionInfoTable * pPred, FRAME_TYPE type);
+	virtual CCLImage<float> * getLastImage();
 protected:
 	virtual void doTransformPFrame(CImage<float> * pSrc, CImage<float> * pDst, CPredictionInfoTable * pPred);
 	virtual void doITransformPFrame(CImage<float> * pSrc, CImage<float> * pDst, CPredictionInfoTable * pPred);

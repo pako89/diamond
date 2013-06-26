@@ -349,7 +349,7 @@ __kernel void prediction_itransform(
 	int x = gx + info.dx*scale;
 	int lastIndex = y*width+x;
 	float last = pLast[lastIndex];
-	pDst[index] = pSrc[index] - last;
+	pDst[index] = pSrc[index] + last;
 }
 
 void copyGlobal2Array(__global float * ptr, int width, float * dst)
@@ -359,18 +359,6 @@ void copyGlobal2Array(__global float * ptr, int width, float * dst)
 		for(int x=0;x<16;x++)
 		{
 			dst[y*16+x] = ptr[y*width+x];
-		}
-	}
-
-}
-
-void copyArray2Global(__global float * ptr, int width, float * dst)
-{
-	for(int y=0;y<8;y++)
-	{
-		for(int x=0;x<8;x++)
-		{
-			ptr[y*width+x] = dst[y*8+x];
 		}
 	}
 

@@ -23,6 +23,11 @@ class CCLIDCT : public CCLDCT, public CIDCT
 {
 public:
 	CCLIDCT(CCLDevice * dev, cl_program program, const char * kernel);
+	// TODO: This look ugly 
+	virtual void Transform(CImage<float> * src, CImage<float> * dst)
+	{
+		CCLDCT::Transform(src, dst);
+	}
 protected:
 	virtual void doTransform(CImage<float> * src, CImage<float> * dst);
 };
