@@ -20,6 +20,7 @@ CFLAGS += -DDEFAULT_CL_SRC_FILE="\"src/cl/kernel.cl\""
 CFLAGS += -DDEFAULT_PREDICTION_METHOD=PREDICTION_METHOD_MSE
 CFLAGS += -DIMAGE_CHECK_INDEX
 CFLAGS += -DCOMPONENT_CHECK_INDEX
+#CFLAGS += -DCL_KERNEL_FINISH
 
 # Linker flags
 LDFLAGS	+= -L/usr/lib
@@ -57,6 +58,7 @@ SRC += src/shift.cpp
 SRC += src/zigzag.cpp
 SRC += src/cl_base.cpp
 SRC += src/cl_encoder.cpp
+SRC += src/cl_parallel_encoder.cpp
 SRC += src/cl_policy.cpp
 SRC += src/cl_component.cpp
 SRC += src/cl_image.cpp
