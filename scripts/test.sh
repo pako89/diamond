@@ -6,6 +6,10 @@ VIDEO=
 WIDTH=
 HEIGHT=
 OPENCL="-C"
+HUFFMAN="static"
+GOP="3"
+
+rm -rf bstr_r.dat bstr_w.dat
 
 if [ "$#" -eq 1 ]
 then
@@ -51,6 +55,12 @@ do
 done
 WIDTH=$(echo $RES | sed 's/\([0-9]\+\)x\([0-9]\+\)/\1/')
 HEIGHT=$(echo $RES | sed 's/\([0-9]\+\)x\([0-9]\+\)/\2/')
-./diamond encode $OPENCL -tYUV420 -W $WIDTH -H $HEIGHT -o $TEMP $VIDEO
+
+./diamond encode $OPENCL -g$GOP -tYUV420 -W $WIDTH -H $HEIGHT -e $HUFFMAN -o $TEMP $VIDEO
+#cgdb ./diamond
 ./diamond decode -o $OUT $TEMP
-mplayer $OUT -loop 0 -demuxer rawvideo -rawvideo w=$WIDTH:h=$HEIGHT
+
+if [ $? == 0 ]
+then
+	mplayer $OUT -loop 0 -demuxer rawvideo -rawvideo w=$WIDTH:h=$HEIGHT
+fi
