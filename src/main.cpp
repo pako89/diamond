@@ -38,6 +38,7 @@ int main(int argc,char * argv[])
 		dbg("Height     : %d\n", config.ImageSize.Height);
 		dbg("Width      : %d\n", config.ImageSize.Width);
 		dbg("OpenCL     : %s\n", config.UseOpenCL?"True":"False");
+		dbg("Variant    : %d\n", config.OpenCLVariant);
 		if(diamond::DIAMOND_OP_ENCODE == config.Op)
 		{
 			dbg("Huffman    : %s\n", config.EncoderConfig.HuffmanType==avlib::HUFFMAN_TYPE_DYNAMIC?"dynamic":"static");
@@ -53,11 +54,17 @@ int main(int argc,char * argv[])
 			avlib::CEncoder * enc = NULL;
 			if(config.UseOpenCL)
 			{
-#ifdef DEBUG				
-				enc = new avlib::CCLParallelEncoder(config.EncoderConfig);
-#else
-				enc = new avlib::CCLEncoder(config.EncoderConfig);
-#endif				
+				switch(config.OpenCLVariant)
+				{
+				case 1:
+					enc = new avlib::CCLEncoder(config.EncoderConfig);
+					break;
+				case 2:
+					enc = new avlib::CCLParallelEncoder(config.EncoderConfig);
+					break;
+				default:
+					throw utils::StringFormatException("Unknown OpenCL variant: '%d'", config.OpenCLVariant);
+				}
 			}
 			else
 			{

@@ -23,7 +23,7 @@
 namespace avlib
 {
 
-class CCLEncoder : public CBasicEncoder, public ICLHost
+class CCLEncoder : public CEncoder, public ICLHost
 {
 public:
 	CCLEncoder();
@@ -32,7 +32,22 @@ public:
 	virtual bool Encode(CSequence * pSeq, CBitstream * pBstr);
 protected:
 	virtual void init(CImageFormat fmt);
+	virtual void transform(CCLImage<float> * imgF, CCLImage<int16_t> * img, CCLPredictionInfoTable * predInfo, FRAME_TYPE frame_type);
+	virtual void itransform(CCLImage<float> * imgF, CCLImage<int16_t> * img, CCLPredictionInfoTable * predInfo, FRAME_TYPE frame_type);
+	virtual void entropy(CCLImage<int16_t> * img, CCLPredictionInfoTable * predInfo, CBitstream * pBstr);
 	CCLDevicePolicy * m_clPolicy;
+	CCLDCT * m_dct;
+	CCLIDCT * m_idct;
+	CCLQuant * m_quant;
+	CCLIQuant * m_iquant;
+	CCLZigZag<float, int16_t> * m_zz;
+	CCLShift<float> * m_shift;
+	CCLShift<float> * m_ishift;
+	CCLPrediction * m_pred;
+	CCLPredictionInfoTable * m_predTab;
+	CRLC<int16_t> * m_rlc;
+	CCLImage<float> * m_imgF;
+	CCLImage<int16_t> * m_img;
 	utils::CTimer m_timerCopyToDevice;
 	utils::CTimer m_timerCopyToHost;
 };

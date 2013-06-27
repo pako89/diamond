@@ -10,7 +10,7 @@ CCLEncoder::CCLEncoder()
 }
 
 CCLEncoder::CCLEncoder(EncoderConfig cfg) : 
-	CBasicEncoder(cfg)
+	CEncoder(cfg)
 {
 #ifdef WIN32
 	m_clPolicy = new CCLFirstDevicePolicy();
@@ -29,6 +29,7 @@ CCLEncoder::~CCLEncoder()
 
 void CCLEncoder::init(CImageFormat fmt)
 {
+	m_clPolicy = new CCLFirstGPUDevicePolicy();
 	ICLHost::init(m_clPolicy, (char*)DEFAULT_CL_SRC_FILE);
 	this->m_imgF = new CCLImage<float>(&this->m_dev, fmt);
 	this->m_img = new CCLImage<int16_t>(&this->m_dev, fmt);
@@ -38,15 +39,51 @@ void CCLEncoder::init(CImageFormat fmt)
 	this->m_zz = new CCLZigZag<float, int16_t>(&this->m_dev, this->m_program, "lut_transform_float_int16");
 	this->m_shift = new CCLShift<float>(-128.0f, &this->m_dev, this->m_program, "shift");
 	this->m_ishift = new CCLShift<float>(128.0f, &this->m_dev, this->m_program, "shift");
-	CCLPrediction * pred = new CCLPrediction(&this->m_dev, fmt);
-	this->m_pred = pred;
-	pred->setTransformKernel(this->m_program, "prediction_transform");
-	pred->setITransformKernel(this->m_program, "prediction_itransform");
-	pred->setPredictionKernel(this->m_program, "prediction_predict");
+	this->m_pred = new CCLPrediction(&this->m_dev, fmt);
+	this->m_pred->setTransformKernel(this->m_program, "prediction_transform");
+	this->m_pred->setITransformKernel(this->m_program, "prediction_itransform");
+	this->m_pred->setPredictionKernel(this->m_program, "prediction_predict");
+	this->m_pred->setIFrameTransform(m_shift);
+	this->m_pred->setIFrameITransform(m_ishift);
 	this->m_predTab = new CCLPredictionInfoTable(&this->m_dev, CSize(fmt.Size.Height/16, fmt.Size.Width/16));
 	this->m_iquant = new CCLIQuant(&this->m_dev, this->m_program, "iquant_transform");
-	CBasicEncoder::init(fmt);
+	if(m_config.HuffmanType == HUFFMAN_TYPE_STATIC)
+	{
+		m_rlc = new CStaticRLC<int16_t>();
+	}
+	else if(m_config.HuffmanType == HUFFMAN_TYPE_DYNAMIC)
+	{
+		m_rlc = new CDynamicRLC<int16_t>();
+	}
+	else
+	{
+		throw utils::StringFormatException("Unknown Huffman type\n");
+	}
 }
+
+void CCLEncoder::transform(CCLImage<float> * imgF, CCLImage<int16_t> * img, CCLPredictionInfoTable * predTab, FRAME_TYPE frame_type)
+{
+	m_pred->Transform(imgF, imgF, predTab, frame_type);
+	m_dct->Transform(imgF, imgF);
+	m_quant->Transform(imgF, imgF);
+	m_zz->Transform(imgF, img);
+}
+
+void CCLEncoder::itransform(CCLImage<float> * imgF, CCLImage<int16_t> * img, CCLPredictionInfoTable * predTab, FRAME_TYPE frame_type)
+{
+	m_iquant->Transform(imgF, imgF);
+	m_idct->Transform(imgF, imgF);
+	m_pred->ITransform(imgF, imgF, predTab, frame_type);
+}
+
+void CCLEncoder::entropy(CCLImage<int16_t> * img, CCLPredictionInfoTable * predInfo, CBitstream * pBstr)
+{
+	m_pred->Encode(predInfo, pBstr);
+	m_rlc->Encode(img, pBstr);
+	m_rlc->Flush(pBstr);
+	pBstr->flush();
+}
+
 
 bool CCLEncoder::Encode(CSequence * pSeq, CBitstream * pBstr)
 {
@@ -65,21 +102,14 @@ bool CCLEncoder::Encode(CSequence * pSeq, CBitstream * pBstr)
 			throw utils::StringFormatException("can not read frame from file");
 		}
 		utils::printProgressBar(i, sos.frames_number);
-		(*m_imgF) = pSeq->getFrame();
+		(*static_cast<CImage<float>*>(m_imgF)) = pSeq->getFrame();
+		m_imgF->CopyToDevice();
 		sof_marker_t sof;
 		frame_type = (!m_config.GOP || i%m_config.GOP == 0 || i == sos.frames_number-1)?FRAME_TYPE_I:FRAME_TYPE_P;
 		sof = write_sof(pBstr, frame_type);
-		m_pred->Transform(m_imgF, m_imgF, m_predTab, frame_type);
-		m_dct->Transform(m_imgF, m_imgF);
-		m_quant->Transform(m_imgF, m_imgF);
-		m_zz->Transform(m_imgF, m_img);
-		m_pred->Encode(m_predTab, pBstr);
-		m_rlc->Encode(m_img, pBstr);
-		m_rlc->Flush(pBstr);
-		pBstr->flush();
-		m_iquant->Transform(m_imgF, m_imgF);
-		m_idct->Transform(m_imgF, m_imgF);
-		m_pred->ITransform(m_imgF, m_imgF, m_predTab, frame_type);
+		transform(m_imgF, m_img, m_predTab, frame_type);
+		entropy(m_img, m_predTab, pBstr);
+		itransform(m_imgF, m_img, m_predTab, frame_type);
 	}
 	dbg("\n");
 	m_timer.stop();

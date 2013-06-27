@@ -8,6 +8,11 @@ CCLQuant::CCLQuant(CCLDevice * dev, cl_program program, const char * kernel) :
 {
 }
 
+void CCLQuant::setTables(int qp)
+{
+	CQuant::setTables(qp);
+}
+
 void CCLQuant::setTables(const uint8_t * YQ, const uint8_t * UQ, const uint8_t * VQ, int qp)
 {
 	if(NULL == this->m_q) this->m_q = new CCLImage<float>(this->m_dev, CSize(8, 8), CL_MEM_READ_ONLY);
@@ -60,6 +65,11 @@ void CCLQuant::doTransform(CImage<float> * src, CImage<float> * dst)
 CCLIQuant::CCLIQuant(CCLDevice * dev, cl_program program, const char * kernel) :
 	ICLKernel(dev, program, kernel)
 {
+}
+
+void CCLIQuant::setTables(int qp)
+{
+	CIQuant::setTables(qp);
 }
 
 void CCLIQuant::setTables(const uint8_t * YQ, const uint8_t * UQ, const uint8_t * VQ, int qp)

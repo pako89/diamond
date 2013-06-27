@@ -54,7 +54,8 @@ struct DiamondConfig
 		ImageType(avlib::IMAGE_TYPE_UNKNOWN),
 		ImageTypeStr("unknown"),
 		ImageSize(0, 0),
-		UseOpenCL(false)
+		UseOpenCL(false),
+		OpenCLVariant(0)
 	{
 		EncoderConfig.HuffmanType = avlib::HUFFMAN_TYPE_DYNAMIC;//avlib::HUFFMAN_TYPE_STATIC;
 		EncoderConfig.GOP = DEFAULT_GOP;
@@ -69,6 +70,7 @@ struct DiamondConfig
 	avlib::CSize ImageSize;
 	avlib::EncoderConfig EncoderConfig;	
 	bool UseOpenCL;
+	uint8_t OpenCLVariant;
 };
 
 /**

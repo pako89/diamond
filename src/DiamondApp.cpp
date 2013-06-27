@@ -182,6 +182,10 @@ std::string CDiamondApp::getShortOpts(const struct option long_options[], int si
 		{
 			shortOpts += ':';
 		}
+		else if(long_options[i].has_arg == optional_argument)
+		{
+			shortOpts += "::";
+		}
 	}
 	return shortOpts;
 }
@@ -237,6 +241,14 @@ void CDiamondApp::ParseArgs(int argc, char * argv[])
 			break;
 		case 'C':
 			m_config.UseOpenCL = true;
+			if(optarg)
+			{
+				m_config.OpenCLVariant = parseInt(optarg);
+			}
+			else
+			{
+				m_config.OpenCLVariant = 1;
+			}
 			break;
 		case 'e':
 			m_config.EncoderConfig.HuffmanType = parseHuffman(optarg);
