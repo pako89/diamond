@@ -22,7 +22,6 @@ void CCLDCT::doTransform(CImage<float> * src, CImage<float> * dst)
 	{
 		throw utils::StringFormatException("src or dst is not CCLImage<float>\n");
 	}
-	cl_int err = 0;
 	if(m_kernel)
 	{
 		for(int i=0;i<clSrc->getComponents(); i++)

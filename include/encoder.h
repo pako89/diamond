@@ -26,6 +26,7 @@ public:
 	virtual ~CEncoder();
 	virtual bool Encode(CSequence * pSeq, CBitstream * pBstr) = 0;
 protected:
+	virtual void init(CImageFormat fmt);
 	virtual sos_marker_t write_sos(CSequence * pSeq, CBitstream * pBtr);
 	virtual sof_marker_t write_sof(CBitstream * pBstr, FRAME_TYPE frame_type);
 	EncoderConfig m_config;

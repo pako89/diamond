@@ -152,7 +152,7 @@ const struct option CDiamondApp::common_options[] = {
 	{"type",		required_argument,	NULL,	't'},
 	{"height",		required_argument,	NULL,	'H'},
 	{"width",		required_argument,	NULL,	'W'},
-	{"opencl",		no_argument,		NULL, 	'C'},
+	{"opencl",		optional_argument,	NULL, 	'C'},
 	{"huffman",		required_argument, 	NULL, 	'e'},
 	{"gop",			required_argument,	NULL, 	'g'}
 };

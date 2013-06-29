@@ -45,6 +45,7 @@ SRC += src/basic_encoder.cpp
 SRC += src/dynamic_huffman.cpp
 SRC += src/image.cpp
 SRC += src/rlc.cpp
+SRC += src/rlc_factory.cpp
 SRC += src/transform.cpp
 SRC += src/bitstream.cpp
 SRC += src/component.cpp
@@ -59,6 +60,7 @@ SRC += src/zigzag.cpp
 SRC += src/cl_base.cpp
 SRC += src/cl_encoder.cpp
 SRC += src/cl_parallel_encoder.cpp
+SRC += src/cl_merged_encoder.cpp
 SRC += src/cl_policy.cpp
 SRC += src/cl_component.cpp
 SRC += src/cl_image.cpp
@@ -73,6 +75,7 @@ SRC += src/cl_platform_info.cpp
 SRC += src/cl_shift.cpp
 SRC += src/cl_prediction.cpp
 SRC += src/cl_host.cpp
+SRC += src/cl_dctqzz.cpp
 
 # Objects
 OBJ	= $(SRC:.cpp=.o)

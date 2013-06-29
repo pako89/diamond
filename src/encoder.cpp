@@ -50,4 +50,8 @@ sof_marker_t CEncoder::write_sof(CBitstream * pBstr, FRAME_TYPE frame_type)
 	return sof;
 }
 
+void CEncoder::init(CImageFormat fmt)
+{
+}
+
 }

@@ -47,17 +47,10 @@ void CCLEncoder::init(CImageFormat fmt)
 	this->m_pred->setIFrameITransform(m_ishift);
 	this->m_predTab = new CCLPredictionInfoTable(&this->m_dev, CSize(fmt.Size.Height/16, fmt.Size.Width/16));
 	this->m_iquant = new CCLIQuant(&this->m_dev, this->m_program, "iquant_transform");
-	if(m_config.HuffmanType == HUFFMAN_TYPE_STATIC)
+	this->m_rlc = CRLCFactory<int16_t>::CreateRLC(m_config.HuffmanType);
+	if(NULL == this->m_rlc)
 	{
-		m_rlc = new CStaticRLC<int16_t>();
-	}
-	else if(m_config.HuffmanType == HUFFMAN_TYPE_DYNAMIC)
-	{
-		m_rlc = new CDynamicRLC<int16_t>();
-	}
-	else
-	{
-		throw utils::StringFormatException("Unknown Huffman type\n");
+		throw utils::StringFormatException("Unknown Huffman type '%d'\n", m_config.HuffmanType);
 	}
 }
 

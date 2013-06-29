@@ -10,6 +10,7 @@
 #include <basic_decoder.h>
 #include <cl_encoder.h>
 #include <cl_parallel_encoder.h>
+#include <cl_merged_encoder.h>
 #include <log.h>
 
 module("Main");
@@ -61,6 +62,9 @@ int main(int argc,char * argv[])
 					break;
 				case 2:
 					enc = new avlib::CCLParallelEncoder(config.EncoderConfig);
+					break;
+				case 3:
+					enc = new avlib::CCLMergedEncoder(config.EncoderConfig);
 					break;
 				default:
 					throw utils::StringFormatException("Unknown OpenCL variant: '%d'", config.OpenCLVariant);

@@ -8,6 +8,10 @@
 namespace avlib
 {
 
+extern const uint8_t default_YQTable[];
+extern const uint8_t default_UQTable[];
+extern const uint8_t default_VQTable[];
+
 class CQuant : public CTransform<float, float>
 {
 public:

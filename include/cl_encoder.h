@@ -1,8 +1,8 @@
 #ifndef _CL_ENCODER_H
 #define _CL_ENCODER_H
 
-#include <basic_encoder.h>
-
+#include <encoder.h>
+#include <rlc_factory.h>
 #include <cl_device.h>
 #include <cl_image.h>
 #include <cl_dct.h>
