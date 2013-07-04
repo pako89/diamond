@@ -15,9 +15,9 @@ public:
 	CZigZag();
 	virtual ~CZigZag();
 	virtual void TransformBlock(S * pSrc, D * pDst, CPoint p, CSize s);
+	virtual CPoint getPoint(CPoint p);
 protected:
 	const uint8_t * m_lut;
-	virtual CPoint getPoint(CPoint p);
 	static const uint8_t s_lut[];
 	static const uint8_t s_tul[];
 };

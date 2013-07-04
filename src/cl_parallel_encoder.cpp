@@ -37,7 +37,7 @@ bool CCLParallelEncoder::Encode(CSequence * pSeq, CBitstream * pBstr)
 		m_img->CopyToHost();
 		m_predTab->CopyToHost();
 		itransform(m_imgF, m_img, m_predTab, frame_type);
-		entropy(m_img, m_predTab, pBstr);
+		entropy(m_img, m_predTab, pBstr, frame_type);
 		m_dev.Finish();
 	}
 	m_timer.stop();

@@ -18,6 +18,8 @@ CFLAGS += -DCHECK_HUFFMAN
 CFLAGS += -DDEFAULT_MAX_PREDICTION=2
 CFLAGS += -DDEFAULT_CL_SRC_FILE="\"src/cl/kernel.cl\""
 CFLAGS += -DDEFAULT_PREDICTION_METHOD=PREDICTION_METHOD_MSE
+CFLAGS += -DPREDICTION_USE_INTERPOLATION
+CFLAGS += -DPREDICTION_INTERPOLATION_SCALE=2
 CFLAGS += -DIMAGE_CHECK_INDEX
 CFLAGS += -DCOMPONENT_CHECK_INDEX
 #CFLAGS += -DCL_KERNEL_FINISH
@@ -57,6 +59,7 @@ SRC += src/encoder.cpp
 SRC += src/mtimer.cpp
 SRC += src/shift.cpp
 SRC += src/zigzag.cpp
+SRC += src/interpolation.cpp
 SRC += src/cl_base.cpp
 SRC += src/cl_encoder.cpp
 SRC += src/cl_parallel_encoder.cpp

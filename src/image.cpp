@@ -223,7 +223,7 @@ CComponent<T> & CImage<T>::operator[](int index)
 #ifdef IMAGE_CHECK_INDEX
 	if(index < 0 || index >= m_comp_num)
 	{
-		throw utils::StringFormatException("Index (%d) out of range [%d, %d]", index, 0, m_comp_num); 
+		throw utils::StringFormatException("Image: Index (%d) out of range [%d, %d]", index, 0, m_comp_num); 
 	}
 	else
 #endif		
@@ -238,7 +238,7 @@ int CImage<T>::getScale(int index)
 #ifdef IMAGE_CHECK_INDEX
 	if(index < 0 || index >= m_comp_num)
 	{
-		throw utils::StringFormatException("Index (%d) out of range [%d, %d]", index, 0, m_comp_num); 
+		throw utils::StringFormatException("Image: Index (%d) out of range [%d, %d]", index, 0, m_comp_num); 
 	}
 	else
 #endif		

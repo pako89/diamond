@@ -182,7 +182,7 @@ T * CComponent<T>::operator[](int h)
 #ifdef COMPONENT_CHECK_INDEX
 	if(h < 0 || h >= this->m_size.Height)
 	{
-		throw utils::StringFormatException("Index (%d) out of range [%d, %d]", h, 0, this->m_size.Height); 
+		throw utils::StringFormatException("Component: Index (%d) out of range [%d, %d]", h, 0, this->m_size.Height); 
 	}
 	else
 #endif

@@ -14,17 +14,11 @@ CPrediction::CPrediction() :
 	m_last(NULL),
 	m_IFT(NULL),
 	m_IFIT(NULL),
+#ifdef PREDICTION_USE_INTERPOLATION
+	m_interpol(NULL),
+#endif	
 	m_max(DEFAULT_MAX_PREDICTION)
 {
-	m_huff = new CDynamicHuffman<int>();
-}
-
-CPrediction::CPrediction(CImageFormat format) :
-	m_IFT(NULL),
-	m_IFIT(NULL),
-	m_max(DEFAULT_MAX_PREDICTION)
-{
-	m_last = new CImage<float>(format);
 	m_huff = new CDynamicHuffman<int>();
 }
 
@@ -32,8 +26,42 @@ CPrediction::~CPrediction()
 {
 	RELEASE(m_last);
 	RELEASE(m_huff);
+#ifdef PREDICTION_USE_INTERPOLATION
+	RELEASE(m_interpol);
+#endif	
 }
 
+void CPrediction::Init(
+		CImageFormat format
+#ifdef PREDICTION_USE_INTERPOLATION
+		, int scale
+#endif		
+		)
+{
+#ifdef PREDICTION_USE_INTERPOLATION
+	if(NULL == m_interpol)
+	{
+		m_interpol = new CInterpolation<float>();
+		m_interpol->setScale(scale);
+	}
+	if(NULL == m_last)
+	{
+		CImageFormat newFormat = format;
+		newFormat.Size.Width *= m_interpol->getScale();
+		newFormat.Size.Height *= m_interpol->getScale();
+		m_last = new CImage<float>(newFormat);
+	}
+#else
+	if(NULL == m_last) m_last = new CImage<float>(format);
+#endif
+}
+
+#ifdef PREDICTION_USE_INTERPOLATION
+int CPrediction::getInterpolationScale()
+{
+	return m_interpol->getScale();
+}
+#endif
 
 prediction_info_t CPrediction::predict(float * pSrc, CPoint p, CSize s)
 {
@@ -143,7 +171,11 @@ void CPrediction::ITransform(CImage<float> * pSrc, CImage<float> * pDst, CPredic
 	{
 		throw utils::StringFormatException("Unknown FRAME_TYPE");
 	}
+#ifdef PREDICTION_USE_INTERPOLATION	
+	m_interpol->Transform(pDst, m_last);
+#else
 	*m_last = *pDst;
+#endif
 }
 
 void CPrediction::doPredict(CComponent<float> * pSrc, CPredictionInfoTable * pPred)
@@ -153,7 +185,7 @@ void CPrediction::doPredict(CComponent<float> * pSrc, CPredictionInfoTable * pPr
 	{
 		for(int x=0; x < size.Width; x+=16)
 		{
-			(*pPred)[y/16][x/16] = predict(&(*pSrc)[y][x], CPoint(0, y, x), size);
+			(*pPred)[y/16][x/16] = predict(&(*pSrc)[y][x], CPoint(0, y, x), m_last->getFormat().Size);
 		}
 	}
 }
@@ -197,11 +229,12 @@ void CPrediction::TransformBlock(float * pSrc, float * pDst, CPoint p, CSize s, 
 	int ly = p.Y + predInfo.dy*scale;
 	int lx = p.X + predInfo.dx*scale;
 	float * lastPtr = &(*m_last)[p.Z][ly][lx];
+	int lastWidth = (*m_last)[p.Z].getSize().Width;
 	for(int y=0;y<8;y++)
 	{
 		for(int x=0;x<8;x++)
 		{
-			pDst[y*s.Width+x] = pSrc[y*s.Width+x] - lastPtr[y*s.Width+x];
+			pDst[y*s.Width+x] = pSrc[y*s.Width+x] - lastPtr[y*lastWidth+x];
 		}
 	}
 }
@@ -211,11 +244,12 @@ void CPrediction::ITransformBlock(float * pSrc, float * pDst, CPoint p, CSize s,
 	int ly = p.Y + predInfo.dy*scale;
 	int lx = p.X + predInfo.dx*scale;
 	float * lastPtr = &(*m_last)[p.Z][ly][lx];
+	int lastWidth = (*m_last)[p.Z].getSize().Width;
 	for(int y=0;y<8;y++)
 	{
 		for(int x=0;x<8;x++)
 		{
-			pDst[y*s.Width+x] = pSrc[y*s.Width+x] + lastPtr[y*s.Width+x];
+			pDst[y*s.Width+x] = pSrc[y*s.Width+x] + lastPtr[y*lastWidth+x];
 		}
 	}
 }
@@ -244,24 +278,30 @@ void CPrediction::setIFrameITransform(CTransform<float, float> * t)
 	}
 }
 
-void CPrediction::Encode(CPredictionInfoTable * pPred, CBitstream * pBstr)
+void CPrediction::Encode(CPredictionInfoTable * pPred, CBitstream * pBstr, FRAME_TYPE frame_type)
 {
-	for(int y=0;y<pPred->getHeight();y++)
+	if(FRAME_TYPE_I != frame_type)
 	{
-		for(int x=0;x<pPred->getWidth();x++)
+		for(int y=0;y<pPred->getHeight();y++)
 		{
-			encodePredictionInfo((*pPred)[y][x], pBstr);
+			for(int x=0;x<pPred->getWidth();x++)
+			{
+				encodePredictionInfo((*pPred)[y][x], pBstr);
+			}
 		}
 	}
 }
 
-void CPrediction::Decode(CPredictionInfoTable * pPred, CBitstream * pBstr)
+void CPrediction::Decode(CPredictionInfoTable * pPred, CBitstream * pBstr, FRAME_TYPE frame_type)
 {
-	for(int y=0;y<pPred->getHeight();y++)
+	if(FRAME_TYPE_I != frame_type)
 	{
-		for(int x=0;x<pPred->getWidth();x++)
+		for(int y=0;y<pPred->getHeight();y++)
 		{
-			(*pPred)[y][x] = decodePredictionInfo(pBstr);
+			for(int x=0;x<pPred->getWidth();x++)
+			{
+				(*pPred)[y][x] = decodePredictionInfo(pBstr);
+			}
 		}
 	}
 }

@@ -51,7 +51,12 @@ bool CBasicDecoder::Decode(CBitstream * pBstr, CSequence * pSeq)
 		break;
 	}
 	CShift<float> * shift = new CShift<float>(128.0f);
-	CPrediction * pred = new CPrediction(pSeq->getFormat());
+	CPrediction * pred = new CPrediction();
+#ifdef PREDICTION_USE_INTERPOLATION
+	pred->Init(pSeq->getFormat(), sos.interpolation_scale);
+#else
+	pred->Init(pSeq->getFormat());
+#endif
 	pred->setIFrameITransform(shift);
 	sof_marker_t sof;
 	for(uint32_t n = 0 ; n < sos.frames_number; n++)
@@ -63,7 +68,7 @@ bool CBasicDecoder::Decode(CBitstream * pBstr, CSequence * pSeq)
 		{
 			throw utils::StringFormatException("can not sync frame");
 		}
-		pred->Decode(predTab, pBstr);
+		pred->Decode(predTab, pBstr, (FRAME_TYPE)sof.frame_type);
 		irlc->Decode(pBstr, img);
 		irlc->Fill(pBstr);
 		izigzag->Transform(img, imgF);

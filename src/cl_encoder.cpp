@@ -69,9 +69,9 @@ void CCLEncoder::itransform(CCLImage<float> * imgF, CCLImage<int16_t> * img, CCL
 	m_pred->ITransform(imgF, imgF, predTab, frame_type);
 }
 
-void CCLEncoder::entropy(CCLImage<int16_t> * img, CCLPredictionInfoTable * predInfo, CBitstream * pBstr)
+void CCLEncoder::entropy(CCLImage<int16_t> * img, CCLPredictionInfoTable * predInfo, CBitstream * pBstr, FRAME_TYPE frame_type)
 {
-	m_pred->Encode(predInfo, pBstr);
+	m_pred->Encode(predInfo, pBstr, frame_type);
 	m_rlc->Encode(img, pBstr);
 	m_rlc->Flush(pBstr);
 	pBstr->flush();
@@ -101,7 +101,7 @@ bool CCLEncoder::Encode(CSequence * pSeq, CBitstream * pBstr)
 		frame_type = (!m_config.GOP || i%m_config.GOP == 0 || i == sos.frames_number-1)?FRAME_TYPE_I:FRAME_TYPE_P;
 		sof = write_sof(pBstr, frame_type);
 		transform(m_imgF, m_img, m_predTab, frame_type);
-		entropy(m_img, m_predTab, pBstr);
+		entropy(m_img, m_predTab, pBstr, frame_type);
 		itransform(m_imgF, m_img, m_predTab, frame_type);
 	}
 	dbg("\n");

@@ -85,7 +85,15 @@ void CBasicEncoder::init(CImageFormat fmt)
 	if(NULL == m_ishift) m_ishift = new CShift<float>(128.0f);
 	if(NULL == m_idct) m_idct = new CIDCT();
 	if(NULL == m_iquant) m_iquant = new CIQuant();
-	if(NULL == m_pred) m_pred = new CPrediction(fmt);
+	if(NULL == m_pred)
+	{
+		m_pred = new CPrediction();
+#ifdef PREDICTION_USE_INTERPOLATION
+		m_pred->Init(fmt, PREDICTION_INTERPOLATION_SCALE);
+#else
+		m_pred->Init(fmt);
+#endif
+	}
 	if(NULL == m_predTab) m_predTab = new CPredictionInfoTable(CSize(fmt.Size.Height/16, fmt.Size.Width/16));
 }
 
@@ -115,7 +123,7 @@ bool CBasicEncoder::Encode(CSequence * pSeq, CBitstream * pBstr)
 		m_dct->Transform(m_imgF, m_imgF);
 		m_quant->Transform(m_imgF, m_imgF);
 		m_zz->Transform(m_imgF, m_img);
-		m_pred->Encode(m_predTab, pBstr);
+		m_pred->Encode(m_predTab, pBstr, frame_type);
 		m_rlc->Encode(m_img, pBstr);
 		m_rlc->Flush(pBstr);
 		pBstr->flush();

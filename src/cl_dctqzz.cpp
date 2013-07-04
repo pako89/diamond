@@ -60,6 +60,32 @@ void CCLDCTQZZ::doTransform(CImage<float> * src, CImage<int16_t> * dst)
 #ifdef CL_KERNEL_FINISH
 			m_kernel->Finish();
 #endif
+#if 0
+			CZigZag<float, int16_t> zz;
+			for(int y=0;y<height;y++)
+			{
+				for(int x=0;x<width;x++)
+				{
+					struct CPoint np = zz.getPoint(CPoint(y%8,x%8));
+					struct CPoint p;
+					int16_t val =(*clDst)[i][y][x]; 
+					int _y = y/8;
+					_y = _y*8;
+					int _x = x/8;
+					_x = _x*8;
+					int16_t c = (int16_t)(*clSrc)[i][_y+np.Y][_x+np.X];
+					//p.Y = val>>8;
+					//p.X = val&0xff;
+					//dbg("(y=%3d, x=%3d) : CPU(%d, %d) <-> GPU(%d, %d)\n", y, x, np.Y, np.X, p.Y, p.X);
+					//if(p.Y != np.Y || p.X != np.X)
+					if(c != val)
+					{
+						dbg("(y=%3d, x=%3d) : CPU(%2d) <-> GPU(%2d)\n", y, x, c, val);
+						throw utils::StringFormatException("DUPA\n");
+					}
+				}
+			}
+#endif
 		}
 	}
 	else

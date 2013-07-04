@@ -16,6 +16,9 @@ struct EncoderConfig
 {
 	HUFFMAN_TYPE HuffmanType;
 	int GOP;
+#ifdef PREDICTION_USE_INTERPOLATION
+	int InterpolationScale;
+#endif
 };
 
 class CEncoder : public utils::ITimer

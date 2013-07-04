@@ -40,6 +40,9 @@ MARKER_DEF(sos)
 	uint32_t frames_number;
 	uint32_t width;
 	uint32_t height;
+#ifdef PREDICTION_USE_INTERPOLATION
+	uint8_t interpolation_scale;
+#endif
 MARKER_END(sos)
 
 MARKER_DEF(sof)

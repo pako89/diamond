@@ -57,6 +57,7 @@ bool CCLMergedEncoder::Encode(CSequence * pSeq, CBitstream * pBstr)
 	sos_marker_t sos = write_sos(pSeq, pBstr);
 	FRAME_TYPE frame_type;
 	CCLZigZag<float, int16_t> * m_zz = new CCLZigZag<float, int16_t>(&this->m_dev, this->m_program, "lut_transform_float_int16");
+	CZigZag<int16_t, int16_t> * zz = new CZigZag<int16_t, int16_t>();
 	m_dctqzz->setTables(1);
 	m_idctqzz->setTables(1);
 	for(int i=0;i<sos.frames_number;i++)
@@ -73,14 +74,16 @@ bool CCLMergedEncoder::Encode(CSequence * pSeq, CBitstream * pBstr)
 		sof = write_sof(pBstr, frame_type);
 		m_pred->Transform(m_imgF, m_imgF, m_predTab, frame_type);
 		m_dctqzz->Transform(m_imgF, m_img);
-		m_zz->Transform(m_imgF, m_img);
-		m_pred->Encode(m_predTab, pBstr);
+		//zz->Transform(m_img, m_img);
+		//m_zz->Transform(m_imgF, m_img);
+		m_pred->Encode(m_predTab, pBstr, frame_type);
 		m_rlc->Encode(m_img, pBstr);
 		m_rlc->Flush(pBstr);
 		pBstr->flush();
 		m_idctqzz->Transform(m_imgF, m_imgF);
 		m_pred->ITransform(m_imgF, m_imgF, m_predTab, frame_type);
 	}
+	delete zz;
 	delete m_zz;
 	dbg("\n");
 	m_timer.stop();

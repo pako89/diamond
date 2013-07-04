@@ -32,10 +32,6 @@ void CTransform<S, D>::TransformBlock(S * pSrc, D * pDst, CPoint p, CSize s)
 template <class S, class D>
 void CTransform<S, D>::Transform(CImage<S> * src, CImage<D> * dst)
 {
-	if(src->getFormat() != dst->getFormat())
-	{
-		throw utils::StringFormatException("formats does not match\n");
-	}
 	m_timer.start();
 	doTransform(src, dst);
 	m_timer.stop();
@@ -44,6 +40,10 @@ void CTransform<S, D>::Transform(CImage<S> * src, CImage<D> * dst)
 template <class S, class D>
 void CTransform<S, D>::doTransform(CImage<S> * src, CImage<D> * dst)
 {
+	if(src->getFormat() != dst->getFormat())
+	{
+		throw utils::StringFormatException("formats does not match\n");
+	}
 	for(int k=0;k<src->getComponents(); k++)
 	{
 		CSize size((*src)[k].getHeight(), (*src)[k].getWidth());

@@ -71,15 +71,15 @@ __kernel void dct_transform(__global float * pSrc, __global float * pDst, int he
 	__local float src[64];
 	
 	int lid = get_local_id(0);
-	int gy = get_group_id(0);
-	int gx = get_group_id(1);
+	int gy = get_global_id(0);
+	int gx = get_global_id(1);
 	int lsy = get_local_size(0);
 	int lsx = get_local_size(1);
 	
-	int srcIndex = gy*8*width + gx*8;
+	int srcIndex = gy*width + gx*8;
 	
 	__local float * localPtr = &src[lid*8];
-	__global float * srcPtr = &pSrc[srcIndex + lid*width];
+	__global float * srcPtr = &pSrc[srcIndex];
 	for(int i=0;i<8;i++)
 	{
 		*(localPtr++) = *(srcPtr++);
@@ -91,41 +91,11 @@ __kernel void dct_transform(__global float * pSrc, __global float * pDst, int he
 	barrier(CLK_LOCAL_MEM_FENCE);
 	
 	localPtr = &src[lid*8];
-	__global float * dstPtr = &pDst[srcIndex + lid*width];
+	__global float * dstPtr = &pDst[srcIndex];
 	for(int i=0;i<8;i++)
 	{
 		*(dstPtr++) = *(localPtr++);
 	}
-}
-
-#define LIMIT(v, l)	( (v) > (l) ? (l) : ((v) < -(l) ? -(l) : (v)) )
-
-__kernel void quant_transform(__global float * pSrc, __global float * pDst, __global float * pQ, int height, int width)
-{
-	int ly = get_local_id(0);
-	int lx = get_local_id(1);
-	int gy = get_global_id(0);
-	int gx = get_global_id(1);
-
-	float q = pQ[ly*8+lx];
-	int index = gy*width+gx;
-	float d = q*pSrc[index];
-	if(!ly && !lx) d = LIMIT(d, 2047.0f);
-	else d = LIMIT(d, 1023.0f);	
-	pDst[index] = d;
-}
-
-__kernel void iquant_transform(__global float * pSrc, __global float * pDst, __global float * pQ, int height, int width)
-{
-	int ly = get_local_id(0);
-	int lx = get_local_id(1);
-	int gy = get_global_id(0);
-	int gx = get_global_id(1);
-
-	float q = pQ[ly*8+lx];
-	int index = gy*width+gx;
-	float d = pSrc[index]*q;
-	pDst[index] = d;
 }
 
 __constant float idct_c1 = 1.387039845322148f;
@@ -192,15 +162,15 @@ __kernel void idct_transform(__global float * pSrc, __global float * pDst, int h
 	__local float src[64];
 	
 	int lid = get_local_id(0);
-	int gy = get_group_id(0);
-	int gx = get_group_id(1);
+	int gy = get_global_id(0);
+	int gx = get_global_id(1);
 	int lsy = get_local_size(0);
 	int lsx = get_local_size(1);
 	
-	int srcIndex = gy*8*width + gx*8;
+	int srcIndex = gy*width + gx*8;
 	
 	__local float * localPtr = &src[lid*8];
-	__global float * srcPtr = &pSrc[srcIndex + lid*width];
+	__global float * srcPtr = &pSrc[srcIndex];
 	for(int i=0;i<8;i++)
 	{
 		*(localPtr++) = *(srcPtr++);
@@ -212,12 +182,43 @@ __kernel void idct_transform(__global float * pSrc, __global float * pDst, int h
 	barrier(CLK_LOCAL_MEM_FENCE);
 	
 	localPtr = &src[lid*8];
-	__global float * dstPtr = &pDst[srcIndex + lid*width];
+	__global float * dstPtr = &pDst[srcIndex];
 	for(int i=0;i<8;i++)
 	{
 		*(dstPtr++) = *(localPtr++);
 	}
 }
+
+#define LIMIT(v, l)	( (v) > (l) ? (l) : ((v) < -(l) ? -(l) : (v)) )
+
+__kernel void quant_transform(__global float * pSrc, __global float * pDst, __global float * pQ, int height, int width)
+{
+	int ly = get_local_id(0);
+	int lx = get_local_id(1);
+	int gy = get_global_id(0);
+	int gx = get_global_id(1);
+
+	float q = pQ[ly*8+lx];
+	int index = gy*width+gx;
+	float d = q*pSrc[index];
+	if(!ly && !lx) d = LIMIT(d, 2047.0f);
+	else d = LIMIT(d, 1023.0f);	
+	pDst[index] = d;
+}
+
+__kernel void iquant_transform(__global float * pSrc, __global float * pDst, __global float * pQ, int height, int width)
+{
+	int ly = get_local_id(0);
+	int lx = get_local_id(1);
+	int gy = get_global_id(0);
+	int gx = get_global_id(1);
+
+	float q = pQ[ly*8+lx];
+	int index = gy*width+gx;
+	float d = pSrc[index]*q;
+	pDst[index] = d;
+}
+
 
 struct Point
 {
@@ -438,44 +439,42 @@ __kernel void dctqzz_transform(
 {
 	__local float tmp[64];
 	__local float src[64];
+	__local short dst[64];
 	float q[8];
 	float q0 = pQ[0];
 
 	int lid = get_local_id(0);
 	int ly = get_local_id(0);
 	int lx = get_local_id(1);
-	int gy = get_group_id(0);
-	int gx = get_group_id(1);
+	int gy = get_global_id(0);
+	int gx = get_global_id(1);
 	int lsy = get_local_size(0);
 	int lsx = get_local_size(1);
 	
-	int y = gy/8*8;
-	int x = gx*8;
+	int y = get_group_id(0)*8;
+	int x = get_group_id(1)*8;
 
-	int srcIndex = gy*8*width + gx*8;
+	int srcIndex = gy*width + gx*8;
 	
 	__local float * localPtr = &src[lid*8];
-	__global float * srcPtr = &pSrc[srcIndex + lid*width];
+	__global float * srcPtr = &pSrc[srcIndex];
 	__global float * qPtr = &pQ[lid*8];
 	for(int i=0;i<8;i++)
 	{
 		*(localPtr++) = *(srcPtr++);
 		q[i] = *(qPtr++);
 	}
-	
 
 	// DCT
 	dct8x8(&src[8*lid], 1, &tmp[8*lid], 1);
 	barrier(CLK_LOCAL_MEM_FENCE);
 	dct8x8(&tmp[lid], 8, &src[lid], 8);
 	barrier(CLK_LOCAL_MEM_FENCE);
-	
 
 	//Quantization
 	int i=0;
 	localPtr = &src[lid*8];
 
-	//DC Quantization
 	if(!lid)
 	{
 		float d = *localPtr;
@@ -492,28 +491,47 @@ __kernel void dctqzz_transform(
 		d = LIMIT(d, 1023.0f);
 		*(localPtr++) = d;
 	}
-	barrier(CLK_LOCAL_MEM_FENCE);
-	/*
+	
 	//Zig Zag
-	struct Point p;
-	p.Y = lid;
 	localPtr = &src[lid*8];
 	for(int i=0;i<8;i++)
 	{
+		struct Point p;
+		p.Y = lid;
 		p.X = i;
 		struct Point np = getPoint(p);
-		int newindex = (y+np.Y)*width + (x+np.X);
-		pDst[newindex] = (short)(*(localPtr++));
+//		int newindex = (y+np.Y)*width + (x+np.X);
+//		int index = (y+p.Y)*width + (x+p.X);
+//		pDst[newindex] = (np.Y<<8) + np.X;//(short)(*(localPtr++));
+//		pDst[newindex] = (short)(*(localPtr++));
+//		pDst[newindex] = (short)pSrc[index];
+//		pDst[newindex] = (short)(src[p.Y*8+p.X]);
+//		float t = src[p.Y*8+p.X];
+//		dst[np.Y*8+np.X] = (short)t;
+//		dst[p.Y*8 + p.X] = (np.Y<<8) + np.X;
+//		dst[p.Y*8 + p.X] = (short)t;
+//		dst[p.Y*8 + p.X] = np.Y*8 + np.X;
+		pDst[(p.Y+y)*width + p.X+x] = (short)pSrc[(np.Y+y)*width+np.X+x];
+//		dst[p.Y*8 + p.X] = (np.Y+y)*width + np.X+x;
 	}
-*/
-#if 1
+	
+	//barrier(CLK_LOCAL_MEM_FENCE);
+#if 0
 	localPtr = &src[lid*8];
-	srcPtr = &pSrc[srcIndex + lid*width];
+	srcPtr = &pSrc[srcIndex];
 	for(int i=0;i<8;i++)
 	{
 		*(srcPtr++) = *(localPtr++);
 	}
 #endif
+#if 0	
+	__local short * dstLocalPtr = &dst[lid*8];
+	__global short * dstPtr = &pDst[srcIndex];
+	for(int i=0;i<8;i++)
+	{
+		*(dstPtr++) = *(dstLocalPtr++);
+	}
+#endif	
 }
 
 __kernel void idctq_transform(
@@ -529,15 +547,15 @@ __kernel void idctq_transform(
 	float q[8];	
 	
 	int lid = get_local_id(0);
-	int gy = get_group_id(0);
-	int gx = get_group_id(1);
+	int gy = get_global_id(0);
+	int gx = get_global_id(1);
 	int lsy = get_local_size(0);
 	int lsx = get_local_size(1);
 	
-	int srcIndex = gy*8*width + gx*8;
+	int srcIndex = gy*width + gx*8;
 	
 	__local float * localPtr = &src[lid*8];
-	__global float * srcPtr = &pSrc[srcIndex + lid*width];
+	__global float * srcPtr = &pSrc[srcIndex];
 	__global float * qPtr = &pQ[lid*8];
 	for(int i=0;i<8;i++)
 	{
@@ -559,7 +577,7 @@ __kernel void idctq_transform(
 	barrier(CLK_LOCAL_MEM_FENCE);
 
 	localPtr = &src[lid*8];
-	srcPtr = &pDst[srcIndex + lid*width];
+	srcPtr = &pDst[srcIndex];
 	for(int i=0;i<8;i++)
 	{
 		*(srcPtr++) = *(localPtr++);

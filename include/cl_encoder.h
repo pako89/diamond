@@ -34,7 +34,7 @@ protected:
 	virtual void init(CImageFormat fmt);
 	virtual void transform(CCLImage<float> * imgF, CCLImage<int16_t> * img, CCLPredictionInfoTable * predInfo, FRAME_TYPE frame_type);
 	virtual void itransform(CCLImage<float> * imgF, CCLImage<int16_t> * img, CCLPredictionInfoTable * predInfo, FRAME_TYPE frame_type);
-	virtual void entropy(CCLImage<int16_t> * img, CCLPredictionInfoTable * predInfo, CBitstream * pBstr);
+	virtual void entropy(CCLImage<int16_t> * img, CCLPredictionInfoTable * predInfo, CBitstream * pBstr, FRAME_TYPE frame_type);
 	CCLDevicePolicy * m_clPolicy;
 	CCLDCT * m_dct;
 	CCLIDCT * m_idct;

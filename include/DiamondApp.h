@@ -59,6 +59,9 @@ struct DiamondConfig
 	{
 		EncoderConfig.HuffmanType = avlib::HUFFMAN_TYPE_DYNAMIC;//avlib::HUFFMAN_TYPE_STATIC;
 		EncoderConfig.GOP = DEFAULT_GOP;
+#ifdef PREDICTION_USE_INTERPOLATION
+		EncoderConfig.InterpolationScale = PREDICTION_INTERPOLATION_SCALE;
+#endif
 	}
 	DiamondOperation Op;
 	const char * InputFileName;
