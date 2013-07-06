@@ -88,8 +88,8 @@ void CBasicEncoder::init(CImageFormat fmt)
 	if(NULL == m_pred)
 	{
 		m_pred = new CPrediction();
-#ifdef PREDICTION_USE_INTERPOLATION
-		m_pred->Init(fmt, PREDICTION_INTERPOLATION_SCALE);
+#if USE(INTERPOLATION)
+		m_pred->Init(fmt, m_config.InterpolationScale);
 #else
 		m_pred->Init(fmt);
 #endif

@@ -57,9 +57,9 @@ struct DiamondConfig
 		UseOpenCL(false),
 		OpenCLVariant(0)
 	{
-		EncoderConfig.HuffmanType = avlib::HUFFMAN_TYPE_DYNAMIC;//avlib::HUFFMAN_TYPE_STATIC;
+		EncoderConfig.HuffmanType = avlib::HUFFMAN_TYPE_STATIC;
 		EncoderConfig.GOP = DEFAULT_GOP;
-#ifdef PREDICTION_USE_INTERPOLATION
+#if USE(INTERPOLATION)
 		EncoderConfig.InterpolationScale = PREDICTION_INTERPOLATION_SCALE;
 #endif
 	}

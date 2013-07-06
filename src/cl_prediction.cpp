@@ -1,5 +1,5 @@
 #include <cl_prediction.h>
-
+#include <cl_interpolation.h>
 
 namespace avlib
 {
@@ -12,20 +12,40 @@ CCLPrediction::CCLPrediction(CCLDevice * dev) :
 {
 }
 
-CCLPrediction::CCLPrediction(CCLDevice * dev, CImageFormat format) :
-	m_dev(dev),
-	m_kernelTransform(NULL),
-	m_kernelITransform(NULL),
-	m_kernelPrediction(NULL)
-{
-	m_last = new CCLImage<float>(dev, format, CL_MEM_READ_ONLY);
-}
-
 CCLPrediction::~CCLPrediction()
 {
 	RELEASE(m_kernelTransform);
 	RELEASE(m_kernelITransform);
 	RELEASE(m_kernelPrediction);
+}
+
+void CCLPrediction::Init(
+		CImageFormat format
+#if USE(INTERPOLATION)
+		, int scale
+		, cl_program program
+		, const char * interpolation_kernel
+#endif		
+		)
+{
+#if USE(INTERPOLATION)
+	/*if(NULL == m_interpol)
+	{
+		m_interpol = new CCLInterpolation<float>(m_dev, program, interpolation_kernel);
+		m_interpol->setScale(scale);
+	}*/
+	if(NULL == m_last)
+	{
+		CImageFormat newFormat = format;
+		newFormat.Size.Width *= scale;
+		newFormat.Size.Height *= scale;
+		m_last = new CCLImage<float>(m_dev, newFormat);
+	}
+	CPrediction::Init(format, scale);
+#else
+	if(NULL == m_last) m_last = new CCLImage<float>(m_dev, format);
+	CPrediction::Init(format);
+#endif
 }
 
 void CCLPrediction::setTransformKernel(cl_program program, const char * kernel)
@@ -86,48 +106,6 @@ void CCLPrediction::doITransformPFrame(CImage<float> * pSrc, CImage<float> * pDs
 	}
 }
 
-void CCLPrediction::Transform(CImage<float> * pSrc, CImage<float> * pDst, CPredictionInfoTable * pPredInfo, FRAME_TYPE type)
-{
-	if(pSrc->getFormat() != pDst->getFormat())
-	{
-		throw utils::StringFormatException("formats not equal\n");
-	}
-	if(FRAME_TYPE_I == type)
-	{
-		m_IFT->Transform(pSrc, pDst);
-	}
-	else if(FRAME_TYPE_P == type)
-	{
-		doPredict(&(*pSrc)[0], pPredInfo);
-		doTransformPFrame(pSrc, pDst, pPredInfo);
-	}
-	else
-	{
-		throw utils::StringFormatException("Invalid FRAME TYPE (%d)\n", type);
-	}
-}
-
-
-void CCLPrediction::ITransform(CImage<float> * pSrc, CImage<float> * pDst, CPredictionInfoTable * pPredInfo, FRAME_TYPE type)
-{
-	if(pSrc->getFormat() != pDst->getFormat())
-	{
-		throw utils::StringFormatException("formats not equal\n");
-	}
-	if(FRAME_TYPE_I == type)
-	{
-		m_IFIT->Transform(pSrc, pDst);
-	}
-	else if(FRAME_TYPE_P == type)
-	{
-		doITransformPFrame(pSrc, pDst, pPredInfo);
-	}
-	else
-	{
-		throw utils::StringFormatException("Unknown FRAME_TYPE (%d)\n", type);
-	}
-	*m_last = *pDst;
-}
 
 void CCLPrediction::clTransform(ICLKernel * kernel, CImage<float> * pSrc, CImage<float> * pDst, CPredictionInfoTable * pPred)
 {
@@ -145,7 +123,7 @@ void CCLPrediction::clTransform(ICLKernel * kernel, CImage<float> * pSrc, CImage
 	{
 		int height = (*clSrc)[k].getHeight();
 		int width = (*clSrc)[k].getWidth();
-		int scale = 16/clSrc->getScale(k);
+		int blockScale = 16/clSrc->getScale(k);
 		cl_mem srcMem = clSrc->getCLComponent(k).getCLMem(true);
 		cl_mem dstMem = clDst->getCLComponent(k).getCLMem(true);
 		cl_mem lastMem = clLast->getCLComponent(k).getCLMem(true);
@@ -160,7 +138,13 @@ void CCLPrediction::clTransform(ICLKernel * kernel, CImage<float> * pSrc, CImage
 		kernel->SetArg(3, sizeof(predMem), &predMem);
 		kernel->SetArg(4, sizeof(width), &width);
 		kernel->SetArg(5, sizeof(predWidth), &predWidth);
-		kernel->SetArg(6, sizeof(scale), &scale);
+		kernel->SetArg(6, sizeof(blockScale), &blockScale);
+#if USE(INTERPOLATION)
+		int lastWidth = (*clLast)[k].getWidth();
+		kernel->SetArg(7, sizeof(lastWidth), &lastWidth);
+		int interpolScale = m_interpol->getScale();
+		kernel->SetArg(8, sizeof(interpolScale), &interpolScale);
+#endif		
 
 		kernel->EnqueueNDRangeKernel(2, global_work_size, NULL, 0, NULL, NULL);
 #ifdef CL_KERNEL_FINISH
@@ -188,7 +172,14 @@ void CCLPrediction::clPredict(CCLComponent<float> * pSrc, CCLComponent<float> * 
 	m_kernelPrediction->SetArg(5, sizeof(predHeight), &predHeight);
 	m_kernelPrediction->SetArg(6, sizeof(predWidth), &predWidth);
 	m_kernelPrediction->SetArg(7, sizeof(m_max), &m_max);
-
+#if USE(INTERPOLATION)
+	int lastWidth = pLast->getWidth();
+	int lastHeight = pLast->getHeight();
+	int scale = getInterpolationScale();
+	m_kernelPrediction->SetArg(8, sizeof(lastHeight), &lastHeight);
+	m_kernelPrediction->SetArg(9, sizeof(lastWidth), &lastWidth);
+	m_kernelPrediction->SetArg(10, sizeof(scale), &scale);
+#endif
 	m_kernelPrediction->EnqueueNDRangeKernel(2, global_work_size, NULL, 0, NULL, NULL);
 #ifdef CL_KERNEL_FINISH
 	m_kernelPrediction->Finish();

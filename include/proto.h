@@ -2,6 +2,7 @@
 #define _PROTO_H
 
 #include <stdint.h>
+#include <utils.h>
 
 enum marker_type 
 {
@@ -40,7 +41,7 @@ MARKER_DEF(sos)
 	uint32_t frames_number;
 	uint32_t width;
 	uint32_t height;
-#ifdef PREDICTION_USE_INTERPOLATION
+#if USE(INTERPOLATION)
 	uint8_t interpolation_scale;
 #endif
 MARKER_END(sos)

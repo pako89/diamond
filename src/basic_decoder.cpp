@@ -52,7 +52,7 @@ bool CBasicDecoder::Decode(CBitstream * pBstr, CSequence * pSeq)
 	}
 	CShift<float> * shift = new CShift<float>(128.0f);
 	CPrediction * pred = new CPrediction();
-#ifdef PREDICTION_USE_INTERPOLATION
+#if USE(INTERPOLATION)
 	pred->Init(pSeq->getFormat(), sos.interpolation_scale);
 #else
 	pred->Init(pSeq->getFormat());

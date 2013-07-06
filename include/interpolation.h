@@ -13,7 +13,6 @@ class CInterpolation : public CTransform<T, T>
 {
 public:
 	CInterpolation();
-	CInterpolation(int scale);
 	virtual void setScale(int scale);
 	virtual int getScale(void);
 protected:

@@ -100,7 +100,12 @@ void CCLMergedEncoder::init(CImageFormat fmt)
 	this->m_img = new CCLImage<int16_t>(&this->m_dev, fmt);
 	this->m_shift = new CCLShift<float>(-128.0f, &this->m_dev, this->m_program, "shift");
 	this->m_ishift = new CCLShift<float>(128.0f, &this->m_dev, this->m_program, "shift");
-	this->m_pred = new CCLPrediction(&this->m_dev, fmt);
+	this->m_pred = new CCLPrediction(&this->m_dev);
+#if USE(INTERPOLATION)
+	this->m_pred->Init(fmt, m_config.InterpolationScale, this->m_program, "interpolation_float");
+#else
+	this->m_pred->Init(fmt);
+#endif
 	this->m_pred->setTransformKernel(this->m_program, "prediction_transform");
 	this->m_pred->setITransformKernel(this->m_program, "prediction_itransform");
 	this->m_pred->setPredictionKernel(this->m_program, "prediction_predict");

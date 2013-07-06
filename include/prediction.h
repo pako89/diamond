@@ -44,7 +44,7 @@ public:
 	virtual void setIFrameITransform(CTransform<float, float> * t);
 	virtual void Encode(CPredictionInfoTable * pPred, CBitstream * pBstr, FRAME_TYPE frame_type);
 	virtual void Decode(CPredictionInfoTable * pPred, CBitstream * pBstr, FRAME_TYPE frame_type);
-#ifdef PREDICTION_USE_INTERPOLATION
+#if USE(INTERPOLATION)
 	virtual void Init(CImageFormat format, int scale);
 #else
 	virtual void Init(CImageFormat format);
@@ -56,9 +56,9 @@ protected:
 	virtual void encodePredictionInfo(prediction_info_t, CBitstream * pBstr);
 	virtual prediction_info_t decodePredictionInfo(CBitstream * pBstr);
 	virtual prediction_info_t predict(float * pSrc, CPoint p, CSize s);
-	float diff_abs(float * src, float * ref, CSize s);
-	float diff_mse(float * src, float * ref, CSize s);
-#ifdef PREDICTION_USE_INTERPOLATION
+	float diff_abs(float * src, CSize srcSize, float * ref, CSize refSize);
+	float diff_mse(float * src, CSize srcSize, float * ref, CSize refSize);
+#if USE(INTERPOLATION)
 	virtual int getInterpolationScale();
 	CInterpolation<float> * m_interpol;
 #endif

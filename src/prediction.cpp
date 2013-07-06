@@ -14,7 +14,7 @@ CPrediction::CPrediction() :
 	m_last(NULL),
 	m_IFT(NULL),
 	m_IFIT(NULL),
-#ifdef PREDICTION_USE_INTERPOLATION
+#if USE(INTERPOLATION)
 	m_interpol(NULL),
 #endif	
 	m_max(DEFAULT_MAX_PREDICTION)
@@ -26,19 +26,19 @@ CPrediction::~CPrediction()
 {
 	RELEASE(m_last);
 	RELEASE(m_huff);
-#ifdef PREDICTION_USE_INTERPOLATION
+#if USE(INTERPOLATION)
 	RELEASE(m_interpol);
 #endif	
 }
 
 void CPrediction::Init(
 		CImageFormat format
-#ifdef PREDICTION_USE_INTERPOLATION
+#if USE(INTERPOLATION)
 		, int scale
 #endif		
 		)
 {
-#ifdef PREDICTION_USE_INTERPOLATION
+#if USE(INTERPOLATION)
 	if(NULL == m_interpol)
 	{
 		m_interpol = new CInterpolation<float>();
@@ -56,18 +56,38 @@ void CPrediction::Init(
 #endif
 }
 
-#ifdef PREDICTION_USE_INTERPOLATION
+#if USE(INTERPOLATION)
 int CPrediction::getInterpolationScale()
 {
 	return m_interpol->getScale();
 }
 #endif
 
-prediction_info_t CPrediction::predict(float * pSrc, CPoint p, CSize s)
+void CPrediction::doPredict(CComponent<float> * pSrc, CPredictionInfoTable * pPred)
+{
+	CSize size = pSrc->getSize();
+	for(int y=0; y < size.Height; y+=16)
+	{
+		for(int x=0; x < size.Width; x+=16)
+		{
+			(*pPred)[y/16][x/16] = predict(&(*pSrc)[y][x], CPoint(0, y, x), size);
+		}
+	}
+}
+
+prediction_info_t CPrediction::predict(float * pSrc, CPoint p, CSize srcSize)
 {
 	prediction_info_t info;
 	info.dy = 0;
 	info.dx = 0;
+	CSize s = (*m_last)[p.Z].getSize();
+#if USE(INTERPOLATION)
+	int scale = getInterpolationScale();
+#else
+	int scale = 1;		
+#endif
+	p.Y *= scale;
+	p.X *= scale;
 	if(m_max)
 	{
 		struct
@@ -88,9 +108,9 @@ prediction_info_t CPrediction::predict(float * pSrc, CPoint p, CSize s)
 				{
 					float d;
 #if DEFAULT_PREDICTION_METHOD == PREDICTION_METHOD_MSE				
-					d = diff_mse(pSrc, &(*m_last)[p.Z][dp.Y][dp.X], s);
+					d = diff_mse(pSrc, srcSize, &(*m_last)[p.Z][dp.Y][dp.X], s);
 #elif DEFAULT_PREDICTION_METHOD == PREDICTION_METHOD_ABS
-					d = diff_abs(pSrc, &(*m_last)[p.Z][dp.Y][dp.X], s);
+					d = diff_abs(pSrc, srcSize, &(*m_last)[p.Z][dp.Y][dp.X], s);
 #else
 #error Unknown prediction method 
 #endif
@@ -108,27 +128,27 @@ prediction_info_t CPrediction::predict(float * pSrc, CPoint p, CSize s)
 	return info;
 }
 
-float CPrediction::diff_abs(float * src, float * ref, CSize s)
+float CPrediction::diff_abs(float * src, CSize srcSize, float * ref, CSize refSize)
 {
 	float ret = 0.0;
 	for(int y=0;y<16;y++)
 	{
 		for(int x=0;x<16;x++)
 		{
-			ret += fabs(src[y*s.Width+x] - ref[y*s.Width+x]);
+			ret += fabs(src[y*srcSize.Width+x] - ref[y*refSize.Width+x]);
 		}
 	}
 	return ret;
 }
 
-float CPrediction::diff_mse(float * src, float * ref, CSize s)
+float CPrediction::diff_mse(float * src, CSize srcSize, float * ref, CSize refSize)
 {
 	float ret = 0.0;
 	for(int y=0;y<16;y++)
 	{
 		for(int x=0;x<16;x++)
 		{
-			ret += pow(src[y*s.Width+x] - ref[y*s.Width+x], 2);
+			ret += pow(src[y*srcSize.Width+x] - ref[y*refSize.Width+x], 2);
 		}
 	}
 	return sqrt(ret);
@@ -171,23 +191,11 @@ void CPrediction::ITransform(CImage<float> * pSrc, CImage<float> * pDst, CPredic
 	{
 		throw utils::StringFormatException("Unknown FRAME_TYPE");
 	}
-#ifdef PREDICTION_USE_INTERPOLATION	
+#if USE(INTERPOLATION)	
 	m_interpol->Transform(pDst, m_last);
 #else
 	*m_last = *pDst;
 #endif
-}
-
-void CPrediction::doPredict(CComponent<float> * pSrc, CPredictionInfoTable * pPred)
-{
-	CSize size = pSrc->getSize();
-	for(int y=0; y < size.Height; y+=16)
-	{
-		for(int x=0; x < size.Width; x+=16)
-		{
-			(*pPred)[y/16][x/16] = predict(&(*pSrc)[y][x], CPoint(0, y, x), m_last->getFormat().Size);
-		}
-	}
 }
 
 void CPrediction::doTransformPFrame(CImage<float> * pSrc, CImage<float> * pDst, CPredictionInfoTable * pPred)
@@ -224,32 +232,38 @@ void CPrediction::doITransformPFrame(CImage<float> * pSrc, CImage<float> * pDst,
 	}
 }
 
-void CPrediction::TransformBlock(float * pSrc, float * pDst, CPoint p, CSize s, prediction_info_t predInfo, int scale)
+void CPrediction::TransformBlock(float * pSrc, float * pDst, CPoint p, CSize s, prediction_info_t predInfo, int cscale)
 {
-	int ly = p.Y + predInfo.dy*scale;
-	int lx = p.X + predInfo.dx*scale;
-	float * lastPtr = &(*m_last)[p.Z][ly][lx];
-	int lastWidth = (*m_last)[p.Z].getSize().Width;
+#if USE(INTERPOLATION)
+	int iscale = getInterpolationScale();
+#else
+	int iscale = 1;
+#endif
 	for(int y=0;y<8;y++)
 	{
 		for(int x=0;x<8;x++)
 		{
-			pDst[y*s.Width+x] = pSrc[y*s.Width+x] - lastPtr[y*lastWidth+x];
+			int ly = (p.Y+y)*iscale + predInfo.dy*cscale;
+			int lx = (p.X+x)*iscale + predInfo.dx*cscale;
+			pDst[y*s.Width+x] = pSrc[y*s.Width+x] - (*m_last)[p.Z][ly][lx];
 		}
 	}
 }
 
-void CPrediction::ITransformBlock(float * pSrc, float * pDst, CPoint p, CSize s, prediction_info_t predInfo, int scale)
+void CPrediction::ITransformBlock(float * pSrc, float * pDst, CPoint p, CSize s, prediction_info_t predInfo, int cscale)
 {
-	int ly = p.Y + predInfo.dy*scale;
-	int lx = p.X + predInfo.dx*scale;
-	float * lastPtr = &(*m_last)[p.Z][ly][lx];
-	int lastWidth = (*m_last)[p.Z].getSize().Width;
+#if USE(INTERPOLATION)
+	int iscale = getInterpolationScale();
+#else
+	int iscale = 1;
+#endif
 	for(int y=0;y<8;y++)
 	{
 		for(int x=0;x<8;x++)
 		{
-			pDst[y*s.Width+x] = pSrc[y*s.Width+x] + lastPtr[y*lastWidth+x];
+			int ly = (p.Y+y)*iscale + predInfo.dy*cscale;
+			int lx = (p.X+x)*iscale + predInfo.dx*cscale;
+			pDst[y*s.Width+x] = pSrc[y*s.Width+x] + (*m_last)[p.Z][ly][lx];
 		}
 	}
 }

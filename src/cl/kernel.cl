@@ -330,6 +330,33 @@ __kernel void prediction_transform(
 	pDst[index] = pSrc[index] - last;
 }
 
+__kernel void prediction_transform_interpolation(
+		__global float * pSrc, 
+		__global float * pDst, 
+		__global float * pLast,
+		__global prediction_info_t * pPred, 
+		int width,
+		int predWidth,
+		int blockScale,
+		int lastWidth,
+		int interpolScale
+		)
+{
+	int gy = get_global_id(0);
+	int gx = get_global_id(1);
+	int index = gy*width + gx;
+	int py = gy/blockScale;
+	int px = gx/blockScale;
+	prediction_info_t info = pPred[py*predWidth+px];
+	int y = gy*interpolScale + info.dy*blockScale;
+	int x = gx*interpolScale + info.dx*blockScale;
+	int lastIndex = y*lastWidth+x;
+	float last = pLast[lastIndex];
+	float src = pSrc[index];
+	float dst = src - last;
+	pDst[index] = dst;
+}
+
 __kernel void prediction_itransform(
 		__global float * pSrc, 
 		__global float * pDst, 
@@ -353,6 +380,33 @@ __kernel void prediction_itransform(
 	pDst[index] = pSrc[index] + last;
 }
 
+__kernel void prediction_itransform_interpolation(
+		__global float * pSrc, 
+		__global float * pDst, 
+		__global float * pLast,
+		__global prediction_info_t * pPred, 
+		int width,
+		int predWidth,
+		int blockScale,
+		int lastWidth,
+		int interpolScale
+		)
+{
+	int gy = get_global_id(0);
+	int gx = get_global_id(1);
+	int index = gy*width + gx;
+	int py = gy/blockScale;
+	int px = gx/blockScale;
+	prediction_info_t info = pPred[py*predWidth+px];
+	int y = gy*interpolScale + info.dy*blockScale;
+	int x = gx*interpolScale + info.dx*blockScale;
+	int lastIndex = y*lastWidth+x;
+	float last = pLast[lastIndex];
+	float src = pSrc[index];
+	float dst = src + last;
+	pDst[index] = dst;
+}
+
 void copyGlobal2Array(__global float * ptr, int width, float * dst)
 {
 	for(int y=0;y<16;y++)
@@ -365,7 +419,7 @@ void copyGlobal2Array(__global float * ptr, int width, float * dst)
 
 }
 
-float diff_mse(float * block, __global float * ref, int width)
+float diff_mse(float * block, __global float * ref, int refWidth)
 {
 	float ret = 0.0;
 	int index = 0;
@@ -373,7 +427,7 @@ float diff_mse(float * block, __global float * ref, int width)
 	{
 		for(int x=0;x<16;x++)
 		{
-			float d = block[index] - ref[y*width+x];
+			float d = block[index] - ref[y*refWidth+x];
 			ret += d*d;
 			index++;
 		}
@@ -427,6 +481,74 @@ __kernel void prediction_predict(
 	}
 	pPred[gy*predWidth+gx].dy = _min.dy;
 	pPred[gy*predWidth+gx].dx = _min.dx;
+}
+
+__kernel void prediction_predict_interpolation(
+		__global float * pSrc,
+		__global float * pLast,
+		__global prediction_info_t * pPred,
+		int height,
+		int width,
+		int predHeight,
+		int predWidth,
+		int max_d,
+		int lastHeight,
+		int lastWidth,
+		int scale
+	)
+{
+	float block[16*16];
+	int gy = get_global_id(0);
+	int gx = get_global_id(1);
+	int y = gy*16*scale;
+	int x = gx*16*scale;
+	copyGlobal2Array(&pSrc[y*width+x], width, block);
+	struct 
+	{
+		int dy;
+		int dx;
+		float d;
+	} _min;
+	_min.dy = 0;
+	_min.dx = 0;
+	_min.d = MAXFLOAT;
+	for(int dy = -max_d ; dy <= max_d ; dy++)
+	{
+		for(int dx=-max_d ; dx <= max_d ; dx++)
+		{
+			int dpy = y + dy*16;
+			int dpx = x + dx*16;
+			if(dpx >= 0 && dpy >= 0 && (dpy+16) < lastHeight && (dpx+16) < lastWidth)
+			{
+				float d = diff_mse(block, &pLast[dpy*lastWidth+dpx], lastWidth);
+				if(d < _min.d)
+				{
+					_min.d = d;
+					_min.dy = dy;
+					_min.dx = dx;
+				}
+			}
+		}
+	}
+	pPred[gy*predWidth+gx].dy = _min.dy;
+	pPred[gy*predWidth+gx].dx = _min.dx;
+}
+
+__kernel void interpolation_float(
+		__global float * pSrc,
+		int srcHeight,
+		int srcWidth,
+		__global float * pDst,
+		int dstHeight,
+		int dstWidth,
+		int scale
+		)
+{
+	int y = get_global_id(0);
+	int x = get_global_id(1);
+	int dstIndex = y*dstWidth+x;
+	int srcIndex = y/scale*srcWidth + x/scale;
+	pDst[dstIndex] = pSrc[srcIndex];	
 }
 
 __kernel void dctqzz_transform(

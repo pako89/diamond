@@ -50,7 +50,7 @@ void CInterpolation<T>::doTransform(CImage<T> * src, CImage<T> * dst)
 template <class T>
 void CInterpolation<T>::setScale(int scale)
 {
-	if(scale == 2)
+	if(scale == 2 || scale == 1)
 	{
 		m_scale = scale;
 	}

@@ -16,7 +16,7 @@ struct EncoderConfig
 {
 	HUFFMAN_TYPE HuffmanType;
 	int GOP;
-#ifdef PREDICTION_USE_INTERPOLATION
+#if USE(INTERPOLATION)
 	int InterpolationScale;
 #endif
 };

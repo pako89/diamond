@@ -24,6 +24,8 @@
 #define LIMIT(v, l)	( (v) > (l) ? (l) : ((v) < -(l) ? -(l) : (v)) )
 #define RELEASE(p)	if(NULL != (p)) delete (p);
 
+#define USE(v)		defined USE_##v
+
 namespace utils
 {
 
