@@ -42,14 +42,11 @@ void CCLEncoder::init(CImageFormat fmt)
 	this->m_pred = new CCLPrediction(&this->m_dev);
 #if USE(INTERPOLATION)
 	this->m_pred->Init(fmt, m_config.InterpolationScale, this->m_program, "interpolation_float");
-#else
-	this->m_pred->Init(fmt);
-#endif
-#if USE(INTERPOLATION)
 	this->m_pred->setTransformKernel(this->m_program, "prediction_transform_interpolation");
 	this->m_pred->setITransformKernel(this->m_program, "prediction_itransform_interpolation");
 	this->m_pred->setPredictionKernel(this->m_program, "prediction_predict_interpolation");
 #else
+	this->m_pred->Init(fmt);
 	this->m_pred->setTransformKernel(this->m_program, "prediction_transform");
 	this->m_pred->setITransformKernel(this->m_program, "prediction_itransform");
 	this->m_pred->setPredictionKernel(this->m_program, "prediction_predict");

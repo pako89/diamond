@@ -54,8 +54,8 @@ void CCLParallelEncoder::init(CImageFormat fmt)
 	CCLEncoder::init(fmt);
 	this->m_imgF->setAutoCopy(false);
 	this->m_img->setAutoCopy(false);
-	this->m_pred->getLastImage()->setAutoCopy(false);
 	this->m_predTab->setAutoCopy(false);
+	this->m_pred->getLastImage()->setAutoCopy(false);
 }
 
 }

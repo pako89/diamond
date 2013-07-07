@@ -29,11 +29,11 @@ void CCLPrediction::Init(
 		)
 {
 #if USE(INTERPOLATION)
-	/*if(NULL == m_interpol)
+	if(NULL == m_interpol)
 	{
 		m_interpol = new CCLInterpolation<float>(m_dev, program, interpolation_kernel);
 		m_interpol->setScale(scale);
-	}*/
+	}
 	if(NULL == m_last)
 	{
 		CImageFormat newFormat = format;
