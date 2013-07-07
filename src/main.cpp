@@ -38,8 +38,7 @@ int main(int argc,char * argv[])
 		dbg("Image type : %s\n", config.ImageTypeStr);
 		dbg("Height     : %d\n", config.ImageSize.Height);
 		dbg("Width      : %d\n", config.ImageSize.Width);
-		dbg("OpenCL     : %s\n", config.UseOpenCL?"True":"False");
-		dbg("Variant    : %d\n", config.OpenCLVariant);
+		dbg("Variant    : %s\n", diamond::EncoderVariant2Str(config.Variant));
 		if(diamond::DIAMOND_OP_ENCODE == config.Op)
 		{
 			dbg("Huffman    : %s\n", config.EncoderConfig.HuffmanType==avlib::HUFFMAN_TYPE_DYNAMIC?"dynamic":"static");
@@ -53,26 +52,22 @@ int main(int argc,char * argv[])
 			avlib::CBitstream * bstr = new avlib::CBitstream(10000000);
 			bstr->set_fh(config.OutputFile);
 			avlib::CEncoder * enc = NULL;
-			if(config.UseOpenCL)
+			switch(config.Variant)
 			{
-				switch(config.OpenCLVariant)
-				{
-				case 1:
-					enc = new avlib::CCLEncoder(config.EncoderConfig);
-					break;
-				case 2:
-					enc = new avlib::CCLParallelEncoder(config.EncoderConfig);
-					break;
-				case 3:
-					enc = new avlib::CCLMergedEncoder(config.EncoderConfig);
-					break;
-				default:
-					throw utils::StringFormatException("Unknown OpenCL variant: '%d'", config.OpenCLVariant);
-				}
-			}
-			else
-			{
+			case diamond::ENCODER_VARIANT_CPU:
 		       		enc = new avlib::CBasicEncoder(config.EncoderConfig);
+				break;
+			case diamond::ENCODER_VARIANT_OPENCL:
+				enc = new avlib::CCLEncoder(config.EncoderConfig);
+				break;
+			case diamond::ENCODER_VARIANT_OPENCL_PARALLEL:
+				enc = new avlib::CCLParallelEncoder(config.EncoderConfig);
+				break;
+			case diamond::ENCODER_VARIANT_OPENCL_MERGED:
+				enc = new avlib::CCLMergedEncoder(config.EncoderConfig);
+				break;
+			default:
+				throw utils::StringFormatException("Unknown OpenCL variant: '%d'", config.Variant);
 			}
 			enc->Encode(seq, bstr);
 			bstr->flush_all();

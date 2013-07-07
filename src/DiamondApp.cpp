@@ -5,6 +5,24 @@
 namespace diamond
 {
 
+
+const char * EncoderVariant2Str(enum EncoderVariant v)
+{
+	switch(v)
+	{
+	case ENCODER_VARIANT_CPU:
+		return "CPU";
+	case ENCODER_VARIANT_OPENCL:
+		return "Basic OpenCL";
+	case ENCODER_VARIANT_OPENCL_MERGED:
+		return "Merged OpenCL";
+	case ENCODER_VARIANT_OPENCL_PARALLEL:
+		return "Parallel OpenCL";
+	default:
+		return "Unknown";
+	}
+}
+
 ExitException::ExitException() :
 	m_val(0)
 {
@@ -153,7 +171,7 @@ const struct option CDiamondApp::common_options[] = {
 	{"type",		required_argument,	NULL,	't'},
 	{"height",		required_argument,	NULL,	'H'},
 	{"width",		required_argument,	NULL,	'W'},
-	{"opencl",		optional_argument,	NULL, 	'C'},
+	{"variant",		required_argument,	NULL, 	'V'},
 	{"huffman",		required_argument, 	NULL, 	'e'},
 	{"gop",			required_argument,	NULL, 	'g'},
 #if USE(INTERPOLATION)	
@@ -244,15 +262,10 @@ void CDiamondApp::ParseArgs(int argc, char * argv[])
 		case 'H':
 			m_config.ImageSize.Height = parseInt(optarg);
 			break;
-		case 'C':
-			m_config.UseOpenCL = true;
+		case 'V':
 			if(optarg)
 			{
-				m_config.OpenCLVariant = parseInt(optarg);
-			}
-			else
-			{
-				m_config.OpenCLVariant = 1;
+				m_config.Variant = (EncoderVariant)parseInt(optarg);
 			}
 			break;
 		case 'e':
@@ -288,6 +301,7 @@ void CDiamondApp::ParseArgs(int argc, char * argv[])
 					throw utils::StringFormatException("invalid value '%s'", optarg);
 				}
 			}
+			break;
 #if USE(INTERPOLATION)
 		case 'I':
 			{

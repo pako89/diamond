@@ -7,16 +7,9 @@ module("OpenCL::Policy");
 CCLDevice CCLFirstDevicePolicy::getDevice()
 {
 	CCLBase & clBase = CCLBase::getInstance();
-	dbg("number of platforms: %d\n", clBase.getPlatformsCount());
 	for(cl_uint i=0;i<clBase.getPlatformsCount();i++)
 	{
 		CCLPlatform * p = clBase.getPlatform(i);
-#ifdef DEBUG
-		CCLPlatformInfo * pi = p->getInfo();
-		dbg("platform name: %s\n", pi->getName().c_str());
-		dbg("vendor name  : %s\n", pi->getVendor().c_str());
-		dbg("version      : %s\n", pi->getVersion().c_str());
-#endif 		
 		if(NULL != p)
 		{
 			for(cl_uint j=0;j<p->getDevicesCount();j++)
@@ -25,18 +18,10 @@ CCLDevice CCLFirstDevicePolicy::getDevice()
 				if(d.isValid())
 				{
 					CCLDeviceInfo * i = d.getInfo();
-					dbg("checking device: %s [", i->getName().c_str());
 					if(this->checkDeviceInfo(i))
 					{
-						_LOG("Success]\n");
 						return d;
 					}
-#if DEBUG					
-					else
-					{
-						_LOG("Fail]\n");
-					}
-#endif					
 				}
 			}
 		}

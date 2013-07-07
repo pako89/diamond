@@ -51,6 +51,16 @@ enum DiamondOperation
 	DIAMOND_OP_DECODE
 };
 
+enum EncoderVariant
+{
+	ENCODER_VARIANT_CPU=0,
+	ENCODER_VARIANT_OPENCL=1,
+	ENCODER_VARIANT_OPENCL_MERGED=2,
+	ENCODER_VARIANT_OPENCL_PARALLEL=3
+};
+
+const char * EncoderVariant2Str(enum EncoderVariant v);
+
 struct DiamondConfig
 {
 	DiamondConfig() :
@@ -62,8 +72,7 @@ struct DiamondConfig
 		ImageType(avlib::IMAGE_TYPE_UNKNOWN),
 		ImageTypeStr("unknown"),
 		ImageSize(0, 0),
-		UseOpenCL(false),
-		OpenCLVariant(0)
+		Variant(ENCODER_VARIANT_OPENCL)
 	{
 		EncoderConfig.HuffmanType = avlib::HUFFMAN_TYPE_STATIC;
 		EncoderConfig.GOP = DEFAULT_GOP;
@@ -81,8 +90,7 @@ struct DiamondConfig
 	const char * ImageTypeStr;
 	avlib::CSize ImageSize;
 	avlib::EncoderConfig EncoderConfig;	
-	bool UseOpenCL;
-	uint8_t OpenCLVariant;
+	EncoderVariant Variant;
 };
 
 /**
