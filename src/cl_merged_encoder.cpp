@@ -56,8 +56,6 @@ bool CCLMergedEncoder::Encode(CSequence * pSeq, CBitstream * pBstr)
 	init(pSeq->getFormat());
 	sos_marker_t sos = write_sos(pSeq, pBstr);
 	FRAME_TYPE frame_type;
-	CCLZigZag<float, int16_t> * m_zz = new CCLZigZag<float, int16_t>(&this->m_dev, this->m_program, "lut_transform_float_int16");
-	CZigZag<int16_t, int16_t> * zz = new CZigZag<int16_t, int16_t>();
 	m_dctqzz->setTables(1);
 	m_idctqzz->setTables(1);
 	for(int i=0;i<sos.frames_number;i++)
@@ -74,8 +72,6 @@ bool CCLMergedEncoder::Encode(CSequence * pSeq, CBitstream * pBstr)
 		sof = write_sof(pBstr, frame_type);
 		m_pred->Transform(m_imgF, m_imgF, m_predTab, frame_type);
 		m_dctqzz->Transform(m_imgF, m_img);
-		//zz->Transform(m_img, m_img);
-		//m_zz->Transform(m_imgF, m_img);
 		m_pred->Encode(m_predTab, pBstr, frame_type);
 		m_rlc->Encode(m_img, pBstr);
 		m_rlc->Flush(pBstr);
@@ -83,8 +79,6 @@ bool CCLMergedEncoder::Encode(CSequence * pSeq, CBitstream * pBstr)
 		m_idctqzz->Transform(m_imgF, m_imgF);
 		m_pred->ITransform(m_imgF, m_imgF, m_predTab, frame_type);
 	}
-	delete zz;
-	delete m_zz;
 	dbg("\n");
 	m_timer.stop();
 	dbg("Timer total         : %f\n", m_timer.getTotalSeconds());
@@ -103,12 +97,15 @@ void CCLMergedEncoder::init(CImageFormat fmt)
 	this->m_pred = new CCLPrediction(&this->m_dev);
 #if USE(INTERPOLATION)
 	this->m_pred->Init(fmt, m_config.InterpolationScale, this->m_program, "interpolation_float");
+	this->m_pred->setTransformKernel(this->m_program, "prediction_transform_interpolation");
+	this->m_pred->setITransformKernel(this->m_program, "prediction_itransform_interpolation");
+	this->m_pred->setPredictionKernel(this->m_program, "prediction_predict_interpolation");
 #else
 	this->m_pred->Init(fmt);
-#endif
 	this->m_pred->setTransformKernel(this->m_program, "prediction_transform");
 	this->m_pred->setITransformKernel(this->m_program, "prediction_itransform");
 	this->m_pred->setPredictionKernel(this->m_program, "prediction_predict");
+#endif
 	this->m_pred->setIFrameTransform(m_shift);
 	this->m_pred->setIFrameITransform(m_ishift);
 	this->m_predTab = new CCLPredictionInfoTable(&this->m_dev, CSize(fmt.Size.Height/16, fmt.Size.Width/16));

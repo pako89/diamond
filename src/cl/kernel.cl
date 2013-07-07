@@ -553,6 +553,7 @@ __kernel void interpolation_float(
 
 __kernel void dctqzz_transform(
 		__global float * pSrc, 
+//		__global float * pQDst,
 		__global short * pDst, 
 		__global float * pQ, 
 		int height, 
@@ -566,13 +567,8 @@ __kernel void dctqzz_transform(
 	float q0 = pQ[0];
 
 	int lid = get_local_id(0);
-	int ly = get_local_id(0);
-	int lx = get_local_id(1);
 	int gy = get_global_id(0);
 	int gx = get_global_id(1);
-	int lsy = get_local_size(0);
-	int lsx = get_local_size(1);
-	
 	int y = get_group_id(0)*8;
 	int x = get_group_id(1)*8;
 
@@ -604,6 +600,7 @@ __kernel void dctqzz_transform(
 		d = LIMIT(d, 2047.0f);
 		*(localPtr++) = d;
 		i=1;
+
 	}
 
 	for(;i<8;i++)
@@ -613,47 +610,32 @@ __kernel void dctqzz_transform(
 		d = LIMIT(d, 1023.0f);
 		*(localPtr++) = d;
 	}
-	
-	//Zig Zag
+
+	// Copy Quantized data
 	localPtr = &src[lid*8];
+	__global float * qdstPtr = &pSrc[srcIndex];
+	for(int i=0;i<8;i++)
+	{
+		*(qdstPtr++) = *(localPtr++);
+	}
+
+	// ZigZag
 	for(int i=0;i<8;i++)
 	{
 		struct Point p;
 		p.Y = lid;
 		p.X = i;
 		struct Point np = getPoint(p);
-//		int newindex = (y+np.Y)*width + (x+np.X);
-//		int index = (y+p.Y)*width + (x+p.X);
-//		pDst[newindex] = (np.Y<<8) + np.X;//(short)(*(localPtr++));
-//		pDst[newindex] = (short)(*(localPtr++));
-//		pDst[newindex] = (short)pSrc[index];
-//		pDst[newindex] = (short)(src[p.Y*8+p.X]);
-//		float t = src[p.Y*8+p.X];
-//		dst[np.Y*8+np.X] = (short)t;
-//		dst[p.Y*8 + p.X] = (np.Y<<8) + np.X;
-//		dst[p.Y*8 + p.X] = (short)t;
-//		dst[p.Y*8 + p.X] = np.Y*8 + np.X;
-		pDst[(p.Y+y)*width + p.X+x] = (short)pSrc[(np.Y+y)*width+np.X+x];
-//		dst[p.Y*8 + p.X] = (np.Y+y)*width + np.X+x;
+		dst[np.Y*8+np.X] = (short)src[8*lid+i];
 	}
 	
-	//barrier(CLK_LOCAL_MEM_FENCE);
-#if 0
-	localPtr = &src[lid*8];
-	srcPtr = &pSrc[srcIndex];
+	// Copy ZigZag data
+	__local short * localDstPtr = &dst[lid*8];
+	__global short * globalDstPtr = &pDst[srcIndex];
 	for(int i=0;i<8;i++)
 	{
-		*(srcPtr++) = *(localPtr++);
+		*(globalDstPtr++) = *(localDstPtr++);
 	}
-#endif
-#if 0	
-	__local short * dstLocalPtr = &dst[lid*8];
-	__global short * dstPtr = &pDst[srcIndex];
-	for(int i=0;i<8;i++)
-	{
-		*(dstPtr++) = *(dstLocalPtr++);
-	}
-#endif	
 }
 
 __kernel void idctq_transform(
