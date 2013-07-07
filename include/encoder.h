@@ -19,6 +19,7 @@ struct EncoderConfig
 #if USE(INTERPOLATION)
 	int InterpolationScale;
 #endif
+	bool PrintProgressBar;
 };
 
 class CEncoder : public utils::ITimer
@@ -29,6 +30,7 @@ public:
 	virtual ~CEncoder();
 	virtual bool Encode(CSequence * pSeq, CBitstream * pBstr) = 0;
 protected:
+	virtual void printProgressBar(int i, int n);
 	virtual void init(CImageFormat fmt);
 	virtual sos_marker_t write_sos(CSequence * pSeq, CBitstream * pBtr);
 	virtual sof_marker_t write_sof(CBitstream * pBstr, FRAME_TYPE frame_type);

@@ -18,7 +18,7 @@ namespace avlib
 class CBasicDecoder : public CDecoder
 {
 public:
-	CBasicDecoder();
+	CBasicDecoder(bool progressBar = true);
 	virtual ~CBasicDecoder();
 	virtual bool Decode(CBitstream * pBstr, CSequence * pSeq);
 protected:

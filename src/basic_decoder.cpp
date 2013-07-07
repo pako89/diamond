@@ -7,7 +7,8 @@
 namespace avlib
 {
 
-CBasicDecoder::CBasicDecoder()
+CBasicDecoder::CBasicDecoder(bool progressBar) :
+	CDecoder(progressBar)
 {
 }
 
@@ -61,7 +62,7 @@ bool CBasicDecoder::Decode(CBitstream * pBstr, CSequence * pSeq)
 	sof_marker_t sof;
 	for(uint32_t n = 0 ; n < sos.frames_number; n++)
 	{
-		utils::printProgressBar(n, sos.frames_number);
+		printProgressBar(n, sos.frames_number);
 		pBstr->fill();
 		pBstr->read_block(&sof, sizeof(sof));
 		if(sof.type != MARKER_TYPE_SOF || sof.size != sizeof(sof_marker_t))

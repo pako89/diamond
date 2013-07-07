@@ -10,10 +10,12 @@ namespace avlib
 class CDecoder
 {
 public:
-	CDecoder();
+	CDecoder(bool printProgressBar = true);
 	virtual ~CDecoder();
 	virtual bool Decode(CBitstream * pBstr, CSequence * pSeq) = 0;
 protected:
+	virtual void printProgressBar(int i, int n);
+	bool m_progressBar;
 };
 
 }

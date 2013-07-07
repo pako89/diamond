@@ -64,7 +64,7 @@ bool CCLMergedEncoder::Encode(CSequence * pSeq, CBitstream * pBstr)
 		{
 			throw utils::StringFormatException("can not read frame from file");
 		}
-		utils::printProgressBar(i, sos.frames_number);
+		printProgressBar(i, sos.frames_number);
 		(*static_cast<CImage<float>*>(m_imgF)) = pSeq->getFrame();
 		m_imgF->CopyToDevice();
 		sof_marker_t sof;

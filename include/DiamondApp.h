@@ -17,6 +17,14 @@
 #define DEFAULT_GOP	4
 #endif
 
+#ifndef DEFAULT_PROGRESS_BAR
+#define DEFAULT_PROGRESS_BAR 	true
+#endif
+
+#ifndef DEFAULT_INTERPOLATION_SCALE
+#define DEFAULT_INTERPOLATION_SCALE	2
+#endif
+
 namespace diamond
 {
 
@@ -60,8 +68,9 @@ struct DiamondConfig
 		EncoderConfig.HuffmanType = avlib::HUFFMAN_TYPE_STATIC;
 		EncoderConfig.GOP = DEFAULT_GOP;
 #if USE(INTERPOLATION)
-		EncoderConfig.InterpolationScale = PREDICTION_INTERPOLATION_SCALE;
+		EncoderConfig.InterpolationScale = DEFAULT_INTERPOLATION_SCALE;
 #endif
+		EncoderConfig.PrintProgressBar = DEFAULT_PROGRESS_BAR;
 	}
 	DiamondOperation Op;
 	const char * InputFileName;

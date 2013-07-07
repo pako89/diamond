@@ -191,8 +191,15 @@ void CPrediction::ITransform(CImage<float> * pSrc, CImage<float> * pDst, CPredic
 	{
 		throw utils::StringFormatException("Unknown FRAME_TYPE");
 	}
-#if USE(INTERPOLATION)	
-	m_interpol->Transform(pDst, m_last);
+#if USE(INTERPOLATION)
+	if(getInterpolationScale() > 1)
+	{
+		m_interpol->Transform(pDst, m_last);
+	}
+	else
+	{
+		*m_last = *pDst;
+	}
 #else
 	*m_last = *pDst;
 #endif

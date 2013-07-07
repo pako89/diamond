@@ -1,5 +1,6 @@
 #include "DiamondApp.h"
 #include <string.h>
+#include <algorithm>
 
 namespace diamond
 {
@@ -154,7 +155,11 @@ const struct option CDiamondApp::common_options[] = {
 	{"width",		required_argument,	NULL,	'W'},
 	{"opencl",		optional_argument,	NULL, 	'C'},
 	{"huffman",		required_argument, 	NULL, 	'e'},
-	{"gop",			required_argument,	NULL, 	'g'}
+	{"gop",			required_argument,	NULL, 	'g'},
+#if USE(INTERPOLATION)	
+	{"interpolation",	optional_argument,	NULL,	'I'},
+#endif
+	{"progress-bar",	required_argument, 	NULL, 	'p'}
 };
 
 #define COMMON_OPTS_SIZE	ARRAY_SIZE(common_options)
@@ -266,6 +271,37 @@ void CDiamondApp::ParseArgs(int argc, char * argv[])
 				}
 			}
 			break;
+		case 'p':
+			{
+				std::string pb = optarg;
+				std::transform(pb.begin(), pb.end(), pb.begin(), ::tolower);
+				if(pb == "no")
+				{
+					m_config.EncoderConfig.PrintProgressBar = false;
+				}
+				else if (pb == "yes")
+				{
+					m_config.EncoderConfig.PrintProgressBar = true;
+				}
+				else
+				{
+					throw utils::StringFormatException("invalid value '%s'", optarg);
+				}
+			}
+#if USE(INTERPOLATION)
+		case 'I':
+			{
+				if(optarg)
+				{
+					m_config.EncoderConfig.InterpolationScale = parseInt(optarg);
+				}
+				else
+				{
+					m_config.EncoderConfig.InterpolationScale = DEFAULT_INTERPOLATION_SCALE;
+				}
+			}
+			break;
+#endif			
 		case '?':
 			break;
 		default:

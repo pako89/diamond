@@ -85,8 +85,9 @@ int main(int argc,char * argv[])
 			avlib::CSequence seq(config.OutputFile);
 			avlib::CBitstream * bstr = new avlib::CBitstream(10000000);
 			bstr->set_fh_fill(config.InputFile);
-			avlib::CBasicDecoder dec;
-			dec.Decode(bstr, &seq);
+			avlib::CBasicDecoder * dec = new avlib::CBasicDecoder(config.EncoderConfig.PrintProgressBar);
+			dec->Decode(bstr, &seq);
+			delete dec;
 			delete bstr;
 		}
 	}

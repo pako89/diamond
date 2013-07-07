@@ -56,5 +56,13 @@ sof_marker_t CEncoder::write_sof(CBitstream * pBstr, FRAME_TYPE frame_type)
 void CEncoder::init(CImageFormat fmt)
 {
 }
+	
+void CEncoder::printProgressBar(int i, int n)
+{
+	if(m_config.PrintProgressBar)
+	{
+		utils::printProgressBar(i, n);
+	}
+}
 
 }
