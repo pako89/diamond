@@ -4,13 +4,6 @@
 namespace avlib
 {
 
-const char * ImageTypeString[] = {
-/*[IMAGE_TYPE_UNKNOWN] 	=*/ "unknown",
-/*[IMAGE_TYPE_YUV420]	=*/ "YUV420",
-/*[IMAGE_TYPE_RGB]	=*/ "RGB",
-/*[IMAGE_TYPE_ARGB]	=*/ "ARGB",
-};
-
 template <class T>
 CImage<T>::CImage() :
 	m_comp_num(0),

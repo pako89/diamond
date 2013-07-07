@@ -129,7 +129,7 @@ void CDiamondApp::PrintBanner(void)
 {
 	if(NULL != m_appName)
 	{
-		//printf("%s\n", BANNER);
+		/*TODO*/
 	}
 	
 }
@@ -276,7 +276,7 @@ void CDiamondApp::ParseArgs(int argc, char * argv[])
 	{
 		throw utils::StringFormatException("unknown operation '%s'", argv[1]);
 	}
-	//if(optind < _argc)
+	if(optind < _argc)
 	{
 		m_config.InputFileName = _argv[_argc-1];
 		if(strcmp(m_config.InputFileName, "stdin"))
