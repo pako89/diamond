@@ -5,11 +5,10 @@ OUT=out.yuv
 VIDEO=
 WIDTH=
 HEIGHT=
-OPENCL="-C"
+OPENCL="-C2"
 HUFFMAN="static"
 GOP="3"
-
-rm -rf bstr_r.dat bstr_w.dat
+DEBUG=0
 
 if [ "$#" -eq 1 ]
 then
@@ -56,9 +55,21 @@ done
 WIDTH=$(echo $RES | sed 's/\([0-9]\+\)x\([0-9]\+\)/\1/')
 HEIGHT=$(echo $RES | sed 's/\([0-9]\+\)x\([0-9]\+\)/\2/')
 
-./diamond encode $OPENCL -g$GOP -tYUV420 -W $WIDTH -H $HEIGHT -e $HUFFMAN -o $TEMP $VIDEO
-#cgdb ./diamond
-./diamond decode -o $OUT $TEMP
+if [ $DEBUG == 1 ]
+then
+cat > .gdbinit << EOF
+b main
+run encode $OPENCL -g$GOP -tYUV420 -W $WIDTH -H $HEIGHT -e $HUFFMAN -o $TEMP $VIDEO
+EOF
+cgdb ./diamond
+else
+	./diamond encode $OPENCL -g$GOP -tYUV420 -W $WIDTH -H $HEIGHT -e $HUFFMAN -o $TEMP $VIDEO
+fi
+
+if [ $? == 0 ]
+then
+	./diamond decode -o $OUT $TEMP
+fi
 
 if [ $? == 0 ]
 then
