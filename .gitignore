@@ -5,6 +5,7 @@
 bin/
 obj/
 doc/
+make.visual/*
 make.visual/ipch
 make.visual/obj
 make.visual/*.sdf
@@ -13,4 +14,7 @@ diamond
 video
 output.diamond
 *.swp
-
+*.yuv
+tools/
+temp.bstr
+.gdbinit
