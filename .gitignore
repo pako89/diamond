@@ -18,3 +18,4 @@ output.diamond
 tools/
 temp.bstr
 .gdbinit
+results/

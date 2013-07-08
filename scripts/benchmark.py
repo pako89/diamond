@@ -6,6 +6,7 @@ import ConfigParser
 import datetime
 import commands
 import string
+import collections
 
 def str2bool(v):
 	  return v.lower() in ("yes", "true", "t", "y", "1")
@@ -112,13 +113,33 @@ class Command:
 		self._exit = s
 		self._stdout = o
 
+class EncoderConfig:
+	def __init__(self, video, variant, interpol, huffman, gop):
+		self.Video = video
+		self.Variant = variant
+		self.Interpol = interpol
+		self.Huffman = huffman
+		self.GOP = gop
+	
+	def get_video_variant(self):
+		return self.Video.get_name() + self.get_variant()
 
+	def get_variant(self):
+		s = "_"
+		s += "V"+self.Variant
+		s += "H"+self.Huffman
+		s += "I"+self.Interpol
+		s += "G"+self.GOP
+		return s
 
 class Benchmark:
 	SEPARATOR_LEN = 40
 	def __init__(self, config):
 		self.Config = config
+		if not os.path.exists(self.Config.ResultsDir):
+			os.makedirs(self.Config.ResultsDir)
 		self.flog = open(os.path.join(self.Config.ResultsDir, "benchmark.log"), 'w')
+		self.Results = list()
 
 	def log(self, data):
 		self.flog.write(data)
@@ -131,73 +152,155 @@ class Benchmark:
 
 	def run(self):
 		print "Running benchmark"
-		if not os.path.exists(self.Config.ResultsDir):
-			os.makedirs(self.Config.ResultsDir)
-		counter = 1
+		i = 1
 		for v in self.Config.Videos:
-			for i in self.Config.Interpolation:
-				for h in self.Config.Huffman:
-					for ev in self.Config.EncoderVariant:
-						for g in self.Config.GOP:
-							self.run_encoder(v, i, h, ev, g, counter)
-							counter = counter+1
-	def run_encoder(self, v, I, H, V, G, i):
+			for I in self.Config.Interpolation:
+				for H in self.Config.Huffman:
+					for V in self.Config.EncoderVariant:
+						for G in self.Config.GOP:
+							cfg = EncoderConfig(v, V, I, H, G)
+							self.run_item(cfg, i)
+							i = i+1
+	def out(self, data):
+		sys.stdout.write(data)
+		sys.stdout.flush()
+
+	def run_encoder(self, cfg, bstr):
+		self.out("Encoding...")
 		cmd = Command(self.Config.Encoder)
 		cmd.add_arg(self.Config.EncoderArgs)
-		cmd.add_option("--interpolation", I)
-		cmd.add_option("--huffman", H)
-		cmd.add_option("--variant", V)
-		cmd.add_option("--gop", G)
-		self.append_video(v, cmd, self.get_variant(I, H, V, G))
-		self.log_gsep()
-		self.log("Running command {0}/{1}:\n{2}\n".format(i, self.Config.get_count(), cmd.Command))
-		print "Running command {0}/{1}: {2}".format(i, self.Config.get_count(), cmd.Command)
+		cmd.add_option("--interpolation", cfg.Interpol)
+		cmd.add_option("--huffman", cfg.Huffman)
+		cmd.add_option("--variant", cfg.Variant)
+		cmd.add_option("--gop", cfg.GOP)
+		self.append_video(cfg.Video, cmd, bstr)
+		self.log_lsep()
+		self.log(cmd.Command+'\n')
+		cmd.run()
+		stdout = cmd.get_stdout()
+		self.log_lsep()
+		self.log(stdout+'\n')
+		self.out("Done\n")
+		return stdout
+
+	def parse_results(self, cfg, data):
+		self.out("Parsing results...")
+		result = Result(cfg)
+		result.parse(data)
+		self.Results.append(result)
+		self.out("Done\n")
+		
+	def run_decoder(self, output, bstr):
+		self.out("Decoding...")
+		cmd = Command(self.Config.Decoder)
+		cmd.add_arg(self.Config.DecoderArgs)
+		cmd.add_option("--output", output)
+		cmd.add_arg(bstr)
+		self.log_lsep()
+		self.log(cmd.Command+'\n')
+		cmd.run()
+		stdout = cmd.get_stdout()
+		self.log_lsep()
+		self.log(stdout+'\n')
+		self.out("Done\n")
+
+	def run_tar(self, tar, output):
+		self.out("Tarring...")
+		self.log_lsep()
+		tarcmd = self.Config.Tar.replace('%O', tar).replace('%I', output)
+		cmd = Command(tarcmd)
+		self.log(cmd.Command+'\n')
+		cmd.run()
+		self.out("Done\n")
+
+	def remove_output(self, output):
+		self.out("Removing decoded video...")
+		os.remove(output)
+		self.out("Done\n")
 
 	
-	def get_variant(self, I, H, V, G):
-		s = "_"
-		s += "V"+V
-		s += "H"+H
-		s += "I"+I
-		s += "G"+G
-		return s
+	def run_item(self, cfg, i):
+		self.log_gsep()
+		log = "Run {0}/{1}\n".format(i, self.Config.get_count())
+		self.log(log)
+		self.out(log)
+		bstr = self.get_out_path(cfg.get_video_variant() + ".bstr")
+		output = self.get_out_path(cfg.get_video_variant() + ".yuv")
+		tar = self.get_out_path(cfg.get_video_variant())
+		stdout = self.run_encoder(cfg, bstr) 
+		self.parse_results(cfg, stdout)
+		self.run_decoder(output, bstr)
+		if self.Config.TarDecoded:
+			self.run_tar(tar, output)
+		self.remove_output(output)
 
 	def get_out_path(self, name):
 		return os.path.join(self.Config.ResultsDir, name)
 
-	def append_video(self, video, cmd, variant):
+	def append_video(self, video, cmd, output):
 		cmd.add_option("--type", self.Config.VideosFormat)
 		cmd.add_option("--height", video.Height)
 		cmd.add_option("--width", video.Width)
-		cmd.add_option("--output", self.get_out_path(video.get_name() + variant + ".bstr"))
+		cmd.add_option("--output", output)
 		cmd.add_arg(video.Path)
+
+	def _write_csv(self, resf, data):
+		resf.write(data + ';')
+	
+	def _write_csv_header(self, resf):
+		if len(self.Results) > 0:
+			r = self.Results[0]
+			r.create_dict()
+			for i in r.Dict:
+				self._write_csv(resf, i)
+
+	def save_results(self):
+		resf = open(os.path.join(self.Config.ResultsDir, self.Config.ResultsName), 'w')
+		self._write_csv_header(resf)
+		for r in self.Results:
+			r.create_dict()
+			for i in r.Dict:
+				self._write_csv(resf, r.Dict[i])
+			resf.write('\n')
+		resf.close()
+
 
 
 class ResultItem:
 	INVALID = "-"
 	def __init__(self, desc, reg):
-		self.Value = INVALID
+		self.Value = self.INVALID
 		self.Description = desc
 		self._reg = reg
 
 	def parse(self, data):
-		print "Parsing result item: {0} using regex: {1}".format(self.Description, self._reg)
-		print "Parsing result item: {0} --> Value: {1}".format(self.Description, self.Value)
+		if self.Value == self.INVALID:
+			m = re.search(self._reg, data)
+			if m != None:
+				self.Value = m.group('v')
 
 class Result:
-	def __init__(self):
+	def __init__(self, cfg):
+		self.EncoderConfig = cfg
 		self.Items = list()
-		self.Items.append(ResultItem("Total", "(?P<v>)"))
-		self.Items.append(ResultItem("DCT", "(?P<v>)"))
-		self.Items.append(ResultItem("Quant", "(?P<v>)"))
-		self.Items.append(ResultItem("Zig Zag", "(?P<v>)"))
-		self.Items.append(ResultItem("RLC", "(?P<v>)"))
-		self.Items.append(ResultItem("Copy to Device", "(?P<v>)"))
-		self.Items.append(ResultItem("Copy to Host", "(?P<v>)"))
-		self.Items.append(ResultItem("Prediction", "(?P<v>)"))
-		self.Items.append(ResultItem("Prediction Transform", "(?P<v>)"))
-		self.Items.append(ResultItem("Prediction Encoding", "(?P<v>)"))
-		self.Items.append(ResultItem("Shift", "(?P<v>)"))
+		self.Items.append(ResultItem("Total", self.create_regex("Timer total")))
+		self.Items.append(ResultItem("DCT", self.create_regex("Timer DCT")))
+		self.Items.append(ResultItem("Quant", self.create_regex("Timer Quant")))
+		self.Items.append(ResultItem("Zig Zag", self.create_regex("Timer Zig Zag")))
+		self.Items.append(ResultItem("RLC", self.create_regex("Timer RLC")))
+		self.Dict = collections.OrderedDict()
+		self.Order = list()
+
+	def create_regex(self, text):
+		return "{0}\s*:\s*(?P<v>[0-9]+\.[0-9]+)".format(text)
+	
+	def create_dict(self):
+		self.Dict['Variant'] = self.EncoderConfig.Variant
+		self.Dict['Interpolation'] = self.EncoderConfig.Interpol
+		self.Dict['Huffman'] = self.EncoderConfig.Huffman
+		self.Dict['GOP'] = self.EncoderConfig.GOP
+		for i in self.Items:
+			self.Dict[i.Description] = i.Value
 
 	def parse(self, data):
 		for item in self.Items:
@@ -205,7 +308,6 @@ class Result:
 
 
 def main():
-	print "Test suite"
 	argc = len(sys.argv)
 	config_file = "benchmark.conf"
 	if argc == 2:
@@ -218,6 +320,7 @@ def main():
 	config.print_videos()
 	benchmark = Benchmark(config)
 	benchmark.run()
+	benchmark.save_results()
 	
 
 if __name__ == '__main__':
