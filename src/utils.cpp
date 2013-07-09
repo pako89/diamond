@@ -146,5 +146,21 @@ std::string get_src_from_file(char * file_name)
 	return s;
 }
 
+int ParseInt(std::string arg)
+{
+	if(arg.size()>0)
+	{
+		int ret = atoi(arg.c_str());
+		if(ret == 0 && arg[0] != '0')
+		{
+			throw utils::StringFormatException("can not convert '%s' to integer", arg.c_str());
+		}
+		return ret;
+	}
+	else
+	{
+		throw utils::NullReferenceException();
+	}
+}
 
 }

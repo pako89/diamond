@@ -43,12 +43,12 @@ int main(int argc,char * argv[])
 		{
 			dbg("Huffman    : %s\n", config.EncoderConfig.HuffmanType==avlib::HUFFMAN_TYPE_DYNAMIC?"dynamic":"static");
 			dbg("GOP        : %d\n", config.EncoderConfig.GOP);
-			avlib::CSequence * seq = new avlib::CSequence(
-				config.InputFile,
-				config.ImageType,
-				config.ImageSize.Height,
-				config.ImageSize.Width
-			);
+			avlib::CSequence * seq = new avlib::CSequence(config.InputFile);
+			if(!seq->IsYUV4MPEG())
+			{
+				seq->setFormat(config.ImageType, config.ImageSize.Height, config.ImageSize.Width);
+			}
+			dbg("Frame rate : %d:%d\n", seq->getFrameRate().Nom, seq->getFrameRate().Denom);
 			avlib::CBitstream * bstr = new avlib::CBitstream(10000000);
 			bstr->set_fh(config.OutputFile);
 			avlib::CEncoder * enc = NULL;

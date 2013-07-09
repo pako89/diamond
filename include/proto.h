@@ -43,6 +43,11 @@ MARKER_DEF(sos)
 	uint32_t height;
 #if USE(INTERPOLATION)
 	uint8_t interpolation_scale;
+	struct
+	{
+		uint32_t nom;
+		uint32_t denom;
+	} frame_rate;
 #endif
 MARKER_END(sos)
 
@@ -50,11 +55,5 @@ MARKER_DEF(sof)
 	uint8_t frame_type;
 	uint16_t quant_coeff;
 MARKER_END(sof)	
-/*
-MARKER_DEF(som)
-	macroblock_type_t type;
-	int8_t mx;
-	int8_t my;	
-MARKED_END(som)
-*/
+
 #endif //_PROTO_H

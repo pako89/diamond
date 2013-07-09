@@ -35,6 +35,8 @@ sos_marker_t CEncoder::write_sos(CSequence * pSeq, CBitstream * pBstr)
 	sos.frames_number = pSeq->getFramesCount();
 	sos.width = pSeq->getWidth();
 	sos.height = pSeq->getHeight();
+	sos.frame_rate.nom = pSeq->getFrameRate().Nom;
+	sos.frame_rate.denom = pSeq->getFrameRate().Denom;
 #if USE(INTERPOLATION)
 	sos.interpolation_scale = m_config.InterpolationScale;
 #endif

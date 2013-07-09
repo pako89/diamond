@@ -120,7 +120,6 @@ protected:
 	CDiamondApp(void);
 	DiamondOperation parseOperation(const char * op);
 	avlib::HUFFMAN_TYPE parseHuffman(const char * op);
-	int parseInt(const char * arg);
 	avlib::ImageType parseImageType(const char * arg);
 	std::string getShortOpts(const struct option long_options[], int size);
 

@@ -25,11 +25,15 @@ bool CBasicDecoder::Decode(CBitstream * pBstr, CSequence * pSeq)
 		throw utils::StringFormatException("wrong stream format [can not find start of stream marker]\n");
 	}
 	dbg("Start of Sequence marker:\n");
-	dbg("Frames : %d\n", sos.frames_number);
-	dbg("Width  : %d\n", sos.width);
-	dbg("Height : %d\n", sos.height);
-	dbg("Huffman: %s\n", sos.huffman==HUFFMAN_T_DYNAMIC?"dynamic":"static");
+	dbg("Frames    : %d\n", sos.frames_number);
+	dbg("Width     : %d\n", sos.width);
+	dbg("Height    : %d\n", sos.height);
+	dbg("Huffman   : %s\n", sos.huffman==HUFFMAN_T_DYNAMIC?"dynamic":"static");
+	dbg("Frame rate: %d:%d\n", sos.frame_rate.nom, sos.frame_rate.denom);
 	pSeq->setFormat(IMAGE_TYPE_YUV420, sos.height, sos.width);
+	pSeq->setFrameRate(CFrameRate(sos.frame_rate.nom, sos.frame_rate.denom));
+	pSeq->setYUV4MPEG(true);
+	pSeq->WriteYUV4MPEG();
 	pBstr->fill();
 	CImage<float> * imgF = new CImage<float>(pSeq->getFormat());
 	CImage<float> * imgLast = new CImage<float>(pSeq->getFormat());

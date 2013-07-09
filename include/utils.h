@@ -9,6 +9,7 @@
 #include <limits>
 #include <image.h>
 #include <log.h>
+#include <string>
 
 #define INSTANTIATE(t_class, t_arg)		template class t_class<t_arg>
 #define INSTANTIATE2(t_class, t_arg1, t_arg2)	template class t_class<t_arg1, t_arg2>
@@ -25,6 +26,8 @@
 #define RELEASE(p)	if(NULL != (p)) delete (p);
 
 #define USE(v)		defined USE_##v
+
+#define NOT_IMPLEMENTED()	utils::StringFormatException("Not implemented: %s:%d:%s", __FILE__, __LINE__, __func__)
 
 namespace utils
 {
@@ -118,8 +121,7 @@ void clampImg(avlib::CImage<T> * src, avlib::CImage<U> * dst)
 int log2(int val);
 void printProgressBar(int i, int n);
 std::string get_src_from_file(char * file_name);
-
-
+int ParseInt(std::string str);
 }
 
 

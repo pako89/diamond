@@ -80,32 +80,13 @@ const char * CDiamondApp::getName(void)
 	return m_appName;
 }
 
-int CDiamondApp::parseInt(const char * arg)
-{
-	if(NULL != arg)
-	{
-		int ret = atoi(arg);
-		if(ret == 0 && arg[0] != '0')
-		{
-			throw utils::StringFormatException("can not convert '%s' to integer", arg);
-		}
-		return ret;
-	}
-	else
-	{
-		throw utils::NullReferenceException();
-	}
-}
-
 avlib::ImageType CDiamondApp::parseImageType(const char * arg)
 {
+	avlib::ImageType ret;
 	if(NULL != arg)
 	{
-		if(!strcmp("YUV420", arg))
-		{
-			return avlib::IMAGE_TYPE_YUV420;
-		}
-		else
+		ret = avlib::CImageFormat::ParseImageType(arg);
+		if(avlib::IMAGE_TYPE_UNKNOWN == ret)
 		{
 			throw utils::StringFormatException("unknown image type: '%s'", arg);
 		}
@@ -114,6 +95,7 @@ avlib::ImageType CDiamondApp::parseImageType(const char * arg)
 	{
 		throw utils::NullReferenceException();
 	}
+	return ret;
 }
 
 avlib::HUFFMAN_TYPE CDiamondApp::parseHuffman(const char * arg)
@@ -257,15 +239,15 @@ void CDiamondApp::ParseArgs(int argc, char * argv[])
 			m_config.ImageTypeStr = optarg;
 			break;
 		case 'W':
-			m_config.ImageSize.Width = parseInt(optarg);
+			m_config.ImageSize.Width = utils::ParseInt(optarg);
 			break;
 		case 'H':
-			m_config.ImageSize.Height = parseInt(optarg);
+			m_config.ImageSize.Height = utils::ParseInt(optarg);
 			break;
 		case 'V':
 			if(optarg)
 			{
-				m_config.Variant = (EncoderVariant)parseInt(optarg);
+				m_config.Variant = (EncoderVariant)utils::ParseInt(optarg);
 			}
 			break;
 		case 'e':
@@ -273,10 +255,10 @@ void CDiamondApp::ParseArgs(int argc, char * argv[])
 			break;
 		case 'g':
 			{
-				int gop = parseInt(optarg);
+				int gop = utils::ParseInt(optarg);
 				if(gop >= 0)
 				{
-					m_config.EncoderConfig.GOP = parseInt(optarg);
+					m_config.EncoderConfig.GOP = utils::ParseInt(optarg);
 				}
 				else
 				{
@@ -307,7 +289,7 @@ void CDiamondApp::ParseArgs(int argc, char * argv[])
 			{
 				if(optarg)
 				{
-					m_config.EncoderConfig.InterpolationScale = parseInt(optarg);
+					m_config.EncoderConfig.InterpolationScale = utils::ParseInt(optarg);
 				}
 				else
 				{
@@ -331,7 +313,7 @@ void CDiamondApp::ParseArgs(int argc, char * argv[])
 		m_config.InputFileName = _argv[_argc-1];
 		if(strcmp(m_config.InputFileName, "stdin"))
 		{
-			m_config.InputFile = fopen(m_config.InputFileName, "r");
+			m_config.InputFile = fopen(m_config.InputFileName, "rb");
 			if(NULL == m_config.InputFile)
 			{
 				throw utils::StringFormatException(strerror(errno));

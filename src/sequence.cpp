@@ -1,31 +1,29 @@
 #include <sequence.h>
 #include <utils.h>
 #include <log.h>
+#include <string.h>
+#include <string>
+
+#define YUV4MPEG_HEADER		"YUV4MPEG2 "
+#define YUV4MPEG_HEADER_LEN	10
+#define YUV4MPEG_FRAME		"FRAME\n"
+#define YUV4MPEG_FRAME_LEN	6
 
 namespace avlib
 {
 
-CSequence::CSequence() :
-	m_image(NULL),
-	m_fh(NULL)
-{
-}
-
-CSequence::CSequence(const char * fileName) :
-	m_image(NULL),
-	m_fh(NULL)
-{
-
-}
 CSequence::CSequence(FILE * fh) : 
 	m_image(NULL),
-	m_fh(fh)
+	m_fh(fh),
+	m_yuv4mpeg(false)
 {
+	parseYUV4MPEG();
 }
 
 CSequence::CSequence(FILE * fh, ImageType type, int height, int width) :
 	m_image(NULL),
-	m_fh(fh)
+	m_fh(fh),
+	m_yuv4mpeg(false)
 {
 	setFormat(type, height, width);
 }
@@ -37,6 +35,152 @@ CSequence::~CSequence()
 	{
 		delete m_image;
 	}
+}
+
+void CSequence::setYUV4MPEG(bool val)
+{
+	m_yuv4mpeg = val;
+}
+
+bool CSequence::IsYUV4MPEG()
+{
+	return m_yuv4mpeg;
+}
+
+bool CSequence::parseHeader()
+{
+	char yuv4mpeg[YUV4MPEG_HEADER_LEN+1] = {0,};
+	if(NULL != m_fh)
+	{
+		if(fread(yuv4mpeg, YUV4MPEG_HEADER_LEN, 1, m_fh) == 1)
+		{
+			return !strcmp(yuv4mpeg, "YUV4MPEG2 ");
+		}
+	}
+	return false;
+}
+	
+bool CSequence::writeFrame()
+{
+	char * frame = YUV4MPEG_FRAME;
+	return fwrite(frame, YUV4MPEG_FRAME_LEN, 1, m_fh) == 1;
+}
+
+bool CSequence::readFrame()
+{
+	char frame[YUV4MPEG_FRAME_LEN+1] = {0,};
+	if(NULL != m_fh)
+	{
+		if(fread(frame, YUV4MPEG_FRAME_LEN, 1, m_fh) == 1)
+		{
+			return !strcmp(frame, YUV4MPEG_FRAME);
+		}
+		else
+		{
+			return false;
+		}
+	}
+}
+	
+std::string CSequence::readProperties()
+{
+	std::string ret;
+	char c = '\0';
+	do
+	{
+		if(fread(&c, 1, 1, m_fh) == 1)
+		{
+			if(c!= '\n')
+				ret += c;
+		}
+		else
+		{
+			throw utils::StringFormatException("YUV4MPEG header corrupted");
+		}
+	}while(c!='\n');
+	return ret;
+}
+
+CFrameRate CSequence::getFrameRate()
+{
+	return m_frameRate;
+}
+	
+void CSequence::setFrameRate(CFrameRate frameRate)
+{
+	m_frameRate = frameRate;
+}
+
+void CSequence::parseYUV4MPEG()
+{
+	if(parseHeader())
+	{
+		CImageFormat imageFormat;
+		CFrameRate frameRate;
+		std::string props = readProperties();
+		int pos=0;
+		do
+		{
+			int space = props.find(' ', pos);
+			std::string prop = std::string(props, pos, space-pos);
+			if(prop.size() > 0)
+			{
+				char p = prop[0];
+				std::string val = std::string(prop, 1, prop.size()-1);
+				switch(p)
+				{
+				case 'W':
+					imageFormat.Size.Width = utils::ParseInt(val.c_str());
+					break;
+				case 'H':
+					imageFormat.Size.Height = utils::ParseInt(val.c_str());
+					break;
+				case 'F':
+					frameRate = CFrameRate::ParseFrameRate(val.c_str());
+					break;
+				case 'C':
+					imageFormat.Type = CImageFormat::ParseImageType(val.c_str());
+					break;
+				default:
+					break;
+				}
+			}
+			pos = space+1;
+		}while(pos && pos<props.size());
+		if(imageFormat.Size.Width > 0
+		&& imageFormat.Size.Height > 0
+		&& imageFormat.Type != IMAGE_TYPE_UNKNOWN
+		&& frameRate.Nom > 0
+		&& frameRate.Denom > 0)
+		{
+			m_yuv4mpeg=true;
+			m_frameRate = frameRate;
+			setFormat(imageFormat.Type, imageFormat.Size.Height, imageFormat.Size.Width);
+		}
+	}
+	else
+	{
+		fseek(m_fh, 0, SEEK_SET);
+	}
+}
+	
+void CSequence::WriteYUV4MPEG()
+{
+	CImageFormat imageFormat = getFormat();
+#define BUFF_SIZE	2048
+	char buff[BUFF_SIZE] = {0,};
+	int s = snprintf(buff, BUFF_SIZE, "%sW%d H%d C%s F%d:%d\n",
+			YUV4MPEG_HEADER,
+			imageFormat.Size.Width,
+			imageFormat.Size.Height,
+			"420jpeg",
+			m_frameRate.Nom,
+			m_frameRate.Denom);
+	if(fwrite(buff, s, 1, m_fh) != 1)
+	{
+		throw utils::StringFormatException("Can not write YUV4MPEG Header: '%s'", buff);
+	}
+	//throw NOT_IMPLEMENTED();
 }
 
 bool CSequence::setFormat(ImageType type, int height, int width)
@@ -150,6 +294,10 @@ bool CSequence::write(void)
 {
 	if(NULL != m_fh && NULL != m_image)
 	{
+		if(m_yuv4mpeg && !writeFrame())
+		{
+			throw utils::StringFormatException("Can not write YUV4MPEG FRAME");
+		}
 		int ret = 0;
 		for(int k=0;k<m_image->getComponents(); k++)
 		{
@@ -177,6 +325,10 @@ bool CSequence::read(void)
 {
 	if(NULL != m_fh && NULL != m_image)
 	{
+		if(m_yuv4mpeg && !readFrame())
+		{
+			throw utils::StringFormatException("Can not find YUV4MPEG FRAME\n");
+		}
 		int ret = 0;
 		for(int k=0;k<m_image->getComponents(); k++)
 		{
@@ -197,7 +349,7 @@ bool CSequence::read(void)
 				ret += fread((*m_image)[k][0], (*m_image)[k].getBytesCount(), 1, m_fh);
 			}
 		}
-		return true;//TODO: (ret == m_image->getComponents());
+		return true; //TODO: (ret == m_image->getComponents());
 	}
 	else
 	{

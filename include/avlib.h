@@ -1,6 +1,9 @@
 #ifndef _AVLIB_H
 #define _AVLIB_H
 
+#include <stdint.h>
+#include <string>
+
 namespace avlib
 {
 
@@ -54,9 +57,22 @@ enum ImageType
 };
 
 
+class CFrameRate
+{
+public:
+	CFrameRate();
+	CFrameRate(uint32_t nom, uint32_t denom);
+	~CFrameRate();
+	static CFrameRate ParseFrameRate(std::string str);
+	uint32_t Nom;
+	uint32_t Denom;
+};
+
+
 class CImageFormat
 {
 public:
+	static ImageType ParseImageType(std::string str);
 	CImageFormat();
 	CImageFormat(ImageType type, CSize size);
 	CImageFormat(ImageType type, int height, int width);
