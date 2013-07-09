@@ -5,27 +5,15 @@ OUT=out.yuv
 VIDEO=
 WIDTH=
 HEIGHT=
-OPENCL="-C2"
+VARIANT=2
 HUFFMAN="static"
+PROGRESS_BAR="--progress-bar yes"
 GOP="3"
+COMMON=$PROGRESS_BAR
 DEBUG=0
+DIR="yuvvideo"
 
-if [ "$#" -eq 1 ]
-then
-	case $1 in
-	"c")
-		OPENCL="-C"
-		;;
-	"n")
-		OPENCL=""
-		;;
-	*)
-		OPENCL=""
-		;;
-	esac
-fi
-
-RES=$(ls video)
+RES=$(ls $DIR)
 select R in $RES
 do
 	if [ -d video/$R ]
@@ -39,7 +27,7 @@ do
 	fi
 done
 
-VID=$(find video/$RES -name "*.yuv")
+VID=$(find $DIR/$RES -name "*.yuv")
 select v in $VID
 do
 	if [ -f $v ]
@@ -59,19 +47,19 @@ if [ $DEBUG == 1 ]
 then
 cat > .gdbinit << EOF
 b main
-run encode $OPENCL -g$GOP -tYUV420 -W $WIDTH -H $HEIGHT -e $HUFFMAN -o $TEMP $VIDEO
+run encode $COMMON -V$VARIANT -g$GOP -tYUV420 -W $WIDTH -H $HEIGHT -e $HUFFMAN -o $TEMP $VIDEO
 EOF
 cgdb ./diamond
 else
-	./diamond encode $OPENCL -g$GOP -tYUV420 -W $WIDTH -H $HEIGHT -e $HUFFMAN -o $TEMP $VIDEO
+	./diamond encode $COMMON -V$VARIANT -g$GOP -tYUV420 -W $WIDTH -H $HEIGHT -e $HUFFMAN -o $TEMP $VIDEO
 fi
 
 if [ $? == 0 ]
 then
-	./diamond decode -o $OUT $TEMP
+	./diamond decode $COMMON -o $OUT $TEMP
 fi
 
 if [ $? == 0 ]
 then
-	mplayer $OUT -loop 0 -demuxer rawvideo -rawvideo w=$WIDTH:h=$HEIGHT
+	mplayer $OUT -loop 0 -demuxer y4m
 fi

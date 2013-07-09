@@ -42,6 +42,7 @@ class Config:
 		self.ResultsDir = self.ConfigParser.get('Output', 'ResultsDir')
 		self.wildcard_results_dir()
 		self.ResultsName = self.ConfigParser.get('Output', 'ResultsName')
+		self.RemoveDecoded = str2bool(self.ConfigParser.get('Output', 'RemoveDecoded'))
 		# Input Configuration
 		self._videos_dir = self.ConfigParser.get('Input', 'VideosDir')
 		self._videos_ext = self.ConfigParser.get('Input', 'VideosExt')
@@ -140,16 +141,7 @@ class Benchmark:
 			os.makedirs(self.Config.ResultsDir)
 		self.flog = open(os.path.join(self.Config.ResultsDir, "benchmark.log"), 'w')
 		self.Results = list()
-
-	def log(self, data):
-		self.flog.write(data)
 	
-	def log_gsep(self):
-		self.flog.write('='*self.SEPARATOR_LEN+"\n")
-	
-	def log_lsep(self):
-		self.flog.write('-'*self.SEPARATOR_LEN+"\n")
-
 	def run(self):
 		print "Running benchmark"
 		i = 1
@@ -159,85 +151,106 @@ class Benchmark:
 					for V in self.Config.EncoderVariant:
 						for G in self.Config.GOP:
 							cfg = EncoderConfig(v, V, I, H, G)
-							self.run_item(cfg, i)
+							self._run_item(cfg, i)
 							i = i+1
-	def out(self, data):
+	
+	def save_results(self):
+		resf = open(os.path.join(self.Config.ResultsDir, self.Config.ResultsName), 'w')
+		self._write_csv_header(resf)
+		for r in self.Results:
+			r.create_dict()
+			for i in r.Dict:
+				self._write_csv(resf, r.Dict[i])
+			resf.write('\n')
+		resf.close()
+
+	def _log(self, data):
+		self.flog.write(data)
+	
+	def _log_gsep(self):
+		self.flog.write('='*self.SEPARATOR_LEN+"\n")
+	
+	def _log_lsep(self):
+		self.flog.write('-'*self.SEPARATOR_LEN+"\n")
+
+	def _out(self, data):
 		sys.stdout.write(data)
 		sys.stdout.flush()
 
-	def run_encoder(self, cfg, bstr):
-		self.out("Encoding...")
+	def _run_encoder(self, cfg, bstr):
+		self._out("Encoding...")
 		cmd = Command(self.Config.Encoder)
 		cmd.add_arg(self.Config.EncoderArgs)
 		cmd.add_option("--interpolation", cfg.Interpol)
 		cmd.add_option("--huffman", cfg.Huffman)
 		cmd.add_option("--variant", cfg.Variant)
 		cmd.add_option("--gop", cfg.GOP)
-		self.append_video(cfg.Video, cmd, bstr)
-		self.log_lsep()
-		self.log(cmd.Command+'\n')
+		self._append_video(cfg.Video, cmd, bstr)
+		self._log_lsep()
+		self._log(cmd.Command+'\n')
 		cmd.run()
 		stdout = cmd.get_stdout()
-		self.log_lsep()
-		self.log(stdout+'\n')
-		self.out("Done\n")
+		self._log_lsep()
+		self._log(stdout+'\n')
+		self._out("Done\n")
 		return stdout
 
-	def parse_results(self, cfg, data):
-		self.out("Parsing results...")
+	def _parse_results(self, cfg, data):
+		self._out("Parsing results...")
 		result = Result(cfg)
 		result.parse(data)
 		self.Results.append(result)
-		self.out("Done\n")
+		self._out("Done\n")
 		
-	def run_decoder(self, output, bstr):
-		self.out("Decoding...")
+	def _run_decoder(self, output, bstr):
+		self._out("Decoding...")
 		cmd = Command(self.Config.Decoder)
 		cmd.add_arg(self.Config.DecoderArgs)
 		cmd.add_option("--output", output)
 		cmd.add_arg(bstr)
-		self.log_lsep()
-		self.log(cmd.Command+'\n')
+		self._log_lsep()
+		self._log(cmd.Command+'\n')
 		cmd.run()
 		stdout = cmd.get_stdout()
-		self.log_lsep()
-		self.log(stdout+'\n')
-		self.out("Done\n")
+		self._log_lsep()
+		self._log(stdout+'\n')
+		self._out("Done\n")
 
-	def run_tar(self, tar, output):
-		self.out("Tarring...")
-		self.log_lsep()
+	def _run_tar(self, tar, output):
+		self._out("Tarring...")
+		self._log_lsep()
 		tarcmd = self.Config.Tar.replace('%O', tar).replace('%I', output)
 		cmd = Command(tarcmd)
-		self.log(cmd.Command+'\n')
+		self._log(cmd.Command+'\n')
 		cmd.run()
-		self.out("Done\n")
+		self._out("Done\n")
 
-	def remove_output(self, output):
-		self.out("Removing decoded video...")
+	def _remove_output(self, output):
+		self._out("Removing decoded video...")
 		os.remove(output)
-		self.out("Done\n")
+		self._out("Done\n")
 
 	
-	def run_item(self, cfg, i):
-		self.log_gsep()
+	def _run_item(self, cfg, i):
+		self._log_gsep()
 		log = "Run {0}/{1}\n".format(i, self.Config.get_count())
-		self.log(log)
-		self.out(log)
-		bstr = self.get_out_path(cfg.get_video_variant() + ".bstr")
-		output = self.get_out_path(cfg.get_video_variant() + ".yuv")
-		tar = self.get_out_path(cfg.get_video_variant())
-		stdout = self.run_encoder(cfg, bstr) 
-		self.parse_results(cfg, stdout)
-		self.run_decoder(output, bstr)
+		self._log(log)
+		self._out(log)
+		bstr = self._get_out_path(cfg.get_video_variant() + ".bstr")
+		output = self._get_out_path(cfg.get_video_variant() + ".yuv")
+		tar = self._get_out_path(cfg.get_video_variant())
+		stdout = self._run_encoder(cfg, bstr) 
+		self._parse_results(cfg, stdout)
+		self._run_decoder(output, bstr)
 		if self.Config.TarDecoded:
-			self.run_tar(tar, output)
-		self.remove_output(output)
+			self._run_tar(tar, output)
+		if self.Config.RemoveDecoded:
+			self._remove_output(output)
 
-	def get_out_path(self, name):
+	def _get_out_path(self, name):
 		return os.path.join(self.Config.ResultsDir, name)
 
-	def append_video(self, video, cmd, output):
+	def _append_video(self, video, cmd, output):
 		cmd.add_option("--type", self.Config.VideosFormat)
 		cmd.add_option("--height", video.Height)
 		cmd.add_option("--width", video.Width)
@@ -253,16 +266,6 @@ class Benchmark:
 			r.create_dict()
 			for i in r.Dict:
 				self._write_csv(resf, i)
-
-	def save_results(self):
-		resf = open(os.path.join(self.Config.ResultsDir, self.Config.ResultsName), 'w')
-		self._write_csv_header(resf)
-		for r in self.Results:
-			r.create_dict()
-			for i in r.Dict:
-				self._write_csv(resf, r.Dict[i])
-			resf.write('\n')
-		resf.close()
 
 
 
