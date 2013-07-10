@@ -2,6 +2,10 @@
 #include <string.h>
 #include <algorithm>
 
+#ifndef VERSION
+#define VERSION	"N/A"
+#endif
+
 namespace diamond
 {
 
@@ -126,6 +130,11 @@ DiamondOperation CDiamondApp::parseOperation(const char * op)
 	}
 }
 
+void CDiamondApp::PrintVersion(void)
+{
+	printf("%s version %s\n", m_appName, VERSION);
+}
+
 void CDiamondApp::PrintBanner(void)
 {
 	if(NULL != m_appName)
@@ -137,7 +146,7 @@ void CDiamondApp::PrintBanner(void)
 
 void CDiamondApp::PrintUsage(void)
 {
-	printf("Usage: %s encode|decode [OPTIONS] FILE\n", "diamond");
+	printf("Usage: %s encode|decode [OPTIONS] FILE\n", m_appName);
 }
 
 void CDiamondApp::PrintHelp(void)
@@ -159,7 +168,8 @@ const struct option CDiamondApp::common_options[] = {
 #if USE(INTERPOLATION)	
 	{"interpolation",	optional_argument,	NULL,	'I'},
 #endif
-	{"progress-bar",	required_argument, 	NULL, 	'p'}
+	{"progress-bar",	required_argument, 	NULL, 	'p'},
+	{"version",		no_argument,		NULL,	'X'}
 };
 
 #define COMMON_OPTS_SIZE	ARRAY_SIZE(common_options)
@@ -181,15 +191,18 @@ std::string CDiamondApp::getShortOpts(const struct option long_options[], int si
 	std::string shortOpts;
 	for(int i=0 ; i<size; i++)
 	{
-		char c = (char)long_options[i].val;
-		shortOpts += c;
-		if(long_options[i].has_arg == required_argument)
+		if(long_options[i].val < 0xf00)
 		{
-			shortOpts += ':';
-		}
-		else if(long_options[i].has_arg == optional_argument)
-		{
-			shortOpts += "::";
+			char c = (char)long_options[i].val;
+			shortOpts += c;
+			if(long_options[i].has_arg == required_argument)
+			{
+				shortOpts += ':';
+			}
+			else if(long_options[i].has_arg == optional_argument)
+			{
+				shortOpts += "::";
+			}
 		}
 	}
 	return shortOpts;
@@ -211,8 +224,19 @@ void CDiamondApp::ParseArgs(int argc, char * argv[])
 	int _argc = argc-2;
 	char ** _argv = &argv[2];
 #else
-	int _argc = argc-1;
-	char ** _argv = argv+1;
+	int _argc;
+	char ** _argv;
+	if(m_config.Op != DIAMOND_NOP)
+	{
+		_argc = argc-1;
+		_argv = argv+1;
+	}
+	else
+	{
+		_argc = argc;
+		_argv = argv;
+	}
+
 #endif
 	int opt, longind;
 	while((opt = getopt_long(_argc, _argv, shortopts, CDiamondApp::common_options, &longind)) != -1)
@@ -221,6 +245,10 @@ void CDiamondApp::ParseArgs(int argc, char * argv[])
 		{
 		case 'h':
 			PrintHelp();
+			throw ExitException(0);
+			break;
+		case 'X':
+			PrintVersion();
 			throw ExitException(0);
 			break;
 		case 'o':

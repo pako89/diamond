@@ -113,6 +113,7 @@ public:
 	void PrintBanner(void);
 	void PrintUsage(void);
 	void PrintHelp(void);
+	void PrintVersion(void);
 	
 	const char * getName(void);
 	DiamondConfig getConfig(void);
