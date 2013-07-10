@@ -103,7 +103,7 @@ class Command:
 	def add_option(self, arg, val):
 		self.Command += " " + arg + " " + val
 
-	def get_exit(self):
+	def get_status(self):
 		return self._exit
 
 	def get_stdout(self):
@@ -143,7 +143,7 @@ class Benchmark:
 		self.Results = list()
 	
 	def run(self):
-		print "Running benchmark"
+		print "\033[34;1mRunning benchmark\033[;m"
 		i = 1
 		for v in self.Config.Videos:
 			for I in self.Config.Interpolation:
@@ -177,8 +177,20 @@ class Benchmark:
 		sys.stdout.write(data)
 		sys.stdout.flush()
 
+	def _out_progress(self, txt):
+		self._out("[{0}] {1}...".format("..", txt))
+
+	def _out_done(self, txt, res):
+		if res:
+			self._out_error(txt)
+		else:
+			self._out("\r[\033[32;1m{0}\033[0;m] {1}...\n".format("OK", txt))
+	
+	def _out_error(self, txt):
+		self._out("\r[\033[31;1m{0}\033[0;m] {1}...\n".format("ERROR", txt))
+
 	def _run_encoder(self, cfg, bstr):
-		self._out("Encoding...")
+		self._out_progress("Encoding")
 		cmd = Command(self.Config.Encoder)
 		cmd.add_arg(self.Config.EncoderArgs)
 		cmd.add_option("--interpolation", cfg.Interpol)
@@ -192,18 +204,18 @@ class Benchmark:
 		stdout = cmd.get_stdout()
 		self._log_lsep()
 		self._log(stdout+'\n')
-		self._out("Done\n")
+		self._out_done("Encoding", cmd.get_status())
 		return stdout
 
 	def _parse_results(self, cfg, data):
-		self._out("Parsing results...")
+		self._out_progress("Parsing results")
 		result = Result(cfg)
 		result.parse(data)
 		self.Results.append(result)
-		self._out("Done\n")
+		self._out_done("Parsing results", 0)
 		
 	def _run_decoder(self, output, bstr):
-		self._out("Decoding...")
+		self._out_progress("Decoding")
 		cmd = Command(self.Config.Decoder)
 		cmd.add_arg(self.Config.DecoderArgs)
 		cmd.add_option("--output", output)
@@ -214,26 +226,26 @@ class Benchmark:
 		stdout = cmd.get_stdout()
 		self._log_lsep()
 		self._log(stdout+'\n')
-		self._out("Done\n")
+		self._out_done("Decoding", cmd.get_status())
 
 	def _run_tar(self, tar, output):
-		self._out("Tarring...")
+		self._out_progress("Tarring")
 		self._log_lsep()
 		tarcmd = self.Config.Tar.replace('%O', tar).replace('%I', output)
 		cmd = Command(tarcmd)
 		self._log(cmd.Command+'\n')
 		cmd.run()
-		self._out("Done\n")
+		self._out_done("Tarring", cmd.get_status())
 
 	def _remove_output(self, output):
-		self._out("Removing decoded video...")
+		self._out_progress("Removing decoded video")
 		os.remove(output)
-		self._out("Done\n")
+		self._out_done("Removing decoded video", 0)
 
 	
 	def _run_item(self, cfg, i):
 		self._log_gsep()
-		log = "Run {0}/{1}\n".format(i, self.Config.get_count())
+		log = "\033[33;1mRun {0}/{1}\033[;m\n".format(i, self.Config.get_count())
 		self._log(log)
 		self._out(log)
 		bstr = self._get_out_path(cfg.get_video_variant() + ".bstr")
@@ -268,7 +280,6 @@ class Benchmark:
 				self._write_csv(resf, i)
 
 
-
 class ResultItem:
 	INVALID = "-"
 	def __init__(self, desc, reg):
@@ -281,6 +292,7 @@ class ResultItem:
 			m = re.search(self._reg, data)
 			if m != None:
 				self.Value = m.group('v')
+
 
 class Result:
 	def __init__(self, cfg):
@@ -320,7 +332,6 @@ def main():
 			print "{0}: directory not exists".format(sys.argv[1])
 	config = Config()
 	config.parse_config(config_file)
-	config.print_videos()
 	benchmark = Benchmark(config)
 	benchmark.run()
 	benchmark.save_results()
