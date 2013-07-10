@@ -30,6 +30,16 @@ typedef CComponent<prediction_info_t> CPredictionInfoTable;
 class CPrediction 
 {
 public:
+	enum PredictionTimer
+	{
+		PredictionTimer_Transform,
+		PredictionTimer_ITransform,
+		PredictionTimer_Prediction,
+		PredictionTimer_EncodePrediction,
+		PredictionTimer_Interpolation,
+		PredictionTimer_CopyLast
+	};
+public:
 	CPrediction();
 	virtual ~CPrediction();
 	virtual void Transform(CImage<float> * pSrc, CImage<float> * pDst, CPredictionInfoTable * pPred, FRAME_TYPE type);
@@ -40,6 +50,7 @@ public:
 	virtual void setIFrameITransform(CTransform<float, float> * t);
 	virtual void Encode(CPredictionInfoTable * pPred, CBitstream * pBstr, FRAME_TYPE frame_type);
 	virtual void Decode(CPredictionInfoTable * pPred, CBitstream * pBstr, FRAME_TYPE frame_type);
+	virtual utils::CTimer getTimer(PredictionTimer timer);
 #if USE(INTERPOLATION)
 	virtual void Init(CImageFormat format, int scale);
 #else
@@ -63,6 +74,14 @@ protected:
 	CTransform<float, float> * m_IFIT;
 	int m_max;
 	CDynamicHuffman<int> * m_huff;
+	utils::CTimer m_timerTransform;
+	utils::CTimer m_timerITransform;
+	utils::CTimer m_timerPrediction;
+	utils::CTimer m_timerEncodePrediction;
+#if USE(INTERPOLATION)	
+	utils::CTimer m_timerInterpolation;
+#endif
+	utils::CTimer m_timerCopyLast;
 };
 
 }

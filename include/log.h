@@ -15,17 +15,18 @@ extern FILE * fh_r;
 #endif
 
 #define _FILE			stderr
-#define _LOG(...)	fprintf(_FILE, __VA_ARGS__)
+#define _LOG(...)		fprintf(_FILE, __VA_ARGS__)
 
-#define inc_logv()	(logv++)
-#define LOG(...)	if(logv>0) _LOG(__VA_ARGS__)
-
+#define inc_logv()		(logv++)
+#define logv(...)		if(logv>0) _LOG(__VA_ARGS__)
+#define log_prop(n, f, ...)	logv("%-30s : " f "\n", n, __VA_ARGS__)
+#define log_timer(n, t)		log_prop("Timer " n, "%.2f", (t).getTotalSeconds())
+//logv("Timer %-14s : %f\n", (name), (timer).getTotalSeconds())
 #ifdef DEBUG
 
-#define module(name)	static const char * module = (name)
-#define dbg(...)	_LOG(__VA_ARGS__)
-#define dbgf(...)	_LOG("%s: ", __FUNCTION__);	\
-			_LOG(__VA_ARGS__)
+#define dbg(...)		_LOG(__VA_ARGS__)
+#define dbgf(...)		_LOG("%s: ", __FUNCTION__);	\
+				_LOG(__VA_ARGS__)
 #else
 #define module(name)
 #define dbg(...)

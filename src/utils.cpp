@@ -89,32 +89,39 @@ int log2(int val)
 void printProgressBar(int i, int n)
 {
 #ifndef WIN32
-	struct winsize w;
-	i++;
-	ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
-	int cols = w.ws_col;
-	char * line = new char[cols+1];
-	int nsize = log10(n)+1;
-	int fsize = 2*nsize+2;
-	char * frames = new char[fsize];
-	snprintf(frames, fsize, "%*d/%*d", nsize, i, nsize, n);
-	int bars = cols-fsize-3;
-	int ni = i*bars/n;
-	if(i!=n) ni++;
-	char * bar = new char[ni+1];
-	memset(bar, '=', ni);
-	int mi = i%4;
-	if(ni>0)
+	if(i==n)
 	{
-		bar[ni-1] = (i==n)?'=':(mi==0)?'|':(mi==1)?'/':(mi==2)?'-':'\\';
+		logv("\n");
 	}
-	bar[ni]=0;
-	LOG("\r[%-*s]["YELLOW"%s"EC"]", bars, bar, frames);
-	delete line;
-	delete frames;
-	delete bar;
+	else
+	{
+		struct winsize w;
+		i++;
+		ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
+		int cols = w.ws_col;
+		char * line = new char[cols+1];
+		int nsize = log10(n)+1;
+		int fsize = 2*nsize+2;
+		char * frames = new char[fsize];
+		snprintf(frames, fsize, "%*d/%*d", nsize, i, nsize, n);
+		int bars = cols-fsize-3;
+		int ni = i*bars/n;
+		if(i!=n) ni++;
+		char * bar = new char[ni+1];
+		memset(bar, '=', ni);
+		int mi = i%4;
+		if(ni>0)
+		{
+			bar[ni-1] = (i==n)?'=':(mi==0)?'|':(mi==1)?'/':(mi==2)?'-':'\\';
+		}
+		bar[ni]=0;
+		logv("\r[%-*s]["YELLOW"%s"EC"]", bars, bar, frames);
+		delete line;
+		delete frames;
+		delete bar;
+	}
 #else
-	LOG("\r%d/%d", i+1, n);
+	logv("\r%d/%d", i+1, n);
 #endif
 }
 std::string get_src_from_file(char * file_name)

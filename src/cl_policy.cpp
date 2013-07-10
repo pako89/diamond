@@ -2,8 +2,6 @@
 #include <cl_base.h>
 #include <utils.h>
 
-module("OpenCL::Policy");
-
 CCLDevice CCLFirstDevicePolicy::getDevice()
 {
 	CCLBase & clBase = CCLBase::getInstance();

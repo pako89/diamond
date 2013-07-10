@@ -2,7 +2,6 @@
 #include <log.h>
 #include <shift.h>
 
-module("BasicEncoder");
 
 namespace avlib
 {
@@ -131,13 +130,23 @@ bool CBasicEncoder::Encode(CSequence * pSeq, CBitstream * pBstr)
 		m_idct->Transform(m_imgF, m_imgF);
 		m_pred->ITransform(m_imgF, m_imgF, m_predTab, frame_type);
 	}
-	dbg("\n");
+	printProgressBar(sos.frames_number, sos.frames_number);
 	m_timer.stop();
-	dbg("Timer total         : %f\n", m_timer.getTotalSeconds());
-	dbg("Timer DCT           : %f\n", m_dct->getTimer().getTotalSeconds());
-	dbg("Timer Quant         : %f\n", m_quant->getTimer().getTotalSeconds());
-	dbg("Timer Zig Zag       : %f\n", m_zz->getTimer().getTotalSeconds());
-	dbg("Timer RLC           : %f\n", m_rlc->getTimer().getTotalSeconds());
+	log_timer("Total", m_timer);
+	log_timer("DCT", m_dct->getTimer());
+	log_timer("IDCT", m_idct->getTimer());
+	log_timer("Quant", m_quant->getTimer());
+	log_timer("Inverse Quant", m_iquant->getTimer());
+	log_timer("Zig Zag", m_zz->getTimer());
+	log_timer("RLC", m_rlc->getTimer());
+	log_timer("Prediction", m_pred->getTimer(CPrediction::PredictionTimer_Prediction));
+	log_timer("P FRAME Transform", m_pred->getTimer(CPrediction::PredictionTimer_Transform));
+	log_timer("P FRAME ITransform", m_pred->getTimer(CPrediction::PredictionTimer_ITransform));
+	log_timer("Interpolation", m_pred->getTimer(CPrediction::PredictionTimer_Interpolation));
+	log_timer("Copy Last Image", m_pred->getTimer(CPrediction::PredictionTimer_CopyLast));
+	log_timer("Encode Prediction", m_pred->getTimer(CPrediction::PredictionTimer_EncodePrediction));
+	log_timer("Shift +128", m_shift->getTimer());
+	log_timer("Shift -128", m_ishift->getTimer());
 	return false;
 }
 

@@ -62,7 +62,7 @@ bool CSequence::parseHeader()
 	
 bool CSequence::writeFrame()
 {
-	char * frame = YUV4MPEG_FRAME;
+	char * frame = (char*)YUV4MPEG_FRAME;
 	return fwrite(frame, YUV4MPEG_FRAME_LEN, 1, m_fh) == 1;
 }
 

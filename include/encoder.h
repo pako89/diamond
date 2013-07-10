@@ -28,7 +28,7 @@ public:
 	CEncoder();
 	CEncoder(EncoderConfig cfg);
 	virtual ~CEncoder();
-	virtual bool Encode(CSequence * pSeq, CBitstream * pBstr) = 0;
+	virtual bool Encode(CSequence * pSeq, CBitstream * pBstr)=0;
 protected:
 	virtual void printProgressBar(int i, int n);
 	virtual void init(CImageFormat fmt);

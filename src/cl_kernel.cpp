@@ -1,7 +1,5 @@
 #include <cl_kernel.h>
 
-module("OpenCL::Kernel");
-
 namespace avlib
 {
 

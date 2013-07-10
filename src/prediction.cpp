@@ -56,6 +56,29 @@ void CPrediction::Init(
 #endif
 }
 
+utils::CTimer CPrediction::getTimer(PredictionTimer timer)
+{
+	switch(timer)
+	{
+	case PredictionTimer_Transform:
+		return m_timerTransform;
+	case PredictionTimer_ITransform:
+		return m_timerITransform;
+	case PredictionTimer_Prediction:
+		return m_timerPrediction;
+	case PredictionTimer_EncodePrediction:
+		return m_timerEncodePrediction;
+#if USE(INTERPOLATION)
+	case PredictionTimer_Interpolation:
+		return m_timerInterpolation;
+#endif
+	case PredictionTimer_CopyLast:
+		return m_timerCopyLast;
+	default:
+		return utils::CTimer();
+	}
+}
+
 #if USE(INTERPOLATION)
 int CPrediction::getInterpolationScale()
 {
@@ -163,8 +186,12 @@ void CPrediction::Transform(CImage<float> * pSrc, CImage<float> * pDst, CPredict
 	}
 	else if(FRAME_TYPE_P == type)
 	{
+		m_timerPrediction.start();
 		doPredict(&(*pSrc)[0], pPredInfo);
+		m_timerPrediction.stop();
+		m_timerTransform.start();
 		doTransformPFrame(pSrc, pDst, pPredInfo);
+		m_timerTransform.stop();
 	}
 	else
 	{
@@ -175,6 +202,7 @@ void CPrediction::Transform(CImage<float> * pSrc, CImage<float> * pDst, CPredict
 
 void CPrediction::ITransform(CImage<float> * pSrc, CImage<float> * pDst, CPredictionInfoTable * pPredInfo, FRAME_TYPE type)
 {
+	m_timerITransform.start();
 	if(pSrc->getFormat() != pDst->getFormat())
 	{
 		throw utils::StringFormatException("formats do not match\n");
@@ -191,17 +219,24 @@ void CPrediction::ITransform(CImage<float> * pSrc, CImage<float> * pDst, CPredic
 	{
 		throw utils::StringFormatException("Unknown FRAME_TYPE");
 	}
+	m_timerITransform.stop();
 #if USE(INTERPOLATION)
 	if(getInterpolationScale() > 1)
 	{
+		m_timerInterpolation.start();
 		m_interpol->Transform(pDst, m_last);
+		m_timerInterpolation.stop();
 	}
 	else
 	{
+		m_timerCopyLast.start();
 		*m_last = *pDst;
+		m_timerCopyLast.stop();
 	}
 #else
+	m_timerCopyLast.start();
 	*m_last = *pDst;
+	m_timerCopyLast.stop();
 #endif
 }
 
@@ -301,6 +336,7 @@ void CPrediction::setIFrameITransform(CTransform<float, float> * t)
 
 void CPrediction::Encode(CPredictionInfoTable * pPred, CBitstream * pBstr, FRAME_TYPE frame_type)
 {
+	m_timerEncodePrediction.start();
 	if(FRAME_TYPE_I != frame_type)
 	{
 		for(int y=0;y<pPred->getHeight();y++)
@@ -311,6 +347,7 @@ void CPrediction::Encode(CPredictionInfoTable * pPred, CBitstream * pBstr, FRAME
 			}
 		}
 	}
+	m_timerEncodePrediction.stop();
 }
 
 void CPrediction::Decode(CPredictionInfoTable * pPred, CBitstream * pBstr, FRAME_TYPE frame_type)

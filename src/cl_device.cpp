@@ -1,7 +1,5 @@
 #include <cl_device.h>
 
-module("OpenCL::Device");
-
 CCLDevice::CCLDevice(void) :
 	m_platform(NULL),
 	id(0),

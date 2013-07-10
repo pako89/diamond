@@ -13,7 +13,6 @@
 #include <cl_merged_encoder.h>
 #include <log.h>
 
-module("Main");
 
 #ifdef WIN32
 #define exit(v)		{system("pause"); exit((v));}
@@ -33,22 +32,30 @@ int main(int argc,char * argv[])
 	{
 		app->ParseArgs(argc, argv);
 		diamond::DiamondConfig config = app->getConfig();
-		dbg("Input file : %s\n", config.InputFileName);
+		log_prop("Input file", "%s", config.InputFileName);
+		log_prop("Output file", "%s", config.OutputFileName);
+		/*dbg("Input file : %s\n", config.InputFileName);
 		dbg("Output file: %s\n", config.OutputFileName);
 		dbg("Image type : %s\n", config.ImageTypeStr);
 		dbg("Height     : %d\n", config.ImageSize.Height);
 		dbg("Width      : %d\n", config.ImageSize.Width);
-		dbg("Variant    : %s\n", diamond::EncoderVariant2Str(config.Variant));
+		dbg("Variant    : %s\n", diamond::EncoderVariant2Str(config.Variant));*/
 		if(diamond::DIAMOND_OP_ENCODE == config.Op)
 		{
-			dbg("Huffman    : %s\n", config.EncoderConfig.HuffmanType==avlib::HUFFMAN_TYPE_DYNAMIC?"dynamic":"static");
-			dbg("GOP        : %d\n", config.EncoderConfig.GOP);
+			const char * huffstr = config.EncoderConfig.HuffmanType==avlib::HUFFMAN_TYPE_DYNAMIC?"dynamic":"static";
 			avlib::CSequence * seq = new avlib::CSequence(config.InputFile);
 			if(!seq->IsYUV4MPEG())
 			{
 				seq->setFormat(config.ImageType, config.ImageSize.Height, config.ImageSize.Width);
 			}
-			dbg("Frame rate : %d:%d\n", seq->getFrameRate().Nom, seq->getFrameRate().Denom);
+			log_prop("Variant", "%s", diamond::EncoderVariant2Str(config.Variant));
+			log_prop("Image type", "%s", config.ImageTypeStr);
+			log_prop("Huffman", "%s", huffstr);
+			log_prop("GOP", "%d", config.EncoderConfig.GOP);
+			log_prop("Width", "%d", seq->getFormat().Size.Width);
+			log_prop("Height", "%d", seq->getFormat().Size.Height);
+			log_prop("Frame rate", "%d:%d", seq->getFrameRate().Nom, seq->getFrameRate().Denom);
+			log_prop("Numer of frames", "%d", seq->getFramesCount());
 			avlib::CBitstream * bstr = new avlib::CBitstream(10000000);
 			bstr->set_fh(config.OutputFile);
 			avlib::CEncoder * enc = NULL;
