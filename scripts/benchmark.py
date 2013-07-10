@@ -278,6 +278,7 @@ class Benchmark:
 			r.create_dict()
 			for i in r.Dict:
 				self._write_csv(resf, i)
+			resf.write("\n")
 
 
 class ResultItem:
@@ -292,21 +293,35 @@ class ResultItem:
 			m = re.search(self._reg, data)
 			if m != None:
 				self.Value = m.group('v')
+			#print "{0} = {1}".format(self.Description, self.Value)
 
 
 class Result:
 	def __init__(self, cfg):
 		self.EncoderConfig = cfg
 		self.Items = list()
-		self.Items.append(ResultItem("Total", self.create_regex("Timer total")))
-		self.Items.append(ResultItem("DCT", self.create_regex("Timer DCT")))
-		self.Items.append(ResultItem("Quant", self.create_regex("Timer Quant")))
-		self.Items.append(ResultItem("Zig Zag", self.create_regex("Timer Zig Zag")))
-		self.Items.append(ResultItem("RLC", self.create_regex("Timer RLC")))
+		self.create_result_item_timer("Total")
+		self.create_result_item_timer("DCT")
+		self.create_result_item_timer("IDCT")
+		self.create_result_item_timer("Quant")
+		self.create_result_item_timer("IQuant")
+		self.create_result_item_timer("Zig Zag")
+		self.create_result_item_timer("RLC")
+		self.create_result_item_timer("Prediction")
+		self.create_result_item_timer("P FRAME Transform")
+		self.create_result_item_timer("P FRAME ITransform")
+		self.create_result_item_timer("Interpolation")
+		self.create_result_item_timer("Copy Last Image")
+		self.create_result_item_timer("Encode Prediction")
+		self.create_result_item_timer("Shift +128")
+		self.create_result_item_timer("Shift -128")
 		self.Dict = collections.OrderedDict()
-		self.Order = list()
+
+	def create_result_item_timer(self, name):
+		self.Items.append(ResultItem(name, self.create_regex("Timer " + name)))
 
 	def create_regex(self, text):
+		text = text.replace("+", "\+")
 		return "{0}\s*:\s*(?P<v>[0-9]+\.[0-9]+)".format(text)
 	
 	def create_dict(self):
