@@ -94,45 +94,32 @@ void CBasicEncoder::init(CImageFormat fmt)
 #endif
 	}
 	if(NULL == m_predTab) m_predTab = new CPredictionInfoTable(CSize(fmt.Size.Height/16, fmt.Size.Width/16));
-}
-
-
-bool CBasicEncoder::Encode(CSequence * pSeq, CBitstream * pBstr)
-{
-	m_timer.start();
-	init(pSeq->getFormat());
-	sos_marker_t sos = write_sos(pSeq, pBstr);
 	m_pred->setIFrameTransform(m_shift);
 	m_pred->setIFrameITransform(m_ishift);
 	m_quant->setTables(1);
 	m_iquant->setTables(1);
-	FRAME_TYPE frame_type;
-	for(uint32_t i=0;i<sos.frames_number;i++)
-	{
-		if(!pSeq->ReadNext())
-		{
-			throw utils::StringFormatException("can not read frame from file");
-		}
-		printProgressBar(i, sos.frames_number);
-		(*m_imgF) = pSeq->getFrame();
-		sof_marker_t sof;
-		frame_type = (!m_config.GOP || i%m_config.GOP == 0 || i == sos.frames_number-1)?FRAME_TYPE_I:FRAME_TYPE_P;
-		sof = write_sof(pBstr, frame_type);
-		m_pred->Transform(m_imgF, m_imgF, m_predTab, frame_type);
-		m_dct->Transform(m_imgF, m_imgF);
-		m_quant->Transform(m_imgF, m_imgF);
-		m_zz->Transform(m_imgF, m_img);
-		m_pred->Encode(m_predTab, pBstr, frame_type);
-		m_rlc->Encode(m_img, pBstr);
-		m_rlc->Flush(pBstr);
-		pBstr->flush();
-		m_iquant->Transform(m_imgF, m_imgF);
-		m_idct->Transform(m_imgF, m_imgF);
-		m_pred->ITransform(m_imgF, m_imgF, m_predTab, frame_type);
-	}
-	printProgressBar(sos.frames_number, sos.frames_number);
-	m_timer.stop();
-	log_timer("Total", m_timer);
+}
+
+void CBasicEncoder::doEncodeFrame(CImage<uint8_t> * pFrame, CBitstream * pBstr, FRAME_TYPE frame_type)
+{
+	(*m_imgF) = (*pFrame);
+	m_pred->Transform(m_imgF, m_imgF, m_predTab, frame_type);
+	m_dct->Transform(m_imgF, m_imgF);
+	m_quant->Transform(m_imgF, m_imgF);
+	m_zz->Transform(m_imgF, m_img);
+	m_pred->Encode(m_predTab, pBstr, frame_type);
+	m_rlc->Encode(m_img, pBstr);
+	m_rlc->Flush(pBstr);
+	pBstr->flush();
+	m_iquant->Transform(m_imgF, m_imgF);
+	m_idct->Transform(m_imgF, m_imgF);
+	m_pred->ITransform(m_imgF, m_imgF, m_predTab, frame_type);
+}
+
+
+void CBasicEncoder::printTimers(void)
+{
+	CEncoder::printTimers();
 	log_timer("DCT", m_dct->getTimer());
 	log_timer("IDCT", m_idct->getTimer());
 	log_timer("Quant", m_quant->getTimer());
@@ -147,7 +134,7 @@ bool CBasicEncoder::Encode(CSequence * pSeq, CBitstream * pBstr)
 	log_timer("Encode Prediction", m_pred->getTimer(CPrediction::PredictionTimer_EncodePrediction));
 	log_timer("Shift +128", m_shift->getTimer());
 	log_timer("Shift -128", m_ishift->getTimer());
-	return false;
 }
+
 
 }

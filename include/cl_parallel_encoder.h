@@ -28,8 +28,8 @@ class CCLParallelEncoder : public CCLEncoder
 public:
 	CCLParallelEncoder();
 	CCLParallelEncoder(EncoderConfig cfg);
-	virtual bool Encode(CSequence * pSeq, CBitstream * pBstr);
 protected:	
+	virtual void doEncodeFrame(CImage<uint8_t> * pFrame, CBitstream * pBstr, FRAME_TYPE frame_type);
 	virtual void init(CImageFormat fmt);
 };
 

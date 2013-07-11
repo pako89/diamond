@@ -29,9 +29,9 @@ public:
 	CCLEncoder();
 	CCLEncoder(EncoderConfig cfg);
 	virtual ~CCLEncoder();
-	virtual bool Encode(CSequence * pSeq, CBitstream * pBstr);
 protected:
 	virtual void init(CImageFormat fmt);
+	virtual void doEncodeFrame(CImage<uint8_t> * pFrame, CBitstream * pBstr, FRAME_TYPE frame_type);
 	virtual void transform(CCLImage<float> * imgF, CCLImage<int16_t> * img, CCLPredictionInfoTable * predInfo, FRAME_TYPE frame_type);
 	virtual void itransform(CCLImage<float> * imgF, CCLImage<int16_t> * img, CCLPredictionInfoTable * predInfo, FRAME_TYPE frame_type);
 	virtual void entropy(CCLImage<int16_t> * img, CCLPredictionInfoTable * predInfo, CBitstream * pBstr, FRAME_TYPE frame_type);

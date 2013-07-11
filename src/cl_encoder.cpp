@@ -60,6 +60,10 @@ void CCLEncoder::init(CImageFormat fmt)
 	{
 		throw utils::StringFormatException("Unknown Huffman type '%d'\n", m_config.HuffmanType);
 	}
+	m_pred->setIFrameTransform(m_shift);
+	m_pred->setIFrameITransform(m_ishift);
+	m_quant->setTables(1);
+	m_iquant->setTables(1);
 }
 
 void CCLEncoder::transform(CCLImage<float> * imgF, CCLImage<int16_t> * img, CCLPredictionInfoTable * predTab, FRAME_TYPE frame_type)
@@ -85,41 +89,13 @@ void CCLEncoder::entropy(CCLImage<int16_t> * img, CCLPredictionInfoTable * predI
 	pBstr->flush();
 }
 
-
-bool CCLEncoder::Encode(CSequence * pSeq, CBitstream * pBstr)
+void CCLEncoder::doEncodeFrame(CImage<uint8_t> * pFrame, CBitstream * pBstr, FRAME_TYPE frame_type)
 {
-	m_timer.start();
-	init(pSeq->getFormat());
-	sos_marker_t sos = write_sos(pSeq, pBstr);
-	m_pred->setIFrameTransform(m_shift);
-	m_pred->setIFrameITransform(m_ishift);
-	m_quant->setTables(1);
-	m_iquant->setTables(1);
-	FRAME_TYPE frame_type;
-	for(int i=0;i<sos.frames_number;i++)
-	{
-		if(!pSeq->ReadNext())
-		{
-			throw utils::StringFormatException("can not read frame from file");
-		}
-		printProgressBar(i, sos.frames_number);
-		(*static_cast<CImage<float>*>(m_imgF)) = pSeq->getFrame();
+		(*static_cast<CImage<float>*>(m_imgF)) = (*pFrame);
 		m_imgF->CopyToDevice();
-		sof_marker_t sof;
-		frame_type = (!m_config.GOP || i%m_config.GOP == 0 || i == sos.frames_number-1)?FRAME_TYPE_I:FRAME_TYPE_P;
-		sof = write_sof(pBstr, frame_type);
 		transform(m_imgF, m_img, m_predTab, frame_type);
 		entropy(m_img, m_predTab, pBstr, frame_type);
 		itransform(m_imgF, m_img, m_predTab, frame_type);
-	}
-	dbg("\n");
-	m_timer.stop();
-	dbg("Timer total         : %f\n", m_timer.getTotalSeconds());
-	dbg("Timer DCT           : %f\n", m_dct->getTimer().getTotalSeconds());
-	dbg("Timer Quant         : %f\n", m_quant->getTimer().getTotalSeconds());
-	dbg("Timer Zig Zag       : %f\n", m_zz->getTimer().getTotalSeconds());
-	dbg("Timer RLC           : %f\n", m_rlc->getTimer().getTotalSeconds());
-	return false;
 }
 
 }

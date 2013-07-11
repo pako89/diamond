@@ -58,6 +58,38 @@ sof_marker_t CEncoder::write_sof(CBitstream * pBstr, FRAME_TYPE frame_type)
 void CEncoder::init(CImageFormat fmt)
 {
 }
+
+bool CEncoder::Encode(CSequence * pSeq, CBitstream * pBstr)
+{
+	m_timer.start();
+	init(pSeq->getFormat());
+	sos_marker_t sos = write_sos(pSeq, pBstr);
+	FRAME_TYPE frame_type;
+	CImage<uint8_t> * frame = NULL;
+	for(uint32_t i=0;i<sos.frames_number;i++)
+	{
+		sof_marker_t sof;
+		frame_type = (!m_config.GOP || i%m_config.GOP == 0 || i == sos.frames_number-1)?FRAME_TYPE_I:FRAME_TYPE_P;
+		sof = write_sof(pBstr, frame_type);
+		if(!pSeq->ReadNext())
+		{
+			throw utils::StringFormatException("can not read frame from file");
+		}
+		frame = pSeq->getFrame();
+		doEncodeFrame(frame, pBstr, frame_type);
+		pBstr->flush();
+		printProgressBar(i, sos.frames_number);
+	}
+	printProgressBar(sos.frames_number, sos.frames_number);
+	m_timer.stop();
+	printTimers();
+	return true;
+}
+
+void CEncoder::printTimers(void)
+{
+	log_timer("Total", m_timer);
+}
 	
 void CEncoder::printProgressBar(int i, int n)
 {

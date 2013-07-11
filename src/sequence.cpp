@@ -237,13 +237,13 @@ void CSequence::CloseFile()
 	}
 }
 
-CImage<uint8_t> & CSequence::getFrame(void)
+CImage<uint8_t> * CSequence::getFrame(void)
 {
 	if(NULL == m_image)
 	{
 		throw utils::NullReferenceException();
 	}
-	return *m_image;
+	return m_image;
 }
 
 bool CSequence::WriteNext(void)

@@ -49,41 +49,17 @@ CCLMergedEncoder::~CCLMergedEncoder()
 	RELEASE(m_idctqzz);
 }
 
-
-bool CCLMergedEncoder::Encode(CSequence * pSeq, CBitstream * pBstr)
+void CCLMergedEncoder::doEncodeFrame(CImage<uint8_t> * pFrame, CBitstream * pBstr, FRAME_TYPE frame_type)
 {
-	m_timer.start();
-	init(pSeq->getFormat());
-	sos_marker_t sos = write_sos(pSeq, pBstr);
-	FRAME_TYPE frame_type;
-	m_dctqzz->setTables(1);
-	m_idctqzz->setTables(1);
-	for(int i=0;i<sos.frames_number;i++)
-	{
-		if(!pSeq->ReadNext())
-		{
-			throw utils::StringFormatException("can not read frame from file");
-		}
-		printProgressBar(i, sos.frames_number);
-		(*static_cast<CImage<float>*>(m_imgF)) = pSeq->getFrame();
-		m_imgF->CopyToDevice();
-		sof_marker_t sof;
-		frame_type = (!m_config.GOP || i%m_config.GOP == 0 || i == sos.frames_number-1)?FRAME_TYPE_I:FRAME_TYPE_P;
-		sof = write_sof(pBstr, frame_type);
-		m_pred->Transform(m_imgF, m_imgF, m_predTab, frame_type);
-		m_dctqzz->Transform(m_imgF, m_img);
-		m_pred->Encode(m_predTab, pBstr, frame_type);
-		m_rlc->Encode(m_img, pBstr);
-		m_rlc->Flush(pBstr);
-		pBstr->flush();
-		m_idctqzz->Transform(m_imgF, m_imgF);
-		m_pred->ITransform(m_imgF, m_imgF, m_predTab, frame_type);
-	}
-	dbg("\n");
-	m_timer.stop();
-	dbg("Timer total         : %f\n", m_timer.getTotalSeconds());
-	dbg("Timer RLC           : %f\n", m_rlc->getTimer().getTotalSeconds());
-	return false;
+	(*static_cast<CImage<float>*>(m_imgF)) = (*pFrame);
+	m_imgF->CopyToDevice();
+	m_pred->Transform(m_imgF, m_imgF, m_predTab, frame_type);
+	m_dctqzz->Transform(m_imgF, m_img);
+	m_pred->Encode(m_predTab, pBstr, frame_type);
+	m_rlc->Encode(m_img, pBstr);
+	m_rlc->Flush(pBstr);
+	m_idctqzz->Transform(m_imgF, m_imgF);
+	m_pred->ITransform(m_imgF, m_imgF, m_predTab, frame_type);
 }
 
 void CCLMergedEncoder::init(CImageFormat fmt)
@@ -116,6 +92,8 @@ void CCLMergedEncoder::init(CImageFormat fmt)
 	{
 		throw utils::StringFormatException("Unknown Huffman type '%d'\n", m_config.HuffmanType);
 	}
+	m_dctqzz->setTables(1);
+	m_idctqzz->setTables(1);
 }
 
 }

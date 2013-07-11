@@ -22,9 +22,10 @@ public:
 	CBasicEncoder();
 	CBasicEncoder(EncoderConfig cfg);
 	virtual ~CBasicEncoder();
-	virtual bool Encode(CSequence * pSeq, CBitstream * pBstr);
 protected:
+	virtual void doEncodeFrame(CImage<uint8_t> * pFrame, CBitstream * pBstr, FRAME_TYPE frame_type);
 	virtual void init(CImageFormat fmt);
+	virtual void printTimers(void);
 	CImage<float> * m_imgF;
 	CImage<float> * m_imgLast;
 	CImage<int16_t> * m_img;

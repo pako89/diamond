@@ -19,8 +19,8 @@ public:
 	CCLMergedEncoder();
 	CCLMergedEncoder(EncoderConfig cfg);
 	virtual ~CCLMergedEncoder();
-	virtual bool Encode(CSequence * pSeq, CBitstream * pBstr);
 protected:	
+	virtual void doEncodeFrame(CImage<uint8_t> * pFrame, CBitstream * pBstr, FRAME_TYPE frame_type);
 	virtual void init(CImageFormat fmt);
 	CCLDevicePolicy * m_clPolicy;
 	CCLPrediction * m_pred;

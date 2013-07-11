@@ -79,7 +79,7 @@ bool CBasicDecoder::Decode(CBitstream * pBstr, CSequence * pSeq)
 		iquant->Transform(imgF, imgF);
 		idct->Transform(imgF, imgF);
 		pred->ITransform(imgF, imgF, predTab, (FRAME_TYPE)sof.frame_type);
-		pSeq->getFrame() = *imgF;
+		(*pSeq->getFrame()) = *imgF;
 		if(!pSeq->WriteNext())
 		{
 			throw utils::StringFormatException("can not write frame to file");

@@ -28,8 +28,10 @@ public:
 	CEncoder();
 	CEncoder(EncoderConfig cfg);
 	virtual ~CEncoder();
-	virtual bool Encode(CSequence * pSeq, CBitstream * pBstr)=0;
+	virtual bool Encode(CSequence * pSeq, CBitstream * pBstr);
 protected:
+	virtual void doEncodeFrame(CImage<uint8_t> * pFrame, CBitstream * pBstr, FRAME_TYPE frame_type) = 0;
+	virtual void printTimers(void);
 	virtual void printProgressBar(int i, int n);
 	virtual void init(CImageFormat fmt);
 	virtual sos_marker_t write_sos(CSequence * pSeq, CBitstream * pBtr);
