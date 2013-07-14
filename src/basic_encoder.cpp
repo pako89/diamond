@@ -87,11 +87,7 @@ void CBasicEncoder::init(CImageFormat fmt)
 	if(NULL == m_pred)
 	{
 		m_pred = new CPrediction();
-#if USE(INTERPOLATION)
 		m_pred->Init(fmt, m_config.InterpolationScale);
-#else
-		m_pred->Init(fmt);
-#endif
 	}
 	if(NULL == m_predTab) m_predTab = new CPredictionInfoTable(CSize(fmt.Size.Height/16, fmt.Size.Width/16));
 	m_pred->setIFrameTransform(m_shift);

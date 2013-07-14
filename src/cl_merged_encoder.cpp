@@ -59,17 +59,10 @@ void CCLMergedEncoder::init(CImageFormat fmt)
 	this->m_shift = new CCLShift<float>(-128.0f, &this->m_dev, this->m_program, "shift");
 	this->m_ishift = new CCLShift<float>(128.0f, &this->m_dev, this->m_program, "shift");
 	this->m_pred = new CCLPrediction(&this->m_dev);
-#if USE(INTERPOLATION)
 	this->m_pred->Init(fmt, m_config.InterpolationScale, this->m_program, "interpolation_float");
 	this->m_pred->setTransformKernel(this->m_program, "prediction_transform_interpolation");
 	this->m_pred->setITransformKernel(this->m_program, "prediction_itransform_interpolation");
 	this->m_pred->setPredictionKernel(this->m_program, "prediction_predict_interpolation");
-#else
-	this->m_pred->Init(fmt);
-	this->m_pred->setTransformKernel(this->m_program, "prediction_transform");
-	this->m_pred->setITransformKernel(this->m_program, "prediction_itransform");
-	this->m_pred->setPredictionKernel(this->m_program, "prediction_predict");
-#endif
 	this->m_pred->setIFrameTransform(m_shift);
 	this->m_pred->setIFrameITransform(m_ishift);
 	this->m_predTab = new CCLPredictionInfoTable(&this->m_dev, CSize(fmt.Size.Height/16, fmt.Size.Width/16));

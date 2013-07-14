@@ -14,9 +14,7 @@ CPrediction::CPrediction() :
 	m_last(NULL),
 	m_IFT(NULL),
 	m_IFIT(NULL),
-#if USE(INTERPOLATION)
 	m_interpol(NULL),
-#endif	
 	m_max(DEFAULT_MAX_PREDICTION)
 {
 	m_huff = new CDynamicHuffman<int>();
@@ -26,19 +24,11 @@ CPrediction::~CPrediction()
 {
 	RELEASE(m_last);
 	RELEASE(m_huff);
-#if USE(INTERPOLATION)
 	RELEASE(m_interpol);
-#endif	
 }
 
-void CPrediction::Init(
-		CImageFormat format
-#if USE(INTERPOLATION)
-		, int scale
-#endif		
-		)
+void CPrediction::Init(CImageFormat format, int scale)
 {
-#if USE(INTERPOLATION)
 	if(NULL == m_interpol)
 	{
 		m_interpol = new CInterpolation<float>();
@@ -51,9 +41,6 @@ void CPrediction::Init(
 		newFormat.Size.Height *= m_interpol->getScale();
 		m_last = new CImage<float>(newFormat);
 	}
-#else
-	if(NULL == m_last) m_last = new CImage<float>(format);
-#endif
 }
 
 utils::CTimer CPrediction::getTimer(PredictionTimer timer)
@@ -68,10 +55,8 @@ utils::CTimer CPrediction::getTimer(PredictionTimer timer)
 		return m_timerPrediction;
 	case PredictionTimer_EncodePrediction:
 		return m_timerEncodePrediction;
-#if USE(INTERPOLATION)
 	case PredictionTimer_Interpolation:
 		return m_timerInterpolation;
-#endif
 	case PredictionTimer_CopyLast:
 		return m_timerCopyLast;
 	default:
@@ -79,12 +64,10 @@ utils::CTimer CPrediction::getTimer(PredictionTimer timer)
 	}
 }
 
-#if USE(INTERPOLATION)
 int CPrediction::getInterpolationScale()
 {
 	return m_interpol->getScale();
 }
-#endif
 
 void CPrediction::doPredict(CComponent<float> * pSrc, CPredictionInfoTable * pPred)
 {
@@ -104,11 +87,7 @@ prediction_info_t CPrediction::predict(float * pSrc, CPoint p, CSize srcSize)
 	info.dy = 0;
 	info.dx = 0;
 	CSize s = (*m_last)[p.Z].getSize();
-#if USE(INTERPOLATION)
 	int scale = getInterpolationScale();
-#else
-	int scale = 1;		
-#endif
 	p.Y *= scale;
 	p.X *= scale;
 	if(m_max)
@@ -220,7 +199,6 @@ void CPrediction::ITransform(CImage<float> * pSrc, CImage<float> * pDst, CPredic
 		throw utils::StringFormatException("Unknown FRAME_TYPE");
 	}
 	m_timerITransform.stop();
-#if USE(INTERPOLATION)
 	if(getInterpolationScale() > 1)
 	{
 		m_timerInterpolation.start();
@@ -233,11 +211,6 @@ void CPrediction::ITransform(CImage<float> * pSrc, CImage<float> * pDst, CPredic
 		*m_last = *pDst;
 		m_timerCopyLast.stop();
 	}
-#else
-	m_timerCopyLast.start();
-	*m_last = *pDst;
-	m_timerCopyLast.stop();
-#endif
 }
 
 void CPrediction::doTransformPFrame(CImage<float> * pSrc, CImage<float> * pDst, CPredictionInfoTable * pPred)
@@ -276,11 +249,7 @@ void CPrediction::doITransformPFrame(CImage<float> * pSrc, CImage<float> * pDst,
 
 void CPrediction::TransformBlock(float * pSrc, float * pDst, CPoint p, CSize s, prediction_info_t predInfo, int cscale)
 {
-#if USE(INTERPOLATION)
 	int iscale = getInterpolationScale();
-#else
-	int iscale = 1;
-#endif
 	for(int y=0;y<8;y++)
 	{
 		for(int x=0;x<8;x++)
@@ -294,11 +263,7 @@ void CPrediction::TransformBlock(float * pSrc, float * pDst, CPoint p, CSize s, 
 
 void CPrediction::ITransformBlock(float * pSrc, float * pDst, CPoint p, CSize s, prediction_info_t predInfo, int cscale)
 {
-#if USE(INTERPOLATION)
 	int iscale = getInterpolationScale();
-#else
-	int iscale = 1;
-#endif
 	for(int y=0;y<8;y++)
 	{
 		for(int x=0;x<8;x++)

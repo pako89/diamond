@@ -30,9 +30,7 @@ bool CBasicDecoder::Decode(CBitstream * pBstr, CSequence * pSeq)
 	log_prop("Frame rate", "%d:%d", sos.frame_rate.nom, sos.frame_rate.denom);
 	log_prop("Numer of frames", "%d", sos.frames_number);
 	log_prop("Quant coeff", "%d", sos.quant_coeff);
-#if USE(INTERPOLATION_SCALE)
 	log_prop("Interpolation scale", "%d",sos.interpolation_scale);
-#endif	
 	pSeq->setFormat(IMAGE_TYPE_YUV420, sos.height, sos.width);
 	pSeq->setFrameRate(CFrameRate(sos.frame_rate.nom, sos.frame_rate.denom));
 	pSeq->setYUV4MPEG(true);
@@ -60,11 +58,7 @@ bool CBasicDecoder::Decode(CBitstream * pBstr, CSequence * pSeq)
 	}
 	CShift<float> * shift = new CShift<float>(128.0f);
 	CPrediction * pred = new CPrediction();
-#if USE(INTERPOLATION)
 	pred->Init(pSeq->getFormat(), sos.interpolation_scale);
-#else
-	pred->Init(pSeq->getFormat());
-#endif
 	pred->setIFrameITransform(shift);
 	sof_marker_t sof;
 	for(uint32_t n = 0 ; n < sos.frames_number; n++)

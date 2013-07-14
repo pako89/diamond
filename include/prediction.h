@@ -18,10 +18,6 @@
 #define DEFAULT_PREDICTION_METHOD	PREDICTION_METHOD_MSE
 #endif
 
-#ifndef PREDICTION_USE_INTERPOLATION
-#define PREDICTION_USE_INTERPOLATION
-#endif
-
 namespace avlib
 {
 
@@ -51,11 +47,7 @@ public:
 	virtual void Encode(CPredictionInfoTable * pPred, CBitstream * pBstr, FRAME_TYPE frame_type);
 	virtual void Decode(CPredictionInfoTable * pPred, CBitstream * pBstr, FRAME_TYPE frame_type);
 	virtual utils::CTimer getTimer(PredictionTimer timer);
-#if USE(INTERPOLATION)
 	virtual void Init(CImageFormat format, int scale);
-#else
-	virtual void Init(CImageFormat format);
-#endif
 protected:
 	virtual void doTransformPFrame(CImage<float> * pSrc, CImage<float> * pDst, CPredictionInfoTable * pPred);
 	virtual void doITransformPFrame(CImage<float> * pSrc, CImage<float> * pDst, CPredictionInfoTable * pPred);
@@ -65,10 +57,8 @@ protected:
 	virtual prediction_info_t predict(float * pSrc, CPoint p, CSize s);
 	float diff_abs(float * src, CSize srcSize, float * ref, CSize refSize);
 	float diff_mse(float * src, CSize srcSize, float * ref, CSize refSize);
-#if USE(INTERPOLATION)
 	virtual int getInterpolationScale();
 	CInterpolation<float> * m_interpol;
-#endif
 	CImage<float> * m_last;
 	CTransform<float, float> * m_IFT;
 	CTransform<float, float> * m_IFIT;
@@ -78,9 +68,7 @@ protected:
 	utils::CTimer m_timerITransform;
 	utils::CTimer m_timerPrediction;
 	utils::CTimer m_timerEncodePrediction;
-#if USE(INTERPOLATION)	
 	utils::CTimer m_timerInterpolation;
-#endif
 	utils::CTimer m_timerCopyLast;
 };
 

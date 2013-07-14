@@ -23,11 +23,7 @@ public:
 	virtual void setITransformKernel(cl_program program, const char * kernel);
 	virtual void setPredictionKernel(cl_program program, const char * kernel);
 	virtual CCLImage<float> * getLastImage();
-#if USE(INTERPOLATION)
 	virtual void Init(CImageFormat format, int scale, cl_program program, const char * interpolation_kernel);
-#else
-	virtual void Init(CImageFormat format);
-#endif
 protected:
 	virtual void doTransformPFrame(CImage<float> * pSrc, CImage<float> * pDst, CPredictionInfoTable * pPred);
 	virtual void doITransformPFrame(CImage<float> * pSrc, CImage<float> * pDst, CPredictionInfoTable * pPred);

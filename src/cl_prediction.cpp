@@ -19,16 +19,8 @@ CCLPrediction::~CCLPrediction()
 	RELEASE(m_kernelPrediction);
 }
 
-void CCLPrediction::Init(
-		CImageFormat format
-#if USE(INTERPOLATION)
-		, int scale
-		, cl_program program
-		, const char * interpolation_kernel
-#endif		
-		)
+void CCLPrediction::Init(CImageFormat format, int scale, cl_program program, const char * interpolation_kernel)
 {
-#if USE(INTERPOLATION)
 	if(NULL == m_interpol)
 	{
 		m_interpol = new CCLInterpolation<float>(m_dev, program, interpolation_kernel);
@@ -42,10 +34,6 @@ void CCLPrediction::Init(
 		m_last = new CCLImage<float>(m_dev, newFormat);
 	}
 	CPrediction::Init(format, scale);
-#else
-	if(NULL == m_last) m_last = new CCLImage<float>(m_dev, format);
-	CPrediction::Init(format);
-#endif
 }
 
 void CCLPrediction::setTransformKernel(cl_program program, const char * kernel)
@@ -139,13 +127,10 @@ void CCLPrediction::clTransform(ICLKernel * kernel, CImage<float> * pSrc, CImage
 		kernel->SetArg(4, sizeof(width), &width);
 		kernel->SetArg(5, sizeof(predWidth), &predWidth);
 		kernel->SetArg(6, sizeof(blockScale), &blockScale);
-#if USE(INTERPOLATION)
 		int lastWidth = (*clLast)[k].getWidth();
 		kernel->SetArg(7, sizeof(lastWidth), &lastWidth);
 		int interpolScale = m_interpol->getScale();
 		kernel->SetArg(8, sizeof(interpolScale), &interpolScale);
-#endif		
-
 		kernel->EnqueueNDRangeKernel(2, global_work_size, NULL, 0, NULL, NULL);
 #ifdef CL_KERNEL_FINISH
 		kernel->Finish();
@@ -172,14 +157,12 @@ void CCLPrediction::clPredict(CCLComponent<float> * pSrc, CCLComponent<float> * 
 	m_kernelPrediction->SetArg(5, sizeof(predHeight), &predHeight);
 	m_kernelPrediction->SetArg(6, sizeof(predWidth), &predWidth);
 	m_kernelPrediction->SetArg(7, sizeof(m_max), &m_max);
-#if USE(INTERPOLATION)
 	int lastWidth = pLast->getWidth();
 	int lastHeight = pLast->getHeight();
 	int scale = getInterpolationScale();
 	m_kernelPrediction->SetArg(8, sizeof(lastHeight), &lastHeight);
 	m_kernelPrediction->SetArg(9, sizeof(lastWidth), &lastWidth);
 	m_kernelPrediction->SetArg(10, sizeof(scale), &scale);
-#endif
 	m_kernelPrediction->EnqueueNDRangeKernel(2, global_work_size, NULL, 0, NULL, NULL);
 #ifdef CL_KERNEL_FINISH
 	m_kernelPrediction->Finish();

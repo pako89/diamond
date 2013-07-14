@@ -47,9 +47,7 @@ MARKER_DEF(sos)
 		uint32_t nom;
 		uint32_t denom;
 	} frame_rate;
-#if USE(INTERPOLATION)
 	uint8_t interpolation_scale;
-#endif
 MARKER_END(sos)
 
 MARKER_DEF(sof)

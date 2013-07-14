@@ -46,9 +46,7 @@ int main(int argc,char * argv[])
 			log_prop("Huffman", "%s", huffstr);
 			log_prop("GOP", "%d", config.EncoderConfig.GOP);
 			log_prop("Quant coef", "%d", config.EncoderConfig.Q);
-#if USE(INTERPOLATION)
 			log_prop("Interpolation scale", "%d", config.EncoderConfig.InterpolationScale);
-#endif			
 			log_prop("Width", "%d", seq->getFormat().Size.Width);
 			log_prop("Height", "%d", seq->getFormat().Size.Height);
 			log_prop("Frame rate", "%d:%d", seq->getFrameRate().Nom, seq->getFrameRate().Denom);

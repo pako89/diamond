@@ -166,9 +166,7 @@ const struct option CDiamondApp::common_options[] = {
 	{"huffman",		required_argument, 	NULL, 	'e'},
 	{"gop",			required_argument,	NULL, 	'g'},
 	{"quant",		required_argument,	NULL, 	'q'},
-#if USE(INTERPOLATION)	
 	{"interpolation",	optional_argument,	NULL,	'I'},
-#endif
 	{"progress-bar",	required_argument, 	NULL, 	'p'},
 	{"print-timers",	required_argument,	NULL, 	'T'},
 	{"verbose",		no_argument,		NULL,	'v'},
@@ -327,7 +325,6 @@ void CDiamondApp::ParseArgs(int argc, char * argv[])
 				}
 			}
 			break;
-#if USE(INTERPOLATION)
 		case 'I':
 			{
 				if(optarg)
@@ -340,7 +337,6 @@ void CDiamondApp::ParseArgs(int argc, char * argv[])
 				}
 			}
 			break;
-#endif			
 		case 'p':
 			m_config.EncoderConfig.PrintProgressBar = parseBool(optarg);
 			break;

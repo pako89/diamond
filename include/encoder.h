@@ -37,9 +37,7 @@ struct EncoderConfig
 	EncoderConfig() :
 		HuffmanType(DEFAULT_HUFFMAN_TYPE),
 		GOP(DEFAULT_GOP),
-#if USE(INTERPOLATION)
 		InterpolationScale(DEFAULT_INTERPOLATION_SCALE),
-#endif
 		PrintProgressBar(DEFAULT_PROGRESS_BAR),
 		PrintTimers(DEFAULT_PRINT_TIMERS),
 		Q(DEFAULT_Q)
@@ -48,9 +46,7 @@ struct EncoderConfig
 	HUFFMAN_TYPE HuffmanType;
 	int GOP;
 	int Q;
-#if USE(INTERPOLATION)
 	int InterpolationScale;
-#endif
 	bool PrintProgressBar;
 	bool PrintTimers;
 };
