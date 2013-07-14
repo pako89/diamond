@@ -78,11 +78,14 @@ bool CEncoder::Encode(CSequence * pSeq, CBitstream * pBstr)
 		frame = pSeq->getFrame();
 		doEncodeFrame(frame, pBstr, frame_type);
 		pBstr->flush();
-		printProgressBar(i, sos.frames_number);
+		if(m_config.PrintProgressBar) printProgressBar(i, sos.frames_number);
 	}
-	printProgressBar(sos.frames_number, sos.frames_number);
+	if(m_config.PrintProgressBar) printProgressBar(sos.frames_number, sos.frames_number);
 	m_timer.stop();
-	printTimers();
+	if(m_config.PrintTimers)
+	{
+		printTimers();
+	}
 	return true;
 }
 
@@ -93,10 +96,7 @@ void CEncoder::printTimers(void)
 	
 void CEncoder::printProgressBar(int i, int n)
 {
-	if(m_config.PrintProgressBar)
-	{
-		utils::printProgressBar(i, n);
-	}
+	utils::printProgressBar(i, n);
 }
 
 }

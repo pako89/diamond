@@ -31,6 +31,7 @@ public:
 	virtual ~CCLEncoder();
 protected:
 	virtual void init(CImageFormat fmt);
+	virtual void printTimers(void);
 	virtual void doEncodeFrame(CImage<uint8_t> * pFrame, CBitstream * pBstr, FRAME_TYPE frame_type);
 	virtual void transform(CCLImage<float> * imgF, CCLImage<int16_t> * img, CCLPredictionInfoTable * predInfo, FRAME_TYPE frame_type);
 	virtual void itransform(CCLImage<float> * imgF, CCLImage<int16_t> * img, CCLPredictionInfoTable * predInfo, FRAME_TYPE frame_type);
@@ -48,8 +49,6 @@ protected:
 	CRLC<int16_t> * m_rlc;
 	CCLImage<float> * m_imgF;
 	CCLImage<int16_t> * m_img;
-	utils::CTimer m_timerCopyToDevice;
-	utils::CTimer m_timerCopyToHost;
 };
 
 }

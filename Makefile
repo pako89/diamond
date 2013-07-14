@@ -13,14 +13,14 @@ CFLAGS += -Isrc/cl
 cflags += $(INCDIR) 
 CFLAGS += -DDEBUG
 CFLAGS += -DCHECK_HUFFMAN
-#CFLAGS += -DDUMP_BITSTREAM
-#CFLAGS += -Os
 CFLAGS += -DDEFAULT_MAX_PREDICTION=2
 CFLAGS += -DDEFAULT_CL_SRC_FILE="\"src/cl/kernel.cl\""
 CFLAGS += -DDEFAULT_PREDICTION_METHOD=PREDICTION_METHOD_MSE
 CFLAGS += -DUSE_INTERPOLATION
 CFLAGS += -DDEFAULT_INTERPOLATION_SCALE=2
 CFLAGS += -DDEFAULT_PROGRESS_BAR=true
+CFLAGS += -DDEFAULT_PRINT_TIMERS=false
+CFLAGS += -DDEFAULT_VERBOSE=0
 CFLAGS += -DIMAGE_CHECK_INDEX
 CFLAGS += -DCOMPONENT_CHECK_INDEX
 CFLAGS += -DVERSION="\""$(shell git describe)"\""
@@ -82,6 +82,7 @@ SRC += src/cl_prediction.cpp
 SRC += src/cl_host.cpp
 SRC += src/cl_dctqzz.cpp
 SRC += src/cl_interpolation.cpp
+SRC += src/cl_timers.cpp
 
 # Objects
 OBJ	= $(SRC:.cpp=.o)

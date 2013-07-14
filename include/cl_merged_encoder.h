@@ -20,6 +20,7 @@ public:
 	CCLMergedEncoder(EncoderConfig cfg);
 	virtual ~CCLMergedEncoder();
 protected:	
+	virtual void printTimers(void);
 	virtual void doEncodeFrame(CImage<uint8_t> * pFrame, CBitstream * pBstr, FRAME_TYPE frame_type);
 	virtual void init(CImageFormat fmt);
 	CCLDevicePolicy * m_clPolicy;
@@ -31,7 +32,7 @@ protected:
 	CCLShift<float> * m_shift;
 	CCLShift<float> * m_ishift;
 	CCLDCTQZZ * m_dctqzz;
-	CCLIDCTQ * m_idctqzz;
+	CCLIDCTQ * m_idctq;
 };
 
 }

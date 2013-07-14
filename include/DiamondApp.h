@@ -21,6 +21,10 @@
 #define DEFAULT_PROGRESS_BAR 	true
 #endif
 
+#ifndef DEFAULT_PRINT_TIMERS
+#define DEFAULT_PRINT_TIMERS	false
+#endif
+
 #ifndef DEFAULT_INTERPOLATION_SCALE
 #define DEFAULT_INTERPOLATION_SCALE	2
 #endif
@@ -80,6 +84,7 @@ struct DiamondConfig
 		EncoderConfig.InterpolationScale = DEFAULT_INTERPOLATION_SCALE;
 #endif
 		EncoderConfig.PrintProgressBar = DEFAULT_PROGRESS_BAR;
+		EncoderConfig.PrintTimers = DEFAULT_PRINT_TIMERS;
 	}
 	DiamondOperation Op;
 	const char * InputFileName;
@@ -122,6 +127,7 @@ protected:
 	DiamondOperation parseOperation(const char * op);
 	avlib::HUFFMAN_TYPE parseHuffman(const char * op);
 	avlib::ImageType parseImageType(const char * arg);
+	bool parseBool(std::string arg);
 	std::string getShortOpts(const struct option long_options[], int size);
 
 	DiamondConfig m_config;

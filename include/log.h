@@ -7,6 +7,10 @@
 #define EC	"\033[0m"
 #define YELLOW	"\033[1;93m"
 
+#ifndef DEFAULT_VERBOSE
+#define DEFAULT_VERBOSE 	1
+#endif	
+
 extern int logv;
 
 #ifdef DUMP_BITSTREAM
@@ -18,10 +22,10 @@ extern FILE * fh_r;
 #define _LOG(...)		fprintf(_FILE, __VA_ARGS__)
 
 #define inc_logv()		(logv++)
-#define logv(...)		if(logv>0) _LOG(__VA_ARGS__)
-#define log_prop(n, f, ...)	logv("%-30s : " f "\n", n, __VA_ARGS__)
-#define log_timer(n, t)		log_prop("Timer " n, "%.2f", (t).getTotalSeconds())
-//logv("Timer %-14s : %f\n", (name), (timer).getTotalSeconds())
+#define logv(v, ...)		if(logv>=(v)) _LOG(__VA_ARGS__)
+#define log_fmtv(v, n, f, ...)	logv((v), "%-30s : " f "\n", n, __VA_ARGS__)
+#define log_prop(n, f, ...)	log_fmtv(2, n, f, __VA_ARGS__)
+#define log_timer(n, t)		log_fmtv(1, "Timer " n, "%.2f", (t).getTotalSeconds())
 #ifdef DEBUG
 
 #define dbg(...)		_LOG(__VA_ARGS__)

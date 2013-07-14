@@ -27,19 +27,12 @@ int main(int argc,char * argv[])
 	fl=u8;
 	diamond::CDiamondApp * app = diamond::CDiamondApp::getInstance();
 	app->setName(argv[0]);
-	inc_logv();
 	try
 	{
 		app->ParseArgs(argc, argv);
 		diamond::DiamondConfig config = app->getConfig();
 		log_prop("Input file", "%s", config.InputFileName);
 		log_prop("Output file", "%s", config.OutputFileName);
-		/*dbg("Input file : %s\n", config.InputFileName);
-		dbg("Output file: %s\n", config.OutputFileName);
-		dbg("Image type : %s\n", config.ImageTypeStr);
-		dbg("Height     : %d\n", config.ImageSize.Height);
-		dbg("Width      : %d\n", config.ImageSize.Width);
-		dbg("Variant    : %s\n", diamond::EncoderVariant2Str(config.Variant));*/
 		if(diamond::DIAMOND_OP_ENCODE == config.Op)
 		{
 			const char * huffstr = config.EncoderConfig.HuffmanType==avlib::HUFFMAN_TYPE_DYNAMIC?"dynamic":"static";

@@ -315,6 +315,10 @@ class Result:
 		self.create_result_item_timer("Encode Prediction")
 		self.create_result_item_timer("Shift +128")
 		self.create_result_item_timer("Shift -128")
+		self.create_result_item_timer("Copy to host")
+		self.create_result_item_timer("Copy to device")
+		self.create_result_item_timer("Copy buffer")
+		self.create_result_item_timer("Kernel finish")
 		self.Dict = collections.OrderedDict()
 
 	def create_result_item_timer(self, name):

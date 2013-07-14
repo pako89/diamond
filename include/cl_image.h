@@ -8,6 +8,7 @@
 #include <cl_component.h>
 #include <cl_image.h>
 #include <cl_dct.h>
+#include <mtimer.h>
 
 namespace avlib
 {

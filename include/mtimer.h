@@ -35,7 +35,7 @@ class ITimer
 public:
 	ITimer();
 	virtual ~ITimer();
-	CTimer & getTimer();
+	virtual CTimer & getTimer();
 protected:
 	CTimer m_timer;
 };

@@ -169,6 +169,8 @@ const struct option CDiamondApp::common_options[] = {
 	{"interpolation",	optional_argument,	NULL,	'I'},
 #endif
 	{"progress-bar",	required_argument, 	NULL, 	'p'},
+	{"print-timers",	required_argument,	NULL, 	'T'},
+	{"verbose",		no_argument,		NULL,	'v'},
 	{"version",		no_argument,		NULL,	'X'}
 };
 
@@ -206,6 +208,23 @@ std::string CDiamondApp::getShortOpts(const struct option long_options[], int si
 		}
 	}
 	return shortOpts;
+}
+	
+bool CDiamondApp::parseBool(std::string arg)
+{
+	std::transform(arg.begin(), arg.end(), arg.begin(), ::tolower);
+	if(arg == "no" || arg == "false")
+	{
+		return false;
+	}
+	else if (arg == "yes" || arg == "true")
+	{
+		return true;
+	}
+	else
+	{
+		throw utils::StringFormatException("invalid value '%s'", optarg);
+	}
 }
 
 void CDiamondApp::ParseArgs(int argc, char * argv[])
@@ -294,24 +313,6 @@ void CDiamondApp::ParseArgs(int argc, char * argv[])
 				}
 			}
 			break;
-		case 'p':
-			{
-				std::string pb = optarg;
-				std::transform(pb.begin(), pb.end(), pb.begin(), ::tolower);
-				if(pb == "no")
-				{
-					m_config.EncoderConfig.PrintProgressBar = false;
-				}
-				else if (pb == "yes")
-				{
-					m_config.EncoderConfig.PrintProgressBar = true;
-				}
-				else
-				{
-					throw utils::StringFormatException("invalid value '%s'", optarg);
-				}
-			}
-			break;
 #if USE(INTERPOLATION)
 		case 'I':
 			{
@@ -326,6 +327,15 @@ void CDiamondApp::ParseArgs(int argc, char * argv[])
 			}
 			break;
 #endif			
+		case 'p':
+			m_config.EncoderConfig.PrintProgressBar = parseBool(optarg);
+			break;
+		case 'T':
+			m_config.EncoderConfig.PrintTimers = parseBool(optarg);
+			break;
+		case 'v':
+			inc_logv();
+			break;
 		case '?':
 			break;
 		default:

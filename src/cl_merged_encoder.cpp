@@ -2,6 +2,7 @@
 #include <utils.h>
 #include <cl_zigzag.h>
 #include <cl_quantizer.h>
+#include <cl_timers.h>
 #include <rlc_factory.h>
 
 namespace avlib
@@ -17,7 +18,7 @@ CCLMergedEncoder::CCLMergedEncoder() :
 	m_shift(NULL),
 	m_ishift(NULL),
 	m_dctqzz(NULL),
-	m_idctqzz(NULL)
+	m_idctq(NULL)
 {
 }
 
@@ -32,7 +33,7 @@ CCLMergedEncoder::CCLMergedEncoder(EncoderConfig cfg) :
 	m_shift(NULL),
 	m_ishift(NULL),
 	m_dctqzz(NULL),
-	m_idctqzz(NULL)
+	m_idctq(NULL)
 {
 }
 
@@ -46,20 +47,7 @@ CCLMergedEncoder::~CCLMergedEncoder()
 	RELEASE(m_shift);
 	RELEASE(m_ishift);
 	RELEASE(m_dctqzz);
-	RELEASE(m_idctqzz);
-}
-
-void CCLMergedEncoder::doEncodeFrame(CImage<uint8_t> * pFrame, CBitstream * pBstr, FRAME_TYPE frame_type)
-{
-	(*static_cast<CImage<float>*>(m_imgF)) = (*pFrame);
-	m_imgF->CopyToDevice();
-	m_pred->Transform(m_imgF, m_imgF, m_predTab, frame_type);
-	m_dctqzz->Transform(m_imgF, m_img);
-	m_pred->Encode(m_predTab, pBstr, frame_type);
-	m_rlc->Encode(m_img, pBstr);
-	m_rlc->Flush(pBstr);
-	m_idctqzz->Transform(m_imgF, m_imgF);
-	m_pred->ITransform(m_imgF, m_imgF, m_predTab, frame_type);
+	RELEASE(m_idctq);
 }
 
 void CCLMergedEncoder::init(CImageFormat fmt)
@@ -86,14 +74,44 @@ void CCLMergedEncoder::init(CImageFormat fmt)
 	this->m_pred->setIFrameITransform(m_ishift);
 	this->m_predTab = new CCLPredictionInfoTable(&this->m_dev, CSize(fmt.Size.Height/16, fmt.Size.Width/16));
 	this->m_dctqzz = new CCLDCTQZZ(&this->m_dev, this->m_program, "dctqzz_transform");
-	this->m_idctqzz = new CCLIDCTQ(&this->m_dev, this->m_program, "idctq_transform");
+	this->m_idctq = new CCLIDCTQ(&this->m_dev, this->m_program, "idctq_transform");
 	this->m_rlc = CRLCFactory<int16_t>::CreateRLC(m_config.HuffmanType);
 	if(NULL == this->m_rlc)
 	{
 		throw utils::StringFormatException("Unknown Huffman type '%d'\n", m_config.HuffmanType);
 	}
 	m_dctqzz->setTables(1);
-	m_idctqzz->setTables(1);
+	m_idctq->setTables(1);
+}
+
+void CCLMergedEncoder::doEncodeFrame(CImage<uint8_t> * pFrame, CBitstream * pBstr, FRAME_TYPE frame_type)
+{
+	(*static_cast<CImage<float>*>(m_imgF)) = (*pFrame);
+	m_imgF->CopyToDevice();
+	m_pred->Transform(m_imgF, m_imgF, m_predTab, frame_type);
+	m_dctqzz->Transform(m_imgF, m_img);
+	m_pred->Encode(m_predTab, pBstr, frame_type);
+	m_rlc->Encode(m_img, pBstr);
+	m_rlc->Flush(pBstr);
+	m_idctq->Transform(m_imgF, m_imgF);
+	m_pred->ITransform(m_imgF, m_imgF, m_predTab, frame_type);
+}
+
+void CCLMergedEncoder::printTimers(void)
+{
+	CEncoder::printTimers();
+	log_timer("DCTQZZ", m_dctqzz->getTimer());
+	log_timer("IDCTQ", m_idctq->getTimer());
+	log_timer("RLC", m_rlc->getTimer());
+	log_timer("Prediction", m_pred->getTimer(CPrediction::PredictionTimer_Prediction));
+	log_timer("P FRAME Transform", m_pred->getTimer(CPrediction::PredictionTimer_Transform));
+	log_timer("P FRAME ITransform", m_pred->getTimer(CPrediction::PredictionTimer_ITransform));
+	log_timer("Interpolation", m_pred->getTimer(CPrediction::PredictionTimer_Interpolation));
+	log_timer("Copy Last Image", m_pred->getTimer(CPrediction::PredictionTimer_CopyLast));
+	log_timer("Encode Prediction", m_pred->getTimer(CPrediction::PredictionTimer_EncodePrediction));
+	log_timer("Shift +128", m_shift->getTimer());
+	log_timer("Shift -128", m_ishift->getTimer());
+	CCLTimers::Print();
 }
 
 }

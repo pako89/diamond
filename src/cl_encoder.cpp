@@ -1,5 +1,6 @@
 #include <cl_encoder.h>
 #include <shift.h>
+#include <cl_timers.h>
 
 namespace avlib
 {
@@ -91,11 +92,31 @@ void CCLEncoder::entropy(CCLImage<int16_t> * img, CCLPredictionInfoTable * predI
 
 void CCLEncoder::doEncodeFrame(CImage<uint8_t> * pFrame, CBitstream * pBstr, FRAME_TYPE frame_type)
 {
-		(*static_cast<CImage<float>*>(m_imgF)) = (*pFrame);
-		m_imgF->CopyToDevice();
-		transform(m_imgF, m_img, m_predTab, frame_type);
-		entropy(m_img, m_predTab, pBstr, frame_type);
-		itransform(m_imgF, m_img, m_predTab, frame_type);
+	(*static_cast<CImage<float>*>(m_imgF)) = (*pFrame);
+	m_imgF->CopyToDevice();
+	transform(m_imgF, m_img, m_predTab, frame_type);
+	entropy(m_img, m_predTab, pBstr, frame_type);
+	itransform(m_imgF, m_img, m_predTab, frame_type);
+}
+
+void CCLEncoder::printTimers(void)
+{
+	CEncoder::printTimers();
+	log_timer("DCT", m_dct->getTimer());
+	log_timer("IDCT", m_idct->getTimer());
+	log_timer("Quant", m_quant->getTimer());
+	log_timer("Inverse Quant", m_iquant->getTimer());
+	log_timer("Zig Zag", m_zz->getTimer());
+	log_timer("RLC", m_rlc->getTimer());
+	log_timer("Prediction", m_pred->getTimer(CPrediction::PredictionTimer_Prediction));
+	log_timer("P FRAME Transform", m_pred->getTimer(CPrediction::PredictionTimer_Transform));
+	log_timer("P FRAME ITransform", m_pred->getTimer(CPrediction::PredictionTimer_ITransform));
+	log_timer("Interpolation", m_pred->getTimer(CPrediction::PredictionTimer_Interpolation));
+	log_timer("Copy Last Image", m_pred->getTimer(CPrediction::PredictionTimer_CopyLast));
+	log_timer("Encode Prediction", m_pred->getTimer(CPrediction::PredictionTimer_EncodePrediction));
+	log_timer("Shift +128", m_shift->getTimer());
+	log_timer("Shift -128", m_ishift->getTimer());
+	CCLTimers::Print();
 }
 
 }

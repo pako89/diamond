@@ -1,5 +1,6 @@
 #include <cl_component.h>
 #include <clkernel.h>
+#include <cl_timers.h>
 
 namespace avlib
 {
@@ -132,6 +133,7 @@ void CCLComponent<T>::copy(const CComponent<T> * src)
 		CComponent<T>::copy(src);
 		if(CLMEM_STATE_DEVICE==clsrc->m_state)
 		{
+			CCLTimers::getCopyBuffer().start();
 			cl_int err = clEnqueueCopyBuffer(
 					this->m_dev->getCommandQueue(), 
 					clsrc->m_cldata, 
@@ -145,6 +147,7 @@ void CCLComponent<T>::copy(const CComponent<T> * src)
 				throw utils::StringFormatException("clEnqueueCopyBuffer(%d)\n", err);
 			}
 			m_state = CLMEM_STATE_DEVICE;
+			CCLTimers::getCopyBuffer().stop();
 		}
 	}
 	else

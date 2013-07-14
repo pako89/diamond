@@ -20,6 +20,7 @@ struct EncoderConfig
 	int InterpolationScale;
 #endif
 	bool PrintProgressBar;
+	bool PrintTimers;
 };
 
 class CEncoder : public utils::ITimer

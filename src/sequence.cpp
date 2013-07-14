@@ -54,7 +54,7 @@ bool CSequence::parseHeader()
 	{
 		if(fread(yuv4mpeg, YUV4MPEG_HEADER_LEN, 1, m_fh) == 1)
 		{
-			return !strcmp(yuv4mpeg, "YUV4MPEG2 ");
+			return !strcmp(yuv4mpeg, YUV4MPEG_HEADER);
 		}
 	}
 	return false;

@@ -1,4 +1,5 @@
 #include <cl_kernel.h>
+#include <cl_timers.h>
 
 namespace avlib
 {
@@ -57,7 +58,9 @@ void ICLKernel::EnqueueNDRangeKernel(
 
 void ICLKernel::Finish(void)
 {
+	CCLTimers::getFinish().start();
 	cl_int err = clFinish(this->m_dev->getCommandQueue());
+	CCLTimers::getFinish().stop();
 	if(CL_SUCCESS != err) throw utils::StringFormatException("clFinish(%d)\n", err);
 }
 
