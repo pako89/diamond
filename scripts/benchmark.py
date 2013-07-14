@@ -65,6 +65,7 @@ class Config:
 		r *= len(self.Huffman)
 		r *= len(self.EncoderVariant)
 		r *= len(self.GOP)
+		r *= len(self.Q)
 		return r
 	
 	def wildcard_results_dir(self):
