@@ -63,6 +63,7 @@ SRC += src/mtimer.cpp
 SRC += src/shift.cpp
 SRC += src/zigzag.cpp
 SRC += src/interpolation.cpp
+SRC += src/psnr.cpp
 SRC += src/cl_base.cpp
 SRC += src/cl_encoder.cpp
 SRC += src/cl_parallel_encoder.cpp

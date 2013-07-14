@@ -35,6 +35,8 @@ class Config:
 		self.EncoderArgs = self.ConfigParser.get('General', 'EncoderArgs')
 		self.Decoder = self.ConfigParser.get('General', 'Decoder')
 		self.DecoderArgs = self.ConfigParser.get('General', 'DecoderArgs')
+		self.PSNR = self.ConfigParser.get('General', 'PSNR')
+		self.PSNRArgs = self.ConfigParser.get('General', 'PSNRArgs')
 		# Output configuration
 		self.TarDecoded = str2bool(self.ConfigParser.get('Output', 'TarDecoded'))
 		if self.TarDecoded:
@@ -43,6 +45,7 @@ class Config:
 		self.wildcard_results_dir()
 		self.ResultsName = self.ConfigParser.get('Output', 'ResultsName')
 		self.RemoveDecoded = str2bool(self.ConfigParser.get('Output', 'RemoveDecoded'))
+		self.ComputePSNR = str2bool(self.ConfigParser.get('Output', 'ComputePSNR'))
 		# Input Configuration
 		self._videos_dir = self.ConfigParser.get('Input', 'VideosDir')
 		self._videos_ext = self.ConfigParser.get('Input', 'VideosExt')
@@ -214,7 +217,7 @@ class Benchmark:
 
 	def _parse_results(self, cfg, data):
 		self._out_progress("Parsing results")
-		result = Result(cfg)
+		result = Result(cfg, self.Config.PSNR)
 		result.parse(data)
 		self.Results.append(result)
 		self._out_done("Parsing results", 0)
@@ -232,6 +235,25 @@ class Benchmark:
 		self._log_lsep()
 		self._log(stdout+'\n')
 		self._out_done("Decoding", cmd.get_status())
+	
+	def _run_psnr(self, cfg, output):
+		self._out_progress("Computing PSNR")
+		self._log_lsep()
+		cmd = Command(self.Config.PSNR)
+		cmd.add_arg(self.Config.PSNRArgs)
+		cmd.add_option("--gop", cfg.GOP)
+		cmd.add_option("--type", self.Config.VideosFormat)
+		cmd.add_option("--height", cfg.Video.Height)
+		cmd.add_option("--width", cfg.Video.Width)
+		cmd.add_arg(cfg.Video.Path)
+		cmd.add_arg(output)
+		self._log(cmd.Command+'\n')
+		cmd.run()
+		stdout = cmd.get_stdout()
+		self._log_lsep()
+		self._log(stdout+'\n')
+		self._out_done("Computing PSNR", cmd.get_status())
+		return stdout
 
 	def _run_tar(self, tar, output):
 		self._out_progress("Tarring")
@@ -246,7 +268,6 @@ class Benchmark:
 		self._out_progress("Removing decoded video")
 		os.remove(output)
 		self._out_done("Removing decoded video", 0)
-
 	
 	def _run_item(self, cfg, i):
 		self._log_gsep()
@@ -257,8 +278,10 @@ class Benchmark:
 		output = self._get_out_path(cfg.get_video_variant() + ".yuv")
 		tar = self._get_out_path(cfg.get_video_variant())
 		stdout = self._run_encoder(cfg, bstr) 
-		self._parse_results(cfg, stdout)
 		self._run_decoder(output, bstr)
+		if self.Config.ComputePSNR:
+			stdout = stdout + self._run_psnr(cfg, output)
+		self._parse_results(cfg, stdout)
 		if self.Config.TarDecoded:
 			self._run_tar(tar, output)
 		if self.Config.RemoveDecoded:
@@ -302,7 +325,7 @@ class ResultItem:
 
 
 class Result:
-	def __init__(self, cfg):
+	def __init__(self, cfg, psnr):
 		self.EncoderConfig = cfg
 		self.Items = list()
 		self.create_result_item_timer("Total")
@@ -325,6 +348,19 @@ class Result:
 		self.create_result_item_timer("Copy buffer")
 		self.create_result_item_timer("Kernel finish")
 		self.Dict = collections.OrderedDict()
+		if psnr:
+			self.create_result_psnr("Y PSNR")
+			self.create_result_psnr("U PSNR")
+			self.create_result_psnr("V PSNR")
+			self.create_result_psnr("Y PSNR for I frames")
+			self.create_result_psnr("U PSNR for I frames")
+			self.create_result_psnr("V PSNR for I frames")
+			self.create_result_psnr("Y PSNR for P frames")
+			self.create_result_psnr("U PSNR for P frames")
+			self.create_result_psnr("V PSNR for P frames")
+
+	def create_result_psnr(self, name):
+		self.Items.append(ResultItem(name, self.create_regex(name)))
 
 	def create_result_item_timer(self, name):
 		self.Items.append(ResultItem(name, self.create_regex("Timer " + name)))

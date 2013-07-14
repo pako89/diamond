@@ -114,15 +114,20 @@ avlib::HUFFMAN_TYPE CDiamondApp::parseHuffman(const char * arg)
 	}
 }
 
-DiamondOperation CDiamondApp::parseOperation(const char * op)
+DiamondOperation CDiamondApp::parseOperation(std::string op)
 {
-	if(!strcmp(op, "encode"))
+	std::transform(op.begin(), op.end(), op.begin(), ::tolower);
+	if(op == "encode")
 	{
 		return diamond::DIAMOND_OP_ENCODE;
 	}
-	else if(!strcmp(op, "decode"))
+	else if(op == "decode")
 	{
 		return diamond::DIAMOND_OP_DECODE;
+	}
+	else if(op == "psnr")
+	{
+		return diamond::DIAMOND_OP_PSNR;
 	}
 	else
 	{
@@ -162,8 +167,6 @@ const struct option CDiamondApp::common_options[] = {
 	{"print-timers",	required_argument,	NULL, 	'T'},
 	{"verbose",		no_argument,		NULL,	'v'},
 	{"version",		no_argument,		NULL,	'X'},
-	{"height",		required_argument,	NULL,	'H'},
-	{"width",		required_argument,	NULL,	'W'},
 };
 
 #define COMMON_OPTS_SIZE	ARRAY_SIZE(common_options)
@@ -171,6 +174,8 @@ const struct option CDiamondApp::common_options[] = {
 const struct option CDiamondApp::encoder_options[] = {
 	{"output",		required_argument,	NULL, 	'o'},
 	{"type",		required_argument,	NULL,	't'},
+	{"height",		required_argument,	NULL,	'H'},
+	{"width",		required_argument,	NULL,	'W'},
 	{"variant",		required_argument,	NULL, 	'V'},
 	{"huffman",		required_argument, 	NULL, 	'e'},
 	{"gop",			required_argument,	NULL, 	'g'},
@@ -185,6 +190,15 @@ const struct option CDiamondApp::decoder_options[] = {
 };
 
 #define DECODER_OPTS_SIZE	ARRAY_SIZE(decoder_options)
+
+const struct option CDiamondApp::psnr_options[] = {
+	{"gop",			required_argument,	NULL, 	'g'},
+	{"type",		required_argument,	NULL,	't'},
+	{"height",		required_argument,	NULL,	'H'},
+	{"width",		required_argument,	NULL,	'W'},
+};
+
+#define PSNR_OPTS_SIZE		ARRAY_SIZE(psnr_options)
 
 std::string CDiamondApp::getShortOpts(const struct option long_options[], int size)
 {
@@ -225,6 +239,14 @@ bool CDiamondApp::parseBool(std::string arg)
 	}
 }
 
+void CDiamondApp::appendLongOptions(std::list<option> & options, const option * long_options, int c)
+{
+	for(int i=0;i<c;i++)
+	{
+		options.push_front(long_options[i]);
+	}
+}
+
 void CDiamondApp::ParseArgs(int argc, char * argv[])
 {
 	if(argc < 2)
@@ -234,27 +256,38 @@ void CDiamondApp::ParseArgs(int argc, char * argv[])
 		throw ExitException(0);
 	}
 	m_config.Op = parseOperation(argv[1]);
+	std::list<option> long_options;
 	std::string common_opts = getShortOpts(common_options, COMMON_OPTS_SIZE);
+	appendLongOptions(long_options, common_options, COMMON_OPTS_SIZE);
 	std::string operation_opts;
 	switch(m_config.Op)
 	{
 	case DIAMOND_NOP:
 		throw utils::StringFormatException("unknown operation '%s'", argv[1]);
 	case DIAMOND_OP_ENCODE:
-		dbg("ENCODE\n");
 		operation_opts = getShortOpts(encoder_options, ENCODER_OPTS_SIZE);
+		appendLongOptions(long_options, encoder_options, ENCODER_OPTS_SIZE);
 		break;
 	case DIAMOND_OP_DECODE:
-		dbg("DECODE\n");
 		operation_opts = getShortOpts(decoder_options, DECODER_OPTS_SIZE);
+		appendLongOptions(long_options, decoder_options, DECODER_OPTS_SIZE);
+		break;
+	case DIAMOND_OP_PSNR:
+		operation_opts = getShortOpts(psnr_options, PSNR_OPTS_SIZE);
+		appendLongOptions(long_options, psnr_options, PSNR_OPTS_SIZE);
 		break;
 	}
 	const char * shortopts = (common_opts + operation_opts).c_str();
-	dbg("SHORTOPTS: %s\n", shortopts);
+	option * _long_options = new option[long_options.size()];
+	int i=0;
+	for(std::list<option>::iterator itr = long_options.begin(); itr != long_options.end(); ++itr)
+	{
+		_long_options[i++] = *itr;
+	}
 	int _argc = argc-1;
 	char ** _argv = argv+1;
 	int opt, longind;
-	while((opt = getopt_long(_argc, _argv, shortopts, CDiamondApp::common_options, &longind)) != -1)
+	while((opt = getopt_long(_argc, _argv, shortopts, _long_options, &longind)) != -1)
 	{
 		switch(opt)
 		{
@@ -349,6 +382,7 @@ void CDiamondApp::ParseArgs(int argc, char * argv[])
             		throw ParseArgsException("?? getopt returned character code 0%o ??\n", opt);
 		}
 	}
+	delete [] _long_options;
 	if(optind < _argc)
 	{
 		switch(m_config.Op)
@@ -364,6 +398,28 @@ void CDiamondApp::ParseArgs(int argc, char * argv[])
 				{
 					throw utils::StringFormatException(strerror(errno));
 				}
+			}
+			break;
+		case DIAMOND_OP_PSNR:
+			if(optind + 1 < _argc)
+			{
+				m_config.PSNRConfig.GOP = m_config.EncoderConfig.GOP;
+				m_config.PSNRConfig.Seq[0].FileName = _argv[optind];
+				m_config.PSNRConfig.Seq[1].FileName = _argv[optind+1];
+				if(NULL == (m_config.PSNRConfig.Seq[0].File = fopen(m_config.PSNRConfig.Seq[0].FileName, "rb")))
+				{
+					throw utils::StringFormatException("can not open file: %s", m_config.PSNRConfig.Seq[0].FileName);
+				}
+				m_config.PSNRConfig.Seq[1].File = fopen(m_config.PSNRConfig.Seq[1].FileName, "rb");
+				if(NULL == (m_config.PSNRConfig.Seq[1].File = fopen(m_config.PSNRConfig.Seq[1].FileName, "rb")))
+				{
+					throw utils::StringFormatException("can not open file: %s", m_config.PSNRConfig.Seq[1].FileName);
+				}
+			}
+			else
+			{
+				PrintUsage();
+				throw ExitException(1);
 			}
 			break;
 		}

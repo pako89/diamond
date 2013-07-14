@@ -12,6 +12,8 @@
 #include <errno.h>
 #include <avlib.h>
 #include <encoder.h>
+#include <psnr.h>
+#include <list>
 
 namespace diamond
 {
@@ -36,7 +38,8 @@ enum DiamondOperation
 {
 	DIAMOND_NOP,
 	DIAMOND_OP_ENCODE,
-	DIAMOND_OP_DECODE
+	DIAMOND_OP_DECODE,
+	DIAMOND_OP_PSNR
 };
 
 enum EncoderVariant
@@ -72,6 +75,7 @@ struct DiamondConfig
 	avlib::CSize ImageSize;
 	avlib::EncoderConfig EncoderConfig;	
 	EncoderVariant Variant;
+	utils::PSNRConfig PSNRConfig;
 };
 
 /**
@@ -87,6 +91,8 @@ protected:
 	static const struct option common_options[];
 	static const struct option encoder_options[];
 	static const struct option decoder_options[];
+	static const struct option psnr_options[];
+	void appendLongOptions(std::list<option> & options, const option * long_options, int c);
 public:
 	~CDiamondApp(void);
 	void setName(const char * appName);
@@ -100,7 +106,7 @@ public:
 	DiamondConfig getConfig(void);
 protected:
 	CDiamondApp(void);
-	DiamondOperation parseOperation(const char * op);
+	DiamondOperation parseOperation(std::string op);
 	avlib::HUFFMAN_TYPE parseHuffman(const char * op);
 	avlib::ImageType parseImageType(const char * arg);
 	bool parseBool(std::string arg);

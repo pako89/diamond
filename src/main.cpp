@@ -22,9 +22,6 @@
 
 int main(int argc,char * argv[])
 {
-	avlib::CComponent<uint8_t> u8;
-	avlib::CComponent<float> fl;
-	fl=u8;
 	diamond::CDiamondApp * app = diamond::CDiamondApp::getInstance();
 	app->setName(argv[0]);
 	try
@@ -86,6 +83,36 @@ int main(int argc,char * argv[])
 			dec->Decode(bstr, &seq);
 			delete dec;
 			delete bstr;
+		}
+		else if(diamond::DIAMOND_OP_PSNR == config.Op)
+		{
+			avlib::CSequence * seq1 = new avlib::CSequence(config.PSNRConfig.Seq[0].File);
+			if(!seq1->IsYUV4MPEG())
+			{
+				seq1->setFormat(config.ImageType, config.ImageSize.Height, config.ImageSize.Width);
+			}
+			avlib::CSequence * seq2 = new avlib::CSequence(config.PSNRConfig.Seq[1].File);
+			if(!seq2->IsYUV4MPEG())
+			{
+				seq2->setFormat(config.ImageType, config.ImageSize.Height, config.ImageSize.Width);
+			}
+			utils::CPSNR * psnr = new utils::CPSNR(config.PSNRConfig);
+			utils::PSNRResults results = psnr->Compute(*seq1, *seq2);
+			log_res("Y PSNR", "%2.2f dB", results.PSNR.getMean().Y);
+			log_res("U PSNR", "%2.2f dB", results.PSNR.getMean().U);
+			log_res("V PSNR", "%2.2f dB", results.PSNR.getMean().V);
+			if(config.PSNRConfig.GOP > 1)
+			{
+				log_res("Y PSNR for I frames", "%2.2f dB", results.I_FRAME_PSNR.getMean().Y);
+				log_res("U PSNR for I frames", "%2.2f dB", results.I_FRAME_PSNR.getMean().U);
+				log_res("V PSNR for I frames", "%2.2f dB", results.I_FRAME_PSNR.getMean().V);
+				log_res("Y PSNR for P frames", "%2.2f dB", results.P_FRAME_PSNR.getMean().Y);
+				log_res("U PSNR for P frames", "%2.2f dB", results.P_FRAME_PSNR.getMean().U);
+				log_res("V PSNR for P frames", "%2.2f dB", results.P_FRAME_PSNR.getMean().V);
+			}
+			delete psnr;
+			delete seq1;
+			delete seq2;
 		}
 	}
 	catch(diamond::ExitException & e)
