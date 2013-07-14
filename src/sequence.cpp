@@ -180,7 +180,6 @@ void CSequence::WriteYUV4MPEG()
 	{
 		throw utils::StringFormatException("Can not write YUV4MPEG Header: '%s'", buff);
 	}
-	//throw NOT_IMPLEMENTED();
 }
 
 bool CSequence::setFormat(ImageType type, int height, int width)
@@ -194,6 +193,10 @@ bool CSequence::setFormat(ImageType type, int height, int width)
 	{
 		m_image = new CImage<uint8_t>(type, height, width);
 		return (NULL != m_image);
+	}
+	else
+	{
+		throw utils::StringFormatException("invalid format for sequence [height, width or type options]");
 	}
 	return false;
 }

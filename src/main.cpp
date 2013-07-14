@@ -86,6 +86,11 @@ int main(int argc,char * argv[])
 		}
 		else if(diamond::DIAMOND_OP_PSNR == config.Op)
 		{
+			if(NULL == config.PSNRConfig.Seq[0].File
+			|| NULL == config.PSNRConfig.Seq[1].File)
+			{
+				throw utils::StringFormatException("You must specify 2 files for PSNR");
+			}
 			avlib::CSequence * seq1 = new avlib::CSequence(config.PSNRConfig.Seq[0].File);
 			if(!seq1->IsYUV4MPEG())
 			{

@@ -137,7 +137,7 @@ DiamondOperation CDiamondApp::parseOperation(std::string op)
 
 void CDiamondApp::PrintVersion(void)
 {
-	printf("%s version %s\n", m_appName, VERSION);
+	printf("version %s\n", VERSION);
 }
 
 void CDiamondApp::PrintBanner(void)
@@ -151,13 +151,14 @@ void CDiamondApp::PrintBanner(void)
 
 void CDiamondApp::PrintUsage(void)
 {
-	printf("Usage: %s encode|decode [OPTIONS] FILE\n", m_appName);
+	printf("Usage: %s encode|decode|psnr [OPTIONS] FILE[S]\n", m_appName);
 }
 
 void CDiamondApp::PrintHelp(void)
 {
 	PrintBanner();
 	PrintUsage();
+	PrintVersion();
 }
 
 
@@ -249,6 +250,10 @@ void CDiamondApp::appendLongOptions(std::list<option> & options, const option * 
 
 void CDiamondApp::ParseArgs(int argc, char * argv[])
 {
+	if(NULL != argv)
+	{
+		m_appName = basename(argv[0]);
+	}
 	if(argc < 2)
 	{
 		PrintBanner();
@@ -262,8 +267,6 @@ void CDiamondApp::ParseArgs(int argc, char * argv[])
 	std::string operation_opts;
 	switch(m_config.Op)
 	{
-	case DIAMOND_NOP:
-		throw utils::StringFormatException("unknown operation '%s'", argv[1]);
 	case DIAMOND_OP_ENCODE:
 		operation_opts = getShortOpts(encoder_options, ENCODER_OPTS_SIZE);
 		appendLongOptions(long_options, encoder_options, ENCODER_OPTS_SIZE);
@@ -284,8 +287,18 @@ void CDiamondApp::ParseArgs(int argc, char * argv[])
 	{
 		_long_options[i++] = *itr;
 	}
-	int _argc = argc-1;
-	char ** _argv = argv+1;
+	int _argc;
+	char ** _argv;
+	if(DIAMOND_NOP != m_config.Op)
+	{
+		_argc = argc-1;
+		_argv = argv+1;
+	}
+	else
+	{
+		_argc = argc;
+		_argv = argv;
+	}
 	int opt, longind;
 	while((opt = getopt_long(_argc, _argv, shortopts, _long_options, &longind)) != -1)
 	{
@@ -383,6 +396,10 @@ void CDiamondApp::ParseArgs(int argc, char * argv[])
 		}
 	}
 	delete [] _long_options;
+	if(DIAMOND_NOP == m_config.Op)
+	{
+		throw utils::StringFormatException("unknown operation '%s'", argv[1]);
+	}
 	if(optind < _argc)
 	{
 		switch(m_config.Op)
