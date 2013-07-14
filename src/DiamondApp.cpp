@@ -158,34 +158,33 @@ void CDiamondApp::PrintHelp(void)
 
 const struct option CDiamondApp::common_options[] = {
 	{"help",		no_argument,		NULL,	'h'},
-	{"output",		required_argument,	NULL, 	'o'},
-	{"type",		required_argument,	NULL,	't'},
+	{"progress-bar",	required_argument, 	NULL, 	'p'},
+	{"print-timers",	required_argument,	NULL, 	'T'},
+	{"verbose",		no_argument,		NULL,	'v'},
+	{"version",		no_argument,		NULL,	'X'},
 	{"height",		required_argument,	NULL,	'H'},
 	{"width",		required_argument,	NULL,	'W'},
+};
+
+#define COMMON_OPTS_SIZE	ARRAY_SIZE(common_options)
+
+const struct option CDiamondApp::encoder_options[] = {
+	{"output",		required_argument,	NULL, 	'o'},
+	{"type",		required_argument,	NULL,	't'},
 	{"variant",		required_argument,	NULL, 	'V'},
 	{"huffman",		required_argument, 	NULL, 	'e'},
 	{"gop",			required_argument,	NULL, 	'g'},
 	{"quant",		required_argument,	NULL, 	'q'},
 	{"interpolation",	optional_argument,	NULL,	'I'},
-	{"progress-bar",	required_argument, 	NULL, 	'p'},
-	{"print-timers",	required_argument,	NULL, 	'T'},
-	{"verbose",		no_argument,		NULL,	'v'},
-	{"version",		no_argument,		NULL,	'X'}
 };
 
-#define COMMON_OPTS_SIZE	ARRAY_SIZE(common_options)
+#define ENCODER_OPTS_SIZE	ARRAY_SIZE(encoder_options)
 
-const struct option CDiamondApp::encode_options[] = {
-	{}
+const struct option CDiamondApp::decoder_options[] = {
+	{"output",		required_argument,	NULL, 	'o'},
 };
 
-#define ENCODE_OPTS_SIZE	ARRAY_SIZE(encode_options)
-
-const struct option CDiamondApp::decode_options[] = {
-	{}
-};
-
-#define DECODE_OPTS_SIZE	ARRAY_SIZE(decode_options)
+#define DECODER_OPTS_SIZE	ARRAY_SIZE(decoder_options)
 
 std::string CDiamondApp::getShortOpts(const struct option long_options[], int size)
 {
@@ -234,28 +233,26 @@ void CDiamondApp::ParseArgs(int argc, char * argv[])
 		PrintUsage();
 		throw ExitException(0);
 	}
-	const char * shortopts = getShortOpts(common_options, COMMON_OPTS_SIZE).c_str();
 	m_config.Op = parseOperation(argv[1]);
-	const char * op = argv[1];
-	
-#ifdef WIN32
-	int _argc = argc-2;
-	char ** _argv = &argv[2];
-#else
-	int _argc;
-	char ** _argv;
-	if(m_config.Op != DIAMOND_NOP)
+	std::string common_opts = getShortOpts(common_options, COMMON_OPTS_SIZE);
+	std::string operation_opts;
+	switch(m_config.Op)
 	{
-		_argc = argc-1;
-		_argv = argv+1;
+	case DIAMOND_NOP:
+		throw utils::StringFormatException("unknown operation '%s'", argv[1]);
+	case DIAMOND_OP_ENCODE:
+		dbg("ENCODE\n");
+		operation_opts = getShortOpts(encoder_options, ENCODER_OPTS_SIZE);
+		break;
+	case DIAMOND_OP_DECODE:
+		dbg("DECODE\n");
+		operation_opts = getShortOpts(decoder_options, DECODER_OPTS_SIZE);
+		break;
 	}
-	else
-	{
-		_argc = argc;
-		_argv = argv;
-	}
-
-#endif
+	const char * shortopts = (common_opts + operation_opts).c_str();
+	dbg("SHORTOPTS: %s\n", shortopts);
+	int _argc = argc-1;
+	char ** _argv = argv+1;
 	int opt, longind;
 	while((opt = getopt_long(_argc, _argv, shortopts, CDiamondApp::common_options, &longind)) != -1)
 	{
@@ -352,20 +349,23 @@ void CDiamondApp::ParseArgs(int argc, char * argv[])
             		throw ParseArgsException("?? getopt returned character code 0%o ??\n", opt);
 		}
 	}
-	if(diamond::DIAMOND_NOP == m_config.Op)
-	{
-		throw utils::StringFormatException("unknown operation '%s'", argv[1]);
-	}
 	if(optind < _argc)
 	{
-		m_config.InputFileName = _argv[_argc-1];
-		if(strcmp(m_config.InputFileName, "stdin"))
+		switch(m_config.Op)
 		{
-			m_config.InputFile = fopen(m_config.InputFileName, "rb");
-			if(NULL == m_config.InputFile)
+		case DIAMOND_OP_ENCODE:
+			/* FALL THROUGH */
+		case DIAMOND_OP_DECODE:
+			m_config.InputFileName = _argv[_argc-1];
+			if(strcmp(m_config.InputFileName, "stdin"))
 			{
-				throw utils::StringFormatException(strerror(errno));
+				m_config.InputFile = fopen(m_config.InputFileName, "rb");
+				if(NULL == m_config.InputFile)
+				{
+					throw utils::StringFormatException(strerror(errno));
+				}
 			}
+			break;
 		}
 	}
 	if(NULL == m_config.InputFileName)

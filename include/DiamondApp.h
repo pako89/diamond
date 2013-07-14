@@ -85,8 +85,8 @@ public:
 protected:
 	static CDiamondApp * m_instance;
 	static const struct option common_options[];
-	static const struct option encode_options[];
-	static const struct option decode_options[];
+	static const struct option encoder_options[];
+	static const struct option decoder_options[];
 public:
 	~CDiamondApp(void);
 	void setName(const char * appName);
