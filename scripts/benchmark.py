@@ -53,6 +53,7 @@ class Config:
 		self.Huffman = string.split(self.ConfigParser.get('Options', 'Huffman'), ' ')
 		self.EncoderVariant = string.split(self.ConfigParser.get('Options', 'EncoderVariant'), ' ')
 		self.GOP = string.split(self.ConfigParser.get('Options', 'GOP'), ' ')
+		self.Q = string.split(self.ConfigParser.get('Options', 'Q'), ' ')
 
 	def get_count(self):
 		r = 1
@@ -115,12 +116,13 @@ class Command:
 		self._stdout = o
 
 class EncoderConfig:
-	def __init__(self, video, variant, interpol, huffman, gop):
+	def __init__(self, video, variant, interpol, huffman, gop, q):
 		self.Video = video
 		self.Variant = variant
 		self.Interpol = interpol
 		self.Huffman = huffman
 		self.GOP = gop
+		self.Q = q
 	
 	def get_video_variant(self):
 		return self.Video.get_name() + self.get_variant()
@@ -131,6 +133,7 @@ class EncoderConfig:
 		s += "H"+self.Huffman
 		s += "I"+self.Interpol
 		s += "G"+self.GOP
+		s += "Q"+self.Q
 		return s
 
 class Benchmark:
@@ -150,9 +153,10 @@ class Benchmark:
 				for H in self.Config.Huffman:
 					for V in self.Config.EncoderVariant:
 						for G in self.Config.GOP:
-							cfg = EncoderConfig(v, V, I, H, G)
-							self._run_item(cfg, i)
-							i = i+1
+							for Q in self.Config.Q:
+								cfg = EncoderConfig(v, V, I, H, G, Q)
+								self._run_item(cfg, i)
+								i = i+1
 	
 	def save_results(self):
 		resf = open(os.path.join(self.Config.ResultsDir, self.Config.ResultsName), 'w')
@@ -197,6 +201,7 @@ class Benchmark:
 		cmd.add_option("--huffman", cfg.Huffman)
 		cmd.add_option("--variant", cfg.Variant)
 		cmd.add_option("--gop", cfg.GOP)
+		cmd.add_option("--quant", cfg.Q)
 		self._append_video(cfg.Video, cmd, bstr)
 		self._log_lsep()
 		self._log(cmd.Command+'\n')
@@ -333,6 +338,7 @@ class Result:
 		self.Dict['Interpolation'] = self.EncoderConfig.Interpol
 		self.Dict['Huffman'] = self.EncoderConfig.Huffman
 		self.Dict['GOP'] = self.EncoderConfig.GOP
+		self.Dict['Q'] = self.EncoderConfig.Q
 		for i in self.Items:
 			self.Dict[i.Description] = i.Value
 

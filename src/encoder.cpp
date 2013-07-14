@@ -40,6 +40,7 @@ sos_marker_t CEncoder::write_sos(CSequence * pSeq, CBitstream * pBstr)
 #if USE(INTERPOLATION)
 	sos.interpolation_scale = m_config.InterpolationScale;
 #endif
+	sos.quant_coeff = m_config.Q;
 	pBstr->write_block(&sos, sizeof(sos));
 	return sos;
 }
@@ -49,7 +50,6 @@ sof_marker_t CEncoder::write_sof(CBitstream * pBstr, FRAME_TYPE frame_type)
 	sof_marker_t sof;
 	sof.type = MARKER_TYPE_SOF;
 	sof.size = sizeof(sof_marker_t);
-	sof.quant_coeff = 1;
 	sof.frame_type = frame_type;
 	pBstr->write_block(&sof, sizeof(sof));
 	return sof;

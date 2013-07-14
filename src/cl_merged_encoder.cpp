@@ -80,8 +80,8 @@ void CCLMergedEncoder::init(CImageFormat fmt)
 	{
 		throw utils::StringFormatException("Unknown Huffman type '%d'\n", m_config.HuffmanType);
 	}
-	m_dctqzz->setTables(1);
-	m_idctq->setTables(1);
+	m_dctqzz->setTables(m_config.Q);
+	m_idctq->setTables(m_config.Q);
 }
 
 void CCLMergedEncoder::doEncodeFrame(CImage<uint8_t> * pFrame, CBitstream * pBstr, FRAME_TYPE frame_type)

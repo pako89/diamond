@@ -63,8 +63,8 @@ void CCLEncoder::init(CImageFormat fmt)
 	}
 	m_pred->setIFrameTransform(m_shift);
 	m_pred->setIFrameITransform(m_ishift);
-	m_quant->setTables(1);
-	m_iquant->setTables(1);
+	m_quant->setTables(m_config.Q);
+	m_iquant->setTables(m_config.Q);
 }
 
 void CCLEncoder::transform(CCLImage<float> * imgF, CCLImage<int16_t> * img, CCLPredictionInfoTable * predTab, FRAME_TYPE frame_type)

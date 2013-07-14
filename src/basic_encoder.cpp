@@ -96,8 +96,8 @@ void CBasicEncoder::init(CImageFormat fmt)
 	if(NULL == m_predTab) m_predTab = new CPredictionInfoTable(CSize(fmt.Size.Height/16, fmt.Size.Width/16));
 	m_pred->setIFrameTransform(m_shift);
 	m_pred->setIFrameITransform(m_ishift);
-	m_quant->setTables(1);
-	m_iquant->setTables(1);
+	m_quant->setTables(m_config.Q);
+	m_iquant->setTables(m_config.Q);
 }
 
 void CBasicEncoder::doEncodeFrame(CImage<uint8_t> * pFrame, CBitstream * pBstr, FRAME_TYPE frame_type)

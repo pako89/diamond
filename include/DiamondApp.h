@@ -13,22 +13,6 @@
 #include <avlib.h>
 #include <encoder.h>
 
-#ifndef DEFAULT_GOP
-#define DEFAULT_GOP	4
-#endif
-
-#ifndef DEFAULT_PROGRESS_BAR
-#define DEFAULT_PROGRESS_BAR 	true
-#endif
-
-#ifndef DEFAULT_PRINT_TIMERS
-#define DEFAULT_PRINT_TIMERS	false
-#endif
-
-#ifndef DEFAULT_INTERPOLATION_SCALE
-#define DEFAULT_INTERPOLATION_SCALE	2
-#endif
-
 namespace diamond
 {
 
@@ -77,15 +61,7 @@ struct DiamondConfig
 		ImageTypeStr("unknown"),
 		ImageSize(0, 0),
 		Variant(ENCODER_VARIANT_OPENCL)
-	{
-		EncoderConfig.HuffmanType = avlib::HUFFMAN_TYPE_STATIC;
-		EncoderConfig.GOP = DEFAULT_GOP;
-#if USE(INTERPOLATION)
-		EncoderConfig.InterpolationScale = DEFAULT_INTERPOLATION_SCALE;
-#endif
-		EncoderConfig.PrintProgressBar = DEFAULT_PROGRESS_BAR;
-		EncoderConfig.PrintTimers = DEFAULT_PRINT_TIMERS;
-	}
+	{}
 	DiamondOperation Op;
 	const char * InputFileName;
 	FILE * InputFile;

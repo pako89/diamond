@@ -165,6 +165,7 @@ const struct option CDiamondApp::common_options[] = {
 	{"variant",		required_argument,	NULL, 	'V'},
 	{"huffman",		required_argument, 	NULL, 	'e'},
 	{"gop",			required_argument,	NULL, 	'g'},
+	{"quant",		required_argument,	NULL, 	'q'},
 #if USE(INTERPOLATION)	
 	{"interpolation",	optional_argument,	NULL,	'I'},
 #endif
@@ -305,11 +306,24 @@ void CDiamondApp::ParseArgs(int argc, char * argv[])
 				int gop = utils::ParseInt(optarg);
 				if(gop >= 0)
 				{
-					m_config.EncoderConfig.GOP = utils::ParseInt(optarg);
+					m_config.EncoderConfig.GOP = gop;
 				}
 				else
 				{
-					throw utils::StringFormatException("wrong GOP: '%d'\n", gop);
+					throw utils::StringFormatException("invalid GOP value: '%d'\n", gop);
+				}
+			}
+			break;
+		case 'q':
+			{
+				int q = utils::ParseInt(optarg);
+				if(q>0)
+				{
+					m_config.EncoderConfig.Q = q;
+				}
+				else
+				{
+					throw utils::StringFormatException("invalid Q value: '%d'\n", q);
 				}
 			}
 			break;

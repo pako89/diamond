@@ -9,13 +9,45 @@
 #include <avlib.h>
 #include <proto.h>
 
+#ifndef DEFAULT_GOP
+#define DEFAULT_GOP	4
+#endif
+
+#ifndef DEFAULT_PROGRESS_BAR
+#define DEFAULT_PROGRESS_BAR 	true
+#endif
+
+#ifndef DEFAULT_PRINT_TIMERS
+#define DEFAULT_PRINT_TIMERS	false
+#endif
+
+#ifndef DEFAULT_INTERPOLATION_SCALE
+#define DEFAULT_INTERPOLATION_SCALE	2
+#endif
+
+#ifndef DEFAULT_HUFFMAN_TYPE
+#define DEFAULT_HUFFMAN_TYPE	HUFFMAN_TYPE_STATIC
+#endif
+
 namespace avlib
 {
 
 struct EncoderConfig
 {
+	EncoderConfig() :
+		HuffmanType(DEFAULT_HUFFMAN_TYPE),
+		GOP(DEFAULT_GOP),
+#if USE(INTERPOLATION)
+		InterpolationScale(DEFAULT_INTERPOLATION_SCALE),
+#endif
+		PrintProgressBar(DEFAULT_PROGRESS_BAR),
+		PrintTimers(DEFAULT_PRINT_TIMERS),
+		Q(DEFAULT_Q)
+		
+	{}
 	HUFFMAN_TYPE HuffmanType;
 	int GOP;
+	int Q;
 #if USE(INTERPOLATION)
 	int InterpolationScale;
 #endif

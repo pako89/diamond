@@ -29,6 +29,10 @@ bool CBasicDecoder::Decode(CBitstream * pBstr, CSequence * pSeq)
 	log_prop("Height", "%d", sos.height);
 	log_prop("Frame rate", "%d:%d", sos.frame_rate.nom, sos.frame_rate.denom);
 	log_prop("Numer of frames", "%d", sos.frames_number);
+	log_prop("Quant coeff", "%d", sos.quant_coeff);
+#if USE(INTERPOLATION_SCALE)
+	log_prop("Interpolation scale", "%d",sos.interpolation_scale);
+#endif	
 	pSeq->setFormat(IMAGE_TYPE_YUV420, sos.height, sos.width);
 	pSeq->setFrameRate(CFrameRate(sos.frame_rate.nom, sos.frame_rate.denom));
 	pSeq->setYUV4MPEG(true);
@@ -40,7 +44,7 @@ bool CBasicDecoder::Decode(CBitstream * pBstr, CSequence * pSeq)
 	CDynamicHuffman<int16_t> * htree = new CDynamicHuffman<int16_t>();
 	CIDCT * idct = new CIDCT();
 	CIQuant * iquant = new CIQuant();
-	iquant->setTables(1);
+	iquant->setTables(sos.quant_coeff);
 	CIZigZag<int16_t, float> * izigzag = new CIZigZag<int16_t, float>();
 	CIRLC<int16_t> * irlc;
 	CPredictionInfoTable * predTab = new CPredictionInfoTable(CSize(pSeq->getFormat().Size.Height/16, pSeq->getFormat().Size.Width/16));
