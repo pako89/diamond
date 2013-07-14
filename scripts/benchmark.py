@@ -272,9 +272,8 @@ class Benchmark:
 	
 	def _run_item(self, cfg, i):
 		self._log_gsep()
-		log = "\033[33;1mRun {0}/{1}\033[;m\n".format(i, self.Config.get_count())
-		self._log(log)
-		self._out(log)
+		self._log("Run {0}/{1}\n".format(i, self.Config.get_count()))
+		self._out("\033[33;1mRun {0}/{1}\033[;m\n".format(i, self.Config.get_count()))
 		bstr = self._get_out_path(cfg.get_video_variant() + ".bstr")
 		output = self._get_out_path(cfg.get_video_variant() + ".yuv")
 		tar = self._get_out_path(cfg.get_video_variant())
@@ -311,7 +310,7 @@ class Benchmark:
 
 
 class ResultItem:
-	INVALID = "-"
+	INVALID = ""
 	def __init__(self, desc, reg):
 		self.Value = self.INVALID
 		self.Description = desc

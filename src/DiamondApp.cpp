@@ -1,6 +1,7 @@
 #include "DiamondApp.h"
 #include <string.h>
 #include <algorithm>
+#include <cl_base.h>
 
 #ifndef VERSION
 #define VERSION	"N/A"
@@ -128,6 +129,10 @@ DiamondOperation CDiamondApp::parseOperation(std::string op)
 	else if(op == "psnr")
 	{
 		return diamond::DIAMOND_OP_PSNR;
+	}
+	else if(op == "info")
+	{
+		return diamond::DIAMOND_OP_OPENCL_INFO;
 	}
 	else
 	{
@@ -279,6 +284,9 @@ void CDiamondApp::ParseArgs(int argc, char * argv[])
 		operation_opts = getShortOpts(psnr_options, PSNR_OPTS_SIZE);
 		appendLongOptions(long_options, psnr_options, PSNR_OPTS_SIZE);
 		break;
+	case DIAMOND_OP_OPENCL_INFO:
+		PrintOpenCLInfo();
+		throw ExitException(0);
 	}
 	const char * shortopts = (common_opts + operation_opts).c_str();
 	option * _long_options = new option[long_options.size()];
@@ -451,6 +459,110 @@ void CDiamondApp::ParseArgs(int argc, char * argv[])
 DiamondConfig CDiamondApp::getConfig(void)
 {
 	return m_config;
+}
+
+void CDiamondApp::PrintOpenCLInfo(void)
+{
+	CCLBase & base = CCLBase::getInstance();
+	log_info("Number of platforms", "%d", base.getPlatformsCount());
+	int n = base.getPlatformsCount();
+	for(int i=0;i<n; i++)
+	{
+		CCLPlatformInfo * info = base.getPlatform(i)->getInfo();
+		if(NULL == info)
+		{
+			throw utils::StringFormatException("can not get platform info");
+		}
+		logv(0, "Platform[%d]\n", i+1);
+		log_info("Name", "%s", info->getName().c_str());
+		log_info("Vendor", "%s", info->getVendor().c_str());
+		log_info("Version", "%s", info->getVersion().c_str());
+		log_info("Profile", "%s", info->getProfile().c_str());
+		std::vector<std::string> extensions;
+		utils::split(info->getExtensions().c_str(), ' ', extensions);
+		if(extensions.size() > 0)
+		{
+			log_info("Extensions", "%s", extensions[0].c_str());
+			for(int i=1;i<extensions.size();i++)
+			{
+				log_info("", "%s", extensions[i].c_str());
+			}
+		}
+		log_info("Number of devices", "%d", base.getPlatform(i)->getDevicesCount());
+		int m = base.getPlatform(i)->getDevicesCount();
+		for(int j=0;j<m;j++)
+		{
+			CCLDeviceInfo * dinfo = base.getPlatform(i)->getDevice(j).getInfo();
+			if(NULL == dinfo)
+			{
+				throw utils::StringFormatException("can no get device info");
+			}
+			logv(0, "Device[%d]\n", j+1);
+			log_info("Name", "%s", dinfo->getName().c_str());
+			log_info("Profile", "%s", dinfo->getProfile().c_str());
+			log_info("Device Version", "%s", dinfo->getDeviceVersion().c_str());
+			log_info("Driver Version", "%s", dinfo->getDriverVersion().c_str());
+			log_info("Vendor", "%s", dinfo->getVendor().c_str());
+			log_info("Vendor ID", "%d", dinfo->getVendorId());
+			log_info("Global memory size", "%llu", dinfo->getGlobalMemSize());
+			log_info("Global memory cache size", "%llu", dinfo->getGlobalMemCacheSize());
+			log_info("Local memory size", "%llu", dinfo->getLocalMemSize());
+			log_info("Max const buffer size", "%llu", dinfo->getMaxConstBuffSize());
+			log_info("Max memory alloc size", "%llu", dinfo->getMaxMemAllocSize());
+			log_info("Address bits", "%d", dinfo->getAddressBits());
+			log_info("Device available", "%s", utils::bool2str(dinfo->getAvailable()).c_str());
+			log_info("Compiler available", "%s", utils::bool2str(dinfo->getCompilerAvailable()).c_str());
+			log_info("Endian little", "%s", utils::bool2str(dinfo->getEndianLittle()).c_str());
+			log_info("Error correction support", "%s", utils::bool2str(dinfo->getErrorCorrectionSupport()).c_str());
+			log_info("Global memory cache line size", "%u", dinfo->getGlobalMemCacheLineSize());
+			log_info("Image support", "%s", utils::bool2str(dinfo->getImageSupport()).c_str());
+			log_info("Image 2D max height", "%d", dinfo->getImage2DMaxHeight());
+			log_info("Image 2D max width", "%d", dinfo->getImage2DMaxWidth());
+			log_info("Image 3D max depth", "%d", dinfo->getImage3DMaxDepth());
+			log_info("Image 3D max height", "%d", dinfo->getImage3DMaxHeight());
+			log_info("Image 3D max width", "%d", dinfo->getImage3DMaxWidth());
+			log_info("Max clock frequency", "%d", dinfo->getMaxClockFrequency());
+			log_info("Max compute units", "%d", dinfo->getMaxComputeUnits());
+			log_info("Max constant args", "%d", dinfo->getMaxConstantArgs());
+			log_info("Max parameter size", "%d", dinfo->getMaxParameterSize());
+			log_info("Max read image args", "%d", dinfo->getMaxReadImageArgs());
+			log_info("Max write image args", "%d", dinfo->getMaxWriteImageArgs());
+			log_info("Max samplers", "%d", dinfo->getMaxSamplers());
+			log_info("Max work group size", "%d", dinfo->getMaxWorkGroupSize());
+			log_info("Max work item dimensions", "%d", dinfo->getMaxWorkItemDimensions());
+			std::vector<size_t> sizes = dinfo->getMaxWorkItemSizes();
+			if(sizes.size()>0)
+			{
+				log_info("Max work item sizes", "%d", sizes[0]);
+				for(int i=1;i<sizes.size();i++)
+				{
+					log_info("", "%d", sizes[i]);
+				}
+				
+			}
+			log_info("Memory base address align", "%d", dinfo->getMemBaseAddrAlign());
+			log_info("Min data type align size", "%d", dinfo->getMinDataTypeAlignSize());
+			log_info("Preffered vector width char", "%d", dinfo->getPrefferedVectorWidthChar());
+			log_info("Preffered vector width short", "%d", dinfo->getPrefferedVectorWidthShort());
+			log_info("Preffered vector width int", "%d", dinfo->getPrefferedVectorWidthInt());
+			log_info("Preffered vector width long", "%d", dinfo->getPrefferedVectorWidthLong());
+			log_info("Preffered vector width float", "%d", dinfo->getPrefferedVectorWidthFloat());
+			log_info("Preffered vector width double", "%d", dinfo->getPrefferedVectorWidthDouble());
+			log_info("Profiling timer resolution", "%d", dinfo->getProfilingTimerResolution());
+			std::vector<std::string> extensions;
+			utils::split(dinfo->getExtensions().c_str(), ' ', extensions);
+			if(extensions.size() > 0)
+			{
+				log_info("Extensions", "%s", extensions[0].c_str());
+				for(int i=1;i<extensions.size();i++)
+				{
+					log_info("", "%s", extensions[i].c_str());
+				}
+			}
+		
+		}
+		logv(0, "\n");
+	}
 }
 
 }

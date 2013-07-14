@@ -39,7 +39,8 @@ enum DiamondOperation
 	DIAMOND_NOP,
 	DIAMOND_OP_ENCODE,
 	DIAMOND_OP_DECODE,
-	DIAMOND_OP_PSNR
+	DIAMOND_OP_PSNR,
+	DIAMOND_OP_OPENCL_INFO
 };
 
 enum EncoderVariant
@@ -85,7 +86,7 @@ class CDiamondApp
 {
 public:
 	static CDiamondApp * getInstance(void);
-
+	static void PrintOpenCLInfo(void);
 protected:
 	static CDiamondApp * m_instance;
 	static const struct option common_options[];
@@ -101,7 +102,6 @@ public:
 	void PrintUsage(void);
 	void PrintHelp(void);
 	void PrintVersion(void);
-	
 	const char * getName(void);
 	DiamondConfig getConfig(void);
 protected:

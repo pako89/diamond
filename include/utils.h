@@ -10,6 +10,8 @@
 #include <image.h>
 #include <log.h>
 #include <string>
+#include <vector>
+#include <sstream>
 
 #define INSTANTIATE(t_class, t_arg)		template class t_class<t_arg>
 #define INSTANTIATE2(t_class, t_arg1, t_arg2)	template class t_class<t_arg1, t_arg2>
@@ -122,6 +124,9 @@ int log2(int val);
 void printProgressBar(int i, int n);
 std::string get_src_from_file(char * file_name);
 int ParseInt(std::string str);
+std::vector<std::string> & split(const std::string &s, char delim, std::vector<std::string> &elems);
+std::string bool2str(bool v);
+
 }
 
 
