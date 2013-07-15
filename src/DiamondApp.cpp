@@ -9,6 +9,10 @@
 #define VERSION	"N/A"
 #endif
 
+#ifndef BUILD_DATE
+#define BUILD_DATE __DATE__
+#endif
+
 namespace diamond
 {
 
@@ -144,7 +148,8 @@ DiamondOperation CDiamondApp::parseOperation(std::string op)
 
 void CDiamondApp::PrintVersion(void)
 {
-	printf("version %s\n", VERSION);
+	log_info("version", "%s", VERSION);
+	log_info("build date", "%s", BUILD_DATE);
 }
 
 void CDiamondApp::PrintBanner(void)
@@ -287,6 +292,7 @@ void CDiamondApp::ParseArgs(int argc, char * argv[])
 		appendLongOptions(long_options, psnr_options, PSNR_OPTS_SIZE);
 		break;
 	case DIAMOND_OP_INFO:
+		PrintVersion();
 		PrintCPUInfo();
 		PrintMemInfo();
 		PrintOpenCLInfo();
@@ -513,7 +519,7 @@ void CDiamondApp::PrintCPUInfo(void)
 	CDiamondApp::props_t props = CDiamondApp::GetProcInfo("/proc/cpuinfo");
 	if(props.size() > 0)
 	{
-		logv(0, "** CPU Info\n");
+		logv(0, "\n** CPU Info\n");
 		for(CDiamondApp::props_t::iterator itr = props.begin(); itr != props.end(); ++itr)
 		{
 			if((*itr).first == "processor")
@@ -540,7 +546,7 @@ void CDiamondApp::PrintOpenCLInfo(void)
 			throw utils::StringFormatException("can not get platform info");
 		}
 		logv(0, "\n");
-		logv(0, "** Platform [%d]\n", i+1);
+		log_info("Platform", "%d", i);
 		log_info("Name", "%s", info->getName().c_str());
 		log_info("Vendor", "%s", info->getVendor().c_str());
 		log_info("Version", "%s", info->getVersion().c_str());
@@ -565,8 +571,7 @@ void CDiamondApp::PrintOpenCLInfo(void)
 				throw utils::StringFormatException("can no get device info");
 			}
 			logv(0, "\n");
-			logv(0, "** Device [%d]\n", j+1);
-			log_sep(0);
+			log_info("Device", "%d", j);
 			log_info("Name", "%s", dinfo->getName().c_str());
 			log_info("Profile", "%s", dinfo->getProfile().c_str());
 			log_info("Device Version", "%s", dinfo->getDeviceVersion().c_str());
@@ -631,7 +636,6 @@ void CDiamondApp::PrintOpenCLInfo(void)
 					}
 				}
 			}
-			log_sep(0);
 		}
 	}
 }
