@@ -181,6 +181,15 @@ std::vector<std::string> & split(const std::string &s, char delim, std::vector<s
 	return elems;
 }
 
+std::string trim(const std::string& str, const std::string& whitespace)
+{
+	size_t begin = str.find_first_not_of(whitespace);
+	if (begin == std::string::npos) return "";
+	size_t end = str.find_last_not_of(whitespace);
+	size_t range = end - begin + 1;
+	return str.substr(begin, range);
+}
+
 std::string bool2str(bool v)
 {
 	return v?"True":"False";

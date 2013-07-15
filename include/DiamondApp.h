@@ -40,7 +40,7 @@ enum DiamondOperation
 	DIAMOND_OP_ENCODE,
 	DIAMOND_OP_DECODE,
 	DIAMOND_OP_PSNR,
-	DIAMOND_OP_OPENCL_INFO
+	DIAMOND_OP_INFO
 };
 
 enum EncoderVariant
@@ -87,6 +87,10 @@ class CDiamondApp
 public:
 	static CDiamondApp * getInstance(void);
 	static void PrintOpenCLInfo(void);
+	static void PrintCPUInfo(void);
+	static void PrintMemInfo(void);
+	typedef std::list<std::pair<std::string, std::string> > props_t;
+	static CDiamondApp::props_t GetProcInfo(const char * procname);
 protected:
 	static CDiamondApp * m_instance;
 	static const struct option common_options[];

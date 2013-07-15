@@ -125,6 +125,7 @@ void printProgressBar(int i, int n);
 std::string get_src_from_file(char * file_name);
 int ParseInt(std::string str);
 std::vector<std::string> & split(const std::string &s, char delim, std::vector<std::string> &elems);
+std::string trim(const std::string& str, const std::string& whitespace = " \t");
 std::string bool2str(bool v);
 
 }

@@ -2,6 +2,8 @@
 #include <string.h>
 #include <algorithm>
 #include <cl_base.h>
+#include <map>
+#include <vector>
 
 #ifndef VERSION
 #define VERSION	"N/A"
@@ -132,7 +134,7 @@ DiamondOperation CDiamondApp::parseOperation(std::string op)
 	}
 	else if(op == "info")
 	{
-		return diamond::DIAMOND_OP_OPENCL_INFO;
+		return diamond::DIAMOND_OP_INFO;
 	}
 	else
 	{
@@ -284,7 +286,9 @@ void CDiamondApp::ParseArgs(int argc, char * argv[])
 		operation_opts = getShortOpts(psnr_options, PSNR_OPTS_SIZE);
 		appendLongOptions(long_options, psnr_options, PSNR_OPTS_SIZE);
 		break;
-	case DIAMOND_OP_OPENCL_INFO:
+	case DIAMOND_OP_INFO:
+		PrintCPUInfo();
+		PrintMemInfo();
 		PrintOpenCLInfo();
 		throw ExitException(0);
 	}
@@ -461,9 +465,71 @@ DiamondConfig CDiamondApp::getConfig(void)
 	return m_config;
 }
 
+CDiamondApp::props_t CDiamondApp::GetProcInfo(const char * procname)
+{
+#define BUFF_SIZE	4096
+	static char BUFF[BUFF_SIZE];
+	FILE * fh = fopen(procname, "r");
+	if(NULL == fh)
+	{
+		throw utils::StringFormatException("can not open /proc/cpuinfo for read");
+	}
+	CDiamondApp::props_t l;
+	char * line = NULL;
+	while(NULL != (line = fgets(BUFF, BUFF_SIZE, fh)))
+	{
+		std::vector<std::string> p;
+		std::string s = std::string(line);
+		s.resize(s.size()-1);
+		utils::split(s, ':', p);
+		if(p.size() == 2)
+		{
+			std::string n = utils::trim(p[0]);
+			std::string v = utils::trim(p[1]);
+			std::pair<std::string, std::string> pair(n, v);
+			l.push_back(pair);
+		}
+	}
+	fclose(fh);
+	return l;
+}
+
+void CDiamondApp::PrintMemInfo(void)
+{
+	CDiamondApp::props_t props = CDiamondApp::GetProcInfo("/proc/meminfo");
+	if(props.size() > 0)
+	{
+		logv(0, "** Memory Info\n\n");
+		for(CDiamondApp::props_t::iterator itr = props.begin(); itr != props.end(); ++itr)
+		{
+			log_info((*itr).first.c_str(), "%s", (*itr).second.c_str());
+		}
+		logv(0, "\n");
+	}
+}	
+
+void CDiamondApp::PrintCPUInfo(void)
+{
+	CDiamondApp::props_t props = CDiamondApp::GetProcInfo("/proc/cpuinfo");
+	if(props.size() > 0)
+	{
+		logv(0, "** CPU Info\n");
+		for(CDiamondApp::props_t::iterator itr = props.begin(); itr != props.end(); ++itr)
+		{
+			if((*itr).first == "processor")
+			{
+				logv(0, "\n");
+			}
+			log_info((*itr).first.c_str(), "%s", (*itr).second.c_str());
+		}
+		logv(0, "\n");
+	}
+}
+
 void CDiamondApp::PrintOpenCLInfo(void)
 {
 	CCLBase & base = CCLBase::getInstance();
+	logv(0, "** OpenCL platforms information\n\n");
 	log_info("Number of platforms", "%d", base.getPlatformsCount());
 	int n = base.getPlatformsCount();
 	for(int i=0;i<n; i++)
@@ -473,6 +539,7 @@ void CDiamondApp::PrintOpenCLInfo(void)
 		{
 			throw utils::StringFormatException("can not get platform info");
 		}
+		logv(0, "\n");
 		logv(0, "** Platform [%d]\n", i+1);
 		log_info("Name", "%s", info->getName().c_str());
 		log_info("Vendor", "%s", info->getVendor().c_str());
