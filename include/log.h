@@ -28,6 +28,7 @@ extern FILE * fh_r;
 #define log_timer(n, t)		log_fmtv(1, "Timer " n, "%.2f", (t).getTotalSeconds())
 #define log_res(n, f, ...)	log_fmtv(0, n, f, __VA_ARGS__)
 #define log_info(n, f, ...)	log_fmtv(0, n, f, __VA_ARGS__)
+#define log_sep(v)		logv((v), "--------------------------------\n")
 #ifdef DEBUG
 
 #define dbg(...)		_LOG(__VA_ARGS__)

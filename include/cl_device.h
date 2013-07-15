@@ -15,7 +15,7 @@ class CCLDevice
 public:
 	CCLDevice(void);
 	CCLDevice(const CCLDevice & src);
-	CCLDevice(CCLPlatform * platform,cl_device_id device_id);
+	CCLDevice(CCLPlatform * platform, cl_device_id device_id);
 	~CCLDevice(void);
 	bool operator==(CCLDevice & src);
 	bool isValid();

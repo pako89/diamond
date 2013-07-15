@@ -7,7 +7,7 @@ CCLDevice::CCLDevice(void) :
 {
 }
 
-CCLDevice::CCLDevice(CCLPlatform * platform,cl_device_id device_id)
+CCLDevice::CCLDevice(CCLPlatform * platform, cl_device_id device_id)
 {
 	this->info = NULL;
 	this->setId(platform, device_id);

@@ -473,7 +473,7 @@ void CDiamondApp::PrintOpenCLInfo(void)
 		{
 			throw utils::StringFormatException("can not get platform info");
 		}
-		logv(0, "Platform[%d]\n", i+1);
+		logv(0, "** Platform [%d]\n", i+1);
 		log_info("Name", "%s", info->getName().c_str());
 		log_info("Vendor", "%s", info->getVendor().c_str());
 		log_info("Version", "%s", info->getVersion().c_str());
@@ -492,12 +492,14 @@ void CDiamondApp::PrintOpenCLInfo(void)
 		int m = base.getPlatform(i)->getDevicesCount();
 		for(int j=0;j<m;j++)
 		{
-			CCLDeviceInfo * dinfo = base.getPlatform(i)->getDevice(j).getInfo();
+			CCLDeviceInfo * dinfo = base.getPlatform(i)->getDevicePtr(j)->getInfo();
 			if(NULL == dinfo)
 			{
 				throw utils::StringFormatException("can no get device info");
 			}
-			logv(0, "Device[%d]\n", j+1);
+			logv(0, "\n");
+			logv(0, "** Device [%d]\n", j+1);
+			log_sep(0);
 			log_info("Name", "%s", dinfo->getName().c_str());
 			log_info("Profile", "%s", dinfo->getProfile().c_str());
 			log_info("Device Version", "%s", dinfo->getDeviceVersion().c_str());
@@ -556,12 +558,14 @@ void CDiamondApp::PrintOpenCLInfo(void)
 				log_info("Extensions", "%s", extensions[0].c_str());
 				for(int i=1;i<extensions.size();i++)
 				{
-					log_info("", "%s", extensions[i].c_str());
+					if(extensions[i].size() > 0 && extensions[i] != " ")
+					{
+						log_info("", "%s", extensions[i].c_str());
+					}
 				}
 			}
-		
+			log_sep(0);
 		}
-		logv(0, "\n");
 	}
 }
 

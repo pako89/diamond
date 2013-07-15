@@ -17,6 +17,7 @@ public:
 	void fillDevices(cl_device_type type = CL_DEVICE_TYPE_ALL);
 	cl_uint getDevicesCount();
 	CCLDevice getDevice(cl_uint i);
+	CCLDevice * getDevicePtr(cl_uint i);
 	CCLPlatformInfo * getInfo();
 protected:
 	CCLPlatformInfo * info;

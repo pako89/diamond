@@ -89,3 +89,12 @@ CCLDevice CCLPlatform::getDevice(cl_uint i)
 	}
 	return CCLDevice();
 }
+
+CCLDevice * CCLPlatform::getDevicePtr(cl_uint i)
+{
+	if(i < this->num_devices)
+	{
+		return this->devices[i];
+	}
+	return NULL;
+}
