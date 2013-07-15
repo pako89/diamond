@@ -169,7 +169,12 @@ void CSequence::WriteYUV4MPEG()
 	CImageFormat imageFormat = getFormat();
 #define BUFF_SIZE	2048
 	char buff[BUFF_SIZE] = {0,};
-	int s = snprintf(buff, BUFF_SIZE, "%sW%d H%d C%s F%d:%d\n",
+#ifndef WIN32
+	int s = snprintf(
+#else
+	int s = _snprintf(
+#endif
+			buff, BUFF_SIZE, "%sW%d H%d C%s F%d:%d\n",
 			YUV4MPEG_HEADER,
 			imageFormat.Size.Width,
 			imageFormat.Size.Height,

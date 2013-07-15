@@ -264,7 +264,11 @@ void CDiamondApp::ParseArgs(int argc, char * argv[])
 {
 	if(NULL != argv)
 	{
+#ifndef WIN32
 		m_appName = basename(argv[0]);
+#else
+		m_appName = argv[0];
+#endif
 	}
 	if(argc < 2)
 	{
@@ -298,7 +302,7 @@ void CDiamondApp::ParseArgs(int argc, char * argv[])
 		PrintOpenCLInfo();
 		throw ExitException(0);
 	}
-	const char * shortopts = (common_opts + operation_opts).c_str();
+	std::string shortopts = common_opts + operation_opts;
 	option * _long_options = new option[long_options.size()];
 	int i=0;
 	for(std::list<option>::iterator itr = long_options.begin(); itr != long_options.end(); ++itr)
@@ -309,8 +313,13 @@ void CDiamondApp::ParseArgs(int argc, char * argv[])
 	char ** _argv;
 	if(DIAMOND_NOP != m_config.Op)
 	{
+#ifndef WIN32
 		_argc = argc-1;
 		_argv = argv+1;
+#else
+		_argc = argc-2;
+		_argv = argv+2;
+#endif
 	}
 	else
 	{
@@ -318,7 +327,7 @@ void CDiamondApp::ParseArgs(int argc, char * argv[])
 		_argv = argv;
 	}
 	int opt, longind;
-	while((opt = getopt_long(_argc, _argv, shortopts, _long_options, &longind)) != -1)
+	while((opt = getopt_long(_argc, _argv, shortopts.c_str(), _long_options, &longind)) != -1)
 	{
 		switch(opt)
 		{
@@ -431,7 +440,7 @@ void CDiamondApp::ParseArgs(int argc, char * argv[])
 				m_config.InputFile = fopen(m_config.InputFileName, "rb");
 				if(NULL == m_config.InputFile)
 				{
-					throw utils::StringFormatException(strerror(errno));
+					throw utils::StringFormatException("%s: no such file", m_config.InputFileName);
 				}
 			}
 			break;

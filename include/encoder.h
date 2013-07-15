@@ -29,6 +29,10 @@
 #define DEFAULT_HUFFMAN_TYPE	HUFFMAN_TYPE_STATIC
 #endif
 
+#ifndef DEFAULT_Q
+#define DEFAULT_Q	1
+#endif
+
 namespace avlib
 {
 
