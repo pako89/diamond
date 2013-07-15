@@ -37,6 +37,8 @@ class Config:
 		self.DecoderArgs = self.ConfigParser.get('General', 'DecoderArgs')
 		self.PSNR = self.ConfigParser.get('General', 'PSNR')
 		self.PSNRArgs = self.ConfigParser.get('General', 'PSNRArgs')
+		self.Info = self.ConfigParser.get('General', 'Info')
+		self.InfoArgs = self.ConfigParser.get('General', 'InfoArgs')
 		# Output configuration
 		self.TarDecoded = str2bool(self.ConfigParser.get('Output', 'TarDecoded'))
 		if self.TarDecoded:
@@ -46,6 +48,8 @@ class Config:
 		self.ResultsName = self.ConfigParser.get('Output', 'ResultsName')
 		self.RemoveDecoded = str2bool(self.ConfigParser.get('Output', 'RemoveDecoded'))
 		self.ComputePSNR = str2bool(self.ConfigParser.get('Output', 'ComputePSNR'))
+		self.WriteSysInfo = str2bool(self.ConfigParser.get('Output', 'WriteSysInfo'));
+		self.SysInfoName = self.ConfigParser.get('Output', 'SysInfoName')
 		# Input Configuration
 		self._videos_dir = self.ConfigParser.get('Input', 'VideosDir')
 		self._videos_ext = self.ConfigParser.get('Input', 'VideosExt')
@@ -149,7 +153,19 @@ class Benchmark:
 		self.flog = open(os.path.join(self.Config.ResultsDir, "benchmark.log"), 'w')
 		self.Results = list()
 	
+	def _write_sysinfo(self):
+		cmd = Command(self.Config.Info)
+		cmd.add_arg(self.Config.InfoArgs)
+		cmd.run()
+		if cmd.get_status() == 0:
+			fh = open(os.path.join(self.Config.ResultsDir,self.Config.SysInfoName), "w")
+			fh.write(cmd.get_stdout())
+			fh.close()
+
+
 	def run(self):
+		if self.Config.WriteSysInfo:
+			self._write_sysinfo()
 		print "\033[34;1mRunning benchmark\033[;m"
 		i = 1
 		for v in self.Config.Videos:
