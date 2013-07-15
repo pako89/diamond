@@ -5,19 +5,15 @@
 namespace avlib
 {
 
-CCLEncoder::CCLEncoder()
+CCLEncoder::CCLEncoder() : 
+	m_clPolicy(NULL)
 {
-	m_clPolicy = new CCLFirstGPUDevicePolicy();
 }
 
 CCLEncoder::CCLEncoder(EncoderConfig cfg) : 
-	CEncoder(cfg)
+	CEncoder(cfg),
+	m_clPolicy(NULL)
 {
-#ifdef WIN32
-	m_clPolicy = new CCLFirstDevicePolicy();
-#else
-	m_clPolicy = new CCLFirstGPUDevicePolicy();
-#endif
 }
 
 CCLEncoder::~CCLEncoder()

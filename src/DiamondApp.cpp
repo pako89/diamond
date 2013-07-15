@@ -340,7 +340,7 @@ void CDiamondApp::ParseArgs(int argc, char * argv[])
 			throw ExitException(0);
 			break;
 		case 'o':
-			m_config.OutputFile = fopen(optarg, "w+");
+			m_config.OutputFile = fopen(optarg, "wb");
 			if(NULL != m_config.OutputFile)
 			{
 				m_config.OutputFileName = optarg;
@@ -511,6 +511,7 @@ CDiamondApp::props_t CDiamondApp::GetProcInfo(const char * procname)
 
 void CDiamondApp::PrintMemInfo(void)
 {
+#ifndef WIN32
 	CDiamondApp::props_t props = CDiamondApp::GetProcInfo("/proc/meminfo");
 	if(props.size() > 0)
 	{
@@ -521,10 +522,12 @@ void CDiamondApp::PrintMemInfo(void)
 		}
 		logv(0, "\n");
 	}
+#endif
 }	
 
 void CDiamondApp::PrintCPUInfo(void)
 {
+#ifndef WIN32
 	CDiamondApp::props_t props = CDiamondApp::GetProcInfo("/proc/cpuinfo");
 	if(props.size() > 0)
 	{
@@ -539,6 +542,7 @@ void CDiamondApp::PrintCPUInfo(void)
 		}
 		logv(0, "\n");
 	}
+#endif
 }
 
 void CDiamondApp::PrintOpenCLInfo(void)

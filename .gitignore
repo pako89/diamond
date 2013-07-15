@@ -5,7 +5,6 @@
 bin/
 obj/
 doc/
-make.visual/*
 make.visual/ipch
 make.visual/obj
 make.visual/*.sdf

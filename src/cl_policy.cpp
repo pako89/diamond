@@ -12,11 +12,11 @@ CCLDevice CCLFirstDevicePolicy::getDevice()
 		{
 			for(cl_uint j=0;j<p->getDevicesCount();j++)
 			{
-				CCLDevice d = p->getDevice(i);
+				CCLDevice d = p->getDevice(j);
 				if(d.isValid())
 				{
-					CCLDeviceInfo * i = d.getInfo();
-					if(this->checkDeviceInfo(i))
+					CCLDeviceInfo * info = d.getInfo();
+					if(this->checkDeviceInfo(info))
 					{
 						return d;
 					}
