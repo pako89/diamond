@@ -21,13 +21,13 @@ const char * EncoderVariant2Str(enum EncoderVariant v)
 {
 	switch(v)
 	{
-	case ENCODER_VARIANT_CPU:
+/* 0 */	case ENCODER_VARIANT_CPU:
 		return "CPU";
-	case ENCODER_VARIANT_OPENCL:
+/* 1 */	case ENCODER_VARIANT_OPENCL:
 		return "Basic OpenCL";
-	case ENCODER_VARIANT_OPENCL_MERGED:
+/* 2 */	case ENCODER_VARIANT_OPENCL_MERGED:
 		return "Merged OpenCL";
-	case ENCODER_VARIANT_OPENCL_PARALLEL:
+/* 3 */	case ENCODER_VARIANT_OPENCL_PARALLEL:
 		return "Parallel OpenCL";
 	default:
 		return "Unknown";
@@ -150,6 +150,7 @@ void CDiamondApp::PrintVersion(void)
 {
 	log_info("version", "%s", VERSION);
 	log_info("build date", "%s", BUILD_DATE);
+	log_info("Github", "%s", "https://github.com/pako89/diamond");
 }
 
 void CDiamondApp::PrintBanner(void)
@@ -163,14 +164,128 @@ void CDiamondApp::PrintBanner(void)
 
 void CDiamondApp::PrintUsage(void)
 {
-	printf("Usage: %s encode|decode|psnr [OPTIONS] FILE[S]\n", m_appName);
+	printf("Usage: %s encode|decode|psnr|info [OPTIONS] FILE[S]\n", m_appName);
 }
 
 void CDiamondApp::PrintHelp(void)
 {
-	PrintBanner();
-	PrintUsage();
+printf("\
+%s is a non-standarized hybrid video encoder and decoder implementation using CPU and OpenCL technology.\n\
+Copyright © 2013 by Pawel Lebioda <pawel.lebioda89@gmail.com>\n\
+", m_appName);
+printf("\n");
 	PrintVersion();
+printf("\n");
+printf("\
+Usage: %s OPERATION [OPTIONS] [FILE(S)]\n\
+", m_appName);
+printf("\n");
+printf("\
+Avalibale operations:\n\
+");
+printf("\
+	encode	[OPTIONS] FILE	- Encode sequence using specigied variant of encoder.\n\
+			  	  Input file must be in YUV4MPEG2 format, otherwise sequence\n\
+				  parameters must be specified by encoder options.\n\
+");
+printf("\
+	decode	[OPTIONS] FILE	- Decode bitstream file. Output file will be in YUV4MPEG2 format\n\
+");
+printf("\
+	psnr	[OPTIONS] FILES	- Compute PSNR value for two sequences.\n\
+				  Sequences must be in YUV4MPEG2 format, otherwise sequence\n\
+				  parameters must be specified by PSNR options\n\
+");
+printf("\
+	info			- Print system information including:\n\
+				  * Version\n\
+				  * Build data\n\
+				  * CPU information\n\
+				  * Memory information\n\
+				  * OpenCL platforms and devices informations\n\
+");
+printf("\n");
+printf("\
+Common options:\n\
+");
+printf("\
+	-h, --help			Print this help message\n\
+");
+printf("\
+	-p, --progress-bar yes|no	Indicates whether progress bar should be printed\n\
+					Requires -v option\n\
+					[Default: no]\n\
+");
+printf("\
+	-T, --print-timers yes|no	Indicates whether timers' values should be printed\n\
+					Requires -v option\n\
+					[Default: no]\n\
+");
+printf("\
+	-v, --verbose			Increase verbose level\n\
+");
+printf("\
+	-X, --version			Print version information\n\
+");
+printf("\n");
+printf("\
+Encoder options:\n\
+");
+printf("\
+	-o, --output	FILE		Output file name\n\
+					[Default: stdout]\n\
+");
+printf("\
+	-t, --type	FORMAT		Input sequence format type. Valid formats:\n\
+					YUV420|420jpeg\n\
+");
+printf("\
+	-H, --height	INT		Input sequence height\n\
+");
+printf("\
+	-W, --width	INT		Input sequence width\n\
+");
+printf("\
+	-V, --variant	INT		Encoder variant. Available variants:\n\
+					* 0 - CPU\n\
+					* 1 - Basic OpenCL\n\
+					* 2 - Merged OpenCL\n\
+					* 3 - Parallel OpenCL\n\
+");
+printf("\
+	-g, --gop	INT		Group Of Pictures - number of frames between two succesive I Frames\n\
+");
+printf("\
+	-q, --quant	INT		Quantization coefficient\n\
+");
+printf("\
+	-I, --interpolation INT		Interpolation scale for prediction\n\
+");
+printf("\n");
+printf("\
+Decoder options\n\
+");
+printf("\
+	-o, --output			Output file name\n\
+");
+printf("\n");
+printf("\
+PSNR options\n\
+");
+printf("\
+	-g, --gop	INT		Group Of Pictures - number of frames between two succesive I Frames\n\
+");
+printf("\
+	-t, --type	FORMAT		Input sequence format type. Valid formats:\n\
+					YUV420|420jpeg\n\
+");
+printf("\
+	-H, --height	INT		Input sequence height\n\
+");
+printf("\
+	-W, --width	INT		Input sequence width\n\
+");
+printf("\n");
 }
 
 
