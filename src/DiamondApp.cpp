@@ -263,14 +263,14 @@ printf("\
 ");
 printf("\n");
 printf("\
-Decoder options\n\
+Decoder options:\n\
 ");
 printf("\
 	-o, --output			Output file name\n\
 ");
 printf("\n");
 printf("\
-PSNR options\n\
+PSNR options:\n\
 ");
 printf("\
 	-g, --gop	INT		Group Of Pictures - number of frames between two succesive I Frames\n\
