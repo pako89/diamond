@@ -5,12 +5,6 @@
 bin/
 obj/
 doc/
-make.visual/*
-make.visual/ipch
-make.visual/obj
-make.visual/*.sdf
-make.visual/*.suo
-diamond
 video
 output.diamond
 *.swp

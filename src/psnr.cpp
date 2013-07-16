@@ -107,7 +107,7 @@ float CPSNR::Compute(avlib::CComponent<uint8_t> & cmp1, avlib::CComponent<uint8_
 	}
 	float mn = (float)cmp1.getHeight()*(float)cmp2.getWidth();
 	float mse = sum/mn;
-	float psnr = 20*log10(255) - 10*log10(mse);
+	float psnr = 20*log10(static_cast<double>(255)) - 10*log10(mse);
 	return psnr;
 }
 

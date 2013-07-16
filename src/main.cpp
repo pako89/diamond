@@ -70,6 +70,8 @@ int main(int argc,char * argv[])
 			}
 			enc->Encode(seq, bstr);
 			bstr->flush_all();
+			fclose(config.OutputFile);
+			fclose(config.InputFile);
 			delete enc;
 			delete bstr;
 			delete seq;
