@@ -50,12 +50,12 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>DEFAULT_CL_SRC_FILE="d:\\Projects\\diamond\\src\\cl\\kernel.cl";WIN32;DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\include;..\..\src\cl;%(AdditionalIncludeDirectories);c:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v5.0\include\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\include;..\..\src\cl;%(AdditionalIncludeDirectories);c:\Program Files (x86)\Intel\OpenCL SDK\2.0\include\</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>c:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v5.0\lib\Win32\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>c:\Program Files (x86)\Intel\OpenCL SDK\2.0\lib\x86\</AdditionalLibraryDirectories>
       <AdditionalDependencies>OpenCL.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -68,14 +68,14 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>DEFAULT_CL_SRC_FILE="d:\\Projects\\diamond\\src\\cl\\kernel.cl";WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions);DEFAULT_CL_SRC_FILE="d:\Projects\diamond\src\cl\kernel.cl"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\include;..\..\src\cl;%(AdditionalIncludeDirectories);c:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v5.0\include\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\include;..\..\src\cl;%(AdditionalIncludeDirectories);c:\Program Files (x86)\Intel\OpenCL SDK\2.0\include\</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>c:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v5.0\lib\Win32\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>c:\Program Files (x86)\Intel\OpenCL SDK\2.0\lib\x86\</AdditionalLibraryDirectories>
       <AdditionalDependencies>OpenCL.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>

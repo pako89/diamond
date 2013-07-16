@@ -15,13 +15,7 @@
 
 #define INSTANTIATE(t_class, t_arg)		template class t_class<t_arg>
 #define INSTANTIATE2(t_class, t_arg1, t_arg2)	template class t_class<t_arg1, t_arg2>
-#ifdef WIN32
-#define CONVERSION(t_class, t_from, t_to) 	template t_class<t_to>::t_class(const t_class<t_from> &);	\
-						template t_class<t_to> & t_class<t_to>::operator=(const t_class<t_from> & src)
-#else
-#define CONVERSION(t_class, t_from, t_to) 	template t_class<t_to>::t_class<t_from>(const t_class<t_from> &);	\
-						template t_class<t_to> & t_class<t_to>::operator=(const t_class<t_from> & src)
-#endif
+#define CONVERSION(t_class, t_from, t_to) template t_class<t_to> & t_class<t_to>::operator=(const t_class<t_from> & src)
 #define ARRAY_SIZE(x)				(sizeof(x)/sizeof((x)[0]))
 
 #define LIMIT(v, l)	( (v) > (l) ? (l) : ((v) < -(l) ? -(l) : (v)) )
