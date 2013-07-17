@@ -18,317 +18,317 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\avlib.cpp">
+    <ClCompile Include="..\src\avlib.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\basic_decoder.cpp">
+    <ClCompile Include="..\src\basic_decoder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\basic_encoder.cpp">
+    <ClCompile Include="..\src\basic_encoder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\bitstream.cpp">
+    <ClCompile Include="..\src\bitstream.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\cl_base.cpp">
+    <ClCompile Include="..\src\cl_base.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\cl_component.cpp">
+    <ClCompile Include="..\src\cl_component.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\cl_dct.cpp">
+    <ClCompile Include="..\src\cl_dct.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\cl_dctqzz.cpp">
+    <ClCompile Include="..\src\cl_dctqzz.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\cl_device.cpp">
+    <ClCompile Include="..\src\cl_device.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\cl_device_info.cpp">
+    <ClCompile Include="..\src\cl_device_info.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\cl_encoder.cpp">
+    <ClCompile Include="..\src\cl_encoder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\cl_host.cpp">
+    <ClCompile Include="..\src\cl_host.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\cl_image.cpp">
+    <ClCompile Include="..\src\cl_image.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\cl_interpolation.cpp">
+    <ClCompile Include="..\src\cl_interpolation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\cl_kernel.cpp">
+    <ClCompile Include="..\src\cl_kernel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\cl_merged_encoder.cpp">
+    <ClCompile Include="..\src\cl_merged_encoder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\cl_parallel_encoder.cpp">
+    <ClCompile Include="..\src\cl_parallel_encoder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\cl_platform.cpp">
+    <ClCompile Include="..\src\cl_platform.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\cl_platform_info.cpp">
+    <ClCompile Include="..\src\cl_platform_info.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\cl_policy.cpp">
+    <ClCompile Include="..\src\cl_policy.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\cl_prediction.cpp">
+    <ClCompile Include="..\src\cl_prediction.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\cl_quantizer.cpp">
+    <ClCompile Include="..\src\cl_quantizer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\cl_shift.cpp">
+    <ClCompile Include="..\src\cl_shift.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\cl_timers.cpp">
+    <ClCompile Include="..\src\cl_timers.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\cl_zigzag.cpp">
+    <ClCompile Include="..\src\cl_zigzag.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\component.cpp">
+    <ClCompile Include="..\src\component.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\dct.cpp">
+    <ClCompile Include="..\src\dct.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\decoder.cpp">
+    <ClCompile Include="..\src\decoder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\app.cpp">
+    <ClCompile Include="..\src\app.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\dynamic_huffman.cpp">
+    <ClCompile Include="..\src\dynamic_huffman.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\dynamic_rlc.cpp">
+    <ClCompile Include="..\src\dynamic_rlc.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\encoder.cpp">
+    <ClCompile Include="..\src\encoder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\getopt.cpp">
+    <ClCompile Include="..\src\getopt.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\getopt_long.cpp">
+    <ClCompile Include="..\src\getopt_long.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\image.cpp">
+    <ClCompile Include="..\src\image.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\interpolation.cpp">
+    <ClCompile Include="..\src\interpolation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\log.cpp">
+    <ClCompile Include="..\src\log.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\main.cpp">
+    <ClCompile Include="..\src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\mtimer.cpp">
+    <ClCompile Include="..\src\mtimer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\prediction.cpp">
+    <ClCompile Include="..\src\prediction.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\psnr.cpp">
+    <ClCompile Include="..\src\psnr.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\quantizer.cpp">
+    <ClCompile Include="..\src\quantizer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\rlc.cpp">
+    <ClCompile Include="..\src\rlc.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\rlc_factory.cpp">
+    <ClCompile Include="..\src\rlc_factory.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\sequence.cpp">
+    <ClCompile Include="..\src\sequence.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\shift.cpp">
+    <ClCompile Include="..\src\shift.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\static_huffman.cpp">
+    <ClCompile Include="..\src\static_huffman.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\static_rlc.cpp">
+    <ClCompile Include="..\src\static_rlc.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\transform.cpp">
+    <ClCompile Include="..\src\transform.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\utils.cpp">
+    <ClCompile Include="..\src\utils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\zigzag.cpp">
+    <ClCompile Include="..\src\zigzag.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\include\avlib.h">
+    <ClInclude Include="..\include\avlib.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\basic_decoder.h">
+    <ClInclude Include="..\include\basic_decoder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\basic_encoder.h">
+    <ClInclude Include="..\include\basic_encoder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\bitstream.h">
+    <ClInclude Include="..\include\bitstream.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\cl_base.h">
+    <ClInclude Include="..\include\cl_base.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\cl_component.h">
+    <ClInclude Include="..\include\cl_component.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\cl_dct.h">
+    <ClInclude Include="..\include\cl_dct.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\cl_dctqzz.h">
+    <ClInclude Include="..\include\cl_dctqzz.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\cl_device.h">
+    <ClInclude Include="..\include\cl_device.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\cl_device_info.h">
+    <ClInclude Include="..\include\cl_device_info.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\cl_encoder.h">
+    <ClInclude Include="..\include\cl_encoder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\cl_host.h">
+    <ClInclude Include="..\include\cl_host.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\cl_image.h">
+    <ClInclude Include="..\include\cl_image.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\cl_interpolation.h">
+    <ClInclude Include="..\include\cl_interpolation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\cl_kernel.h">
+    <ClInclude Include="..\include\cl_kernel.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\cl_merged_encoder.h">
+    <ClInclude Include="..\include\cl_merged_encoder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\cl_parallel_encoder.h">
+    <ClInclude Include="..\include\cl_parallel_encoder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\cl_platform.h">
+    <ClInclude Include="..\include\cl_platform.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\cl_platform_info.h">
+    <ClInclude Include="..\include\cl_platform_info.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\cl_policy.h">
+    <ClInclude Include="..\include\cl_policy.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\cl_prediction.h">
+    <ClInclude Include="..\include\cl_prediction.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\cl_quantizer.h">
+    <ClInclude Include="..\include\cl_quantizer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\cl_shift.h">
+    <ClInclude Include="..\include\cl_shift.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\cl_timers.h">
+    <ClInclude Include="..\include\cl_timers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\cl_zigzag.h">
+    <ClInclude Include="..\include\cl_zigzag.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\component.h">
+    <ClInclude Include="..\include\component.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\dct.h">
+    <ClInclude Include="..\include\dct.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\decoder.h">
+    <ClInclude Include="..\include\decoder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\app.h">
+    <ClInclude Include="..\include\app.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\dynamic_huffman.h">
+    <ClInclude Include="..\include\dynamic_huffman.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\dynamic_rlc.h">
+    <ClInclude Include="..\include\dynamic_rlc.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\encoder.h">
+    <ClInclude Include="..\include\encoder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\getopt.h">
+    <ClInclude Include="..\include\getopt.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\image.h">
+    <ClInclude Include="..\include\image.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\interpolation.h">
+    <ClInclude Include="..\include\interpolation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\log.h">
+    <ClInclude Include="..\include\log.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\mtimer.h">
+    <ClInclude Include="..\include\mtimer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\prediction.h">
+    <ClInclude Include="..\include\prediction.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\proto.h">
+    <ClInclude Include="..\include\proto.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\psnr.h">
+    <ClInclude Include="..\include\psnr.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\quantizer.h">
+    <ClInclude Include="..\include\quantizer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\rlc.h">
+    <ClInclude Include="..\include\rlc.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\rlc_factory.h">
+    <ClInclude Include="..\include\rlc_factory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\sequence.h">
+    <ClInclude Include="..\include\sequence.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\shift.h">
+    <ClInclude Include="..\include\shift.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\static_huffman.h">
+    <ClInclude Include="..\include\static_huffman.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\static_rlc.h">
+    <ClInclude Include="..\include\static_rlc.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\transform.h">
+    <ClInclude Include="..\include\transform.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\utils.h">
+    <ClInclude Include="..\include\utils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\zigzag.h">
+    <ClInclude Include="..\include\zigzag.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\cl\clkernel.h">
+    <ClInclude Include="..\src\cl\clkernel.h">
       <Filter>OpenCL</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\src\cl\kernel.cl">
+    <None Include="..\src\cl\kernel.cl">
       <Filter>OpenCL</Filter>
     </None>
   </ItemGroup>

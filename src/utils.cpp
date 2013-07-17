@@ -121,7 +121,7 @@ void printProgressBar(int i, int n)
 		delete bar;
 	}
 #else
-	logev(1, "\r%d/%d", i+1, n);
+	logev(1, "\r%d/%d", i, n);
 #endif
 }
 std::string get_src_from_file(char * file_name)

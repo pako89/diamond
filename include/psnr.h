@@ -16,6 +16,14 @@ struct PSNRConfig
 		FILE * File;
 	} Seq[2];
 	int GOP;
+	PSNRConfig()
+	{
+		GOP = 1;
+		Seq[0].File = NULL;
+		Seq[0].FileName = NULL;
+		Seq[1].File = NULL;
+		Seq[1].FileName = NULL;
+	}
 };
 
 template <class T>
