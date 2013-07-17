@@ -91,7 +91,7 @@ void printProgressBar(int i, int n)
 #ifndef WIN32
 	if(i==n)
 	{
-		logv(1, "\n");
+		logev(1, "\n");
 	}
 	else
 	{
@@ -115,13 +115,13 @@ void printProgressBar(int i, int n)
 			bar[ni-1] = (i==n)?'=':(mi==0)?'|':(mi==1)?'/':(mi==2)?'-':'\\';
 		}
 		bar[ni]=0;
-		logv(1, "\r[%-*s]["YELLOW"%s"EC"]", bars, bar, frames);
+		logev(1, "\r[%-*s]["YELLOW"%s"EC"]", bars, bar, frames);
 		delete line;
 		delete frames;
 		delete bar;
 	}
 #else
-	logv(1, "\r%d/%d", i+1, n);
+	logev(1, "\r%d/%d", i+1, n);
 #endif
 }
 std::string get_src_from_file(char * file_name)
