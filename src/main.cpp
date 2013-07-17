@@ -13,13 +13,6 @@
 #include <cl_merged_encoder.h>
 #include <log.h>
 
-
-#ifdef WIN32
-#define exit(v)		{system("pause"); exit((v));}
-#else
-#define exit(v)		exit((v));
-#endif
-
 int main(int argc,char * argv[])
 {
 	irena::CApplication * app = irena::CApplication::getInstance();

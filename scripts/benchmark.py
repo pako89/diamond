@@ -4,10 +4,34 @@ import os
 import re
 import ConfigParser
 import datetime
-import commands
 import string
 import collections
 
+if sys.platform == 'win32':
+	BLUE=""
+	RED=""
+	YELLOW=""
+	GREEN=""
+	EC=""
+else:
+	BLUE="\033[34;1m"
+	RED="\033[31;1m"
+	YELLOW="\033[33;1m"
+	GREEN="\033[32;1m"
+	EC="\033[0;m"
+
+def getstatusoutput(cmd): 
+    """Return (status, output) of executing cmd in a shell."""
+    """This new implementation should work on all platforms."""
+    import subprocess
+    pipe = subprocess.Popen(cmd, shell=True, universal_newlines=True,
+            stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    output = str.join("", pipe.stdout.readlines()) 
+    sts = pipe.wait()
+    if sts is None:
+        sts = 0
+    return sts, output	
+	
 def str2bool(v):
 	  return v.lower() in ("yes", "true", "t", "y", "1")
 
@@ -28,40 +52,50 @@ class Config:
 		self.Videos = list()
 		self.ConfigParser = ConfigParser.RawConfigParser()
 
+	def _get_config(self, section, name):
+		try:
+			ret = self.ConfigParser.get(section, name)
+		except:
+			try:
+				ret = self.ConfigParser.get(sys.platform, name)
+			except:
+				print "Can not find option {0} in sections {1}, {2}".format(name, section, sys.platform)
+				exit(1)
+		return ret
+
 	def parse_config(self, config_file):
 		self.ConfigParser.read(config_file)
 		# General configuration
-		self.Encoder = self.ConfigParser.get('General', 'Encoder')
-		self.EncoderArgs = self.ConfigParser.get('General', 'EncoderArgs')
-		self.Decoder = self.ConfigParser.get('General', 'Decoder')
-		self.DecoderArgs = self.ConfigParser.get('General', 'DecoderArgs')
-		self.PSNR = self.ConfigParser.get('General', 'PSNR')
-		self.PSNRArgs = self.ConfigParser.get('General', 'PSNRArgs')
-		self.Info = self.ConfigParser.get('General', 'Info')
-		self.InfoArgs = self.ConfigParser.get('General', 'InfoArgs')
+		self.Encoder = self._get_config('General', 'Encoder')
+		self.EncoderArgs = self._get_config('General', 'EncoderArgs')
+		self.Decoder = self._get_config('General', 'Decoder')
+		self.DecoderArgs = self._get_config('General', 'DecoderArgs')
+		self.PSNR = self._get_config('General', 'PSNR')
+		self.PSNRArgs = self._get_config('General', 'PSNRArgs')
+		self.Info = self._get_config('General', 'Info')
+		self.InfoArgs = self._get_config('General', 'InfoArgs')
+		self.Tar = self._get_config('General', 'Tar')
 		# Output configuration
-		self.TarDecoded = str2bool(self.ConfigParser.get('Output', 'TarDecoded'))
-		if self.TarDecoded:
-			self.Tar = self.ConfigParser.get('Output', 'Tar')
-		self.ResultsDir = self.ConfigParser.get('Output', 'ResultsDir')
+		self.TarDecoded = str2bool(self._get_config('Output', 'TarDecoded')) and self.Tar != ""		
+		self.ResultsDir = self._get_config('Output', 'ResultsDir')
 		self.wildcard_results_dir()
-		self.ResultsName = self.ConfigParser.get('Output', 'ResultsName')
-		self.RemoveDecoded = str2bool(self.ConfigParser.get('Output', 'RemoveDecoded'))
-		self.ComputePSNR = str2bool(self.ConfigParser.get('Output', 'ComputePSNR'))
-		self.WriteSysInfo = str2bool(self.ConfigParser.get('Output', 'WriteSysInfo'));
-		self.SysInfoName = self.ConfigParser.get('Output', 'SysInfoName')
+		self.ResultsName = self._get_config('Output', 'ResultsName')
+		self.RemoveDecoded = str2bool(self._get_config('Output', 'RemoveDecoded'))
+		self.ComputePSNR = str2bool(self._get_config('Output', 'ComputePSNR'))
+		self.WriteSysInfo = str2bool(self._get_config('Output', 'WriteSysInfo'));
+		self.SysInfoName = self._get_config('Output', 'SysInfoName')
 		# Input Configuration
-		self._videos_dir = self.ConfigParser.get('Input', 'VideosDir')
-		self._videos_ext = self.ConfigParser.get('Input', 'VideosExt')
-		self.VideosFormat = self.ConfigParser.get('Input', 'VideosFormat')
+		self._videos_dir = self._get_config('Input', 'VideosDir')
+		self._videos_ext = self._get_config('Input', 'VideosExt')
+		self.VideosFormat = self._get_config('Input', 'VideosFormat')
 		self.parse_videos()
 		# Options configuration
-		self.Interpolation = string.split(self.ConfigParser.get('Options', 'Interpolation'), ' ')
-		self.Huffman = string.split(self.ConfigParser.get('Options', 'Huffman'), ' ')
-		self.EncoderVariant = string.split(self.ConfigParser.get('Options', 'EncoderVariant'), ' ')
-		self.GOP = string.split(self.ConfigParser.get('Options', 'GOP'), ' ')
-		self.Q = string.split(self.ConfigParser.get('Options', 'Q'), ' ')
-		self.Device = string.split(self.ConfigParser.get('Options', 'Device'), ' ')
+		self.Interpolation = string.split(self._get_config('Options', 'Interpolation'), ' ')
+		self.Huffman = string.split(self._get_config('Options', 'Huffman'), ' ')
+		self.EncoderVariant = string.split(self._get_config('Options', 'EncoderVariant'), ' ')
+		self.GOP = string.split(self._get_config('Options', 'GOP'), ' ')
+		self.Q = string.split(self._get_config('Options', 'Q'), ' ')
+		self.Device = string.split(self._get_config('Options', 'Device'), ' ')
 
 	def get_count(self):
 		r = 1
@@ -121,7 +155,7 @@ class Command:
 		return self._stdout
 
 	def run(self):
-		[s, o] = commands.getstatusoutput(self.Command)
+		[s, o] = getstatusoutput(self.Command)
 		self._exit = s
 		self._stdout = o
 
@@ -170,7 +204,7 @@ class Benchmark:
 	def run(self):
 		if self.Config.WriteSysInfo:
 			self._write_sysinfo()
-		print "\033[34;1mRunning benchmark\033[;m"
+		print BLUE + "Running benchmark"+ EC
 		i = 1
 		for v in self.Config.Videos:
 			for I in self.Config.Interpolation:
@@ -213,10 +247,10 @@ class Benchmark:
 		if res:
 			self._out_error(txt)
 		else:
-			self._out("\r[\033[32;1m{0}\033[0;m] {1}...\n".format("OK", txt))
+			self._out(("\r[" + GREEN + "{0}" + EC + "] {1}...\n").format("OK", txt))
 	
 	def _out_error(self, txt):
-		self._out("\r[\033[31;1m{0}\033[0;m] {1}...\n".format("ERROR", txt))
+		self._out(("\r[" + RED + "{0}" + EC + "] {1}...\n").format("ERROR", txt))
 
 	def _run_encoder(self, cfg, bstr):
 		self._out_progress("Encoding")
@@ -295,7 +329,7 @@ class Benchmark:
 	def _run_item(self, cfg, i):
 		self._log_gsep()
 		self._log("Run {0}/{1}\n".format(i, self.Config.get_count()))
-		self._out("\033[33;1mRun {0}/{1}\033[;m\n".format(i, self.Config.get_count()))
+		self._out((YELLOW + "Run {0}/{1}" + EC + "\n").format(i, self.Config.get_count()))
 		bstr = self._get_out_path(cfg.get_video_variant() + ".bstr")
 		output = self._get_out_path(cfg.get_video_variant() + ".yuv")
 		tar = self._get_out_path(cfg.get_video_variant())

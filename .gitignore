@@ -12,3 +12,11 @@ tools/
 temp.bstr
 .gdbinit
 results/
+*.user
+*.sdf
+ipch
+Debug
+Release
+*.opensdf
+*.bstr
+*.yuv
