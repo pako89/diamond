@@ -1,5 +1,5 @@
-#ifndef _DIAMOND_APP_H
-#define _DIAMOND_APP_H
+#ifndef _IRENA_APP_H
+#define _IRENA_APP_H
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -15,7 +15,7 @@
 #include <psnr.h>
 #include <list>
 
-namespace diamond
+namespace irena
 {
 
 class ExitException : public std::exception
@@ -34,13 +34,13 @@ public:
 	ParseArgsException(const char * fmt, ...);
 };
 
-enum DiamondOperation
+enum Operation
 {
-	DIAMOND_NOP,
-	DIAMOND_OP_ENCODE,
-	DIAMOND_OP_DECODE,
-	DIAMOND_OP_PSNR,
-	DIAMOND_OP_INFO
+	NOP,
+	OP_ENCODE,
+	OP_DECODE,
+	OP_PSNR,
+	OP_INFO
 };
 
 enum EncoderVariant
@@ -53,10 +53,10 @@ enum EncoderVariant
 
 const char * EncoderVariant2Str(enum EncoderVariant v);
 
-struct DiamondConfig
+struct Config
 {
-	DiamondConfig() :
-		Op(DIAMOND_NOP),
+	Config() :
+		Op(NOP),
 		InputFileName("stdin"),
 		InputFile(stdin),
 		OutputFileName("stdout"),
@@ -66,7 +66,7 @@ struct DiamondConfig
 		ImageSize(0, 0),
 		Variant(ENCODER_VARIANT_OPENCL)
 	{}
-	DiamondOperation Op;
+	Operation Op;
 	const char * InputFileName;
 	FILE * InputFile;
 	const char * OutputFileName;
@@ -80,26 +80,26 @@ struct DiamondConfig
 };
 
 /**
- * Singleton class DiamondApp
+ * Singleton class CApplication
  */
-class CDiamondApp
+class CApplication
 {
 public:
-	static CDiamondApp * getInstance(void);
+	static CApplication * getInstance(void);
 	static void PrintOpenCLInfo(void);
 	static void PrintCPUInfo(void);
 	static void PrintMemInfo(void);
 	typedef std::list<std::pair<std::string, std::string> > props_t;
-	static CDiamondApp::props_t GetProcInfo(const char * procname);
+	static CApplication::props_t GetProcInfo(const char * procname);
 protected:
-	static CDiamondApp * m_instance;
+	static CApplication * m_instance;
 	static const struct option common_options[];
 	static const struct option encoder_options[];
 	static const struct option decoder_options[];
 	static const struct option psnr_options[];
 	void appendLongOptions(std::list<option> & options, const option * long_options, int c);
 public:
-	~CDiamondApp(void);
+	~CApplication(void);
 	void setName(const char * appName);
 	void ParseArgs(int argc, char * argv[]);
 	void PrintBanner(void);
@@ -107,18 +107,18 @@ public:
 	void PrintHelp(void);
 	void PrintVersion(void);
 	const char * getName(void);
-	DiamondConfig getConfig(void);
+	Config getConfig(void);
 protected:
-	CDiamondApp(void);
-	DiamondOperation parseOperation(std::string op);
+	CApplication(void);
+	Operation parseOperation(std::string op);
 	avlib::HUFFMAN_TYPE parseHuffman(const char * op);
 	avlib::ImageType parseImageType(const char * arg);
 	bool parseBool(std::string arg);
 	std::string getShortOpts(const struct option long_options[], int size);
 
-	DiamondConfig m_config;
+	Config m_config;
 	const char * m_appName;
 };
 }
-#endif //_DIAMOND_APP_H
+#endif //_IRENA_APP_H
 

@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <DiamondApp.h>
+#include <app.h>
 #include <component.h>
 #include <dynamic_huffman.h>
 #include <vector>
@@ -22,15 +22,15 @@
 
 int main(int argc,char * argv[])
 {
-	diamond::CDiamondApp * app = diamond::CDiamondApp::getInstance();
+	irena::CApplication * app = irena::CApplication::getInstance();
 	app->setName(argv[0]);
 	try
 	{
 		app->ParseArgs(argc, argv);
-		diamond::DiamondConfig config = app->getConfig();
+		irena::Config config = app->getConfig();
 		log_prop("Input file", "%s", config.InputFileName);
 		log_prop("Output file", "%s", config.OutputFileName);
-		if(diamond::DIAMOND_OP_ENCODE == config.Op)
+		if(irena::OP_ENCODE == config.Op)
 		{
 			const char * huffstr = config.EncoderConfig.HuffmanType==avlib::HUFFMAN_TYPE_DYNAMIC?"dynamic":"static";
 			avlib::CSequence * seq = new avlib::CSequence(config.InputFile);
@@ -38,7 +38,7 @@ int main(int argc,char * argv[])
 			{
 				seq->setFormat(config.ImageType, config.ImageSize.Height, config.ImageSize.Width);
 			}
-			log_prop("Variant", "%s", diamond::EncoderVariant2Str(config.Variant));
+			log_prop("Variant", "%s", irena::EncoderVariant2Str(config.Variant));
 			log_prop("Image type", "%s", config.ImageTypeStr);
 			log_prop("Huffman", "%s", huffstr);
 			log_prop("GOP", "%d", config.EncoderConfig.GOP);
@@ -53,16 +53,16 @@ int main(int argc,char * argv[])
 			avlib::CEncoder * enc = NULL;
 			switch(config.Variant)
 			{
-			case diamond::ENCODER_VARIANT_CPU:
+			case irena::ENCODER_VARIANT_CPU:
 		       		enc = new avlib::CBasicEncoder(config.EncoderConfig);
 				break;
-			case diamond::ENCODER_VARIANT_OPENCL:
+			case irena::ENCODER_VARIANT_OPENCL:
 				enc = new avlib::CCLEncoder(config.EncoderConfig);
 				break;
-			case diamond::ENCODER_VARIANT_OPENCL_PARALLEL:
+			case irena::ENCODER_VARIANT_OPENCL_PARALLEL:
 				enc = new avlib::CCLParallelEncoder(config.EncoderConfig);
 				break;
-			case diamond::ENCODER_VARIANT_OPENCL_MERGED:
+			case irena::ENCODER_VARIANT_OPENCL_MERGED:
 				enc = new avlib::CCLMergedEncoder(config.EncoderConfig);
 				break;
 			default:
@@ -76,7 +76,7 @@ int main(int argc,char * argv[])
 			delete bstr;
 			delete seq;
 		}
-		else if (diamond::DIAMOND_OP_DECODE == config.Op)
+		else if (irena::OP_DECODE == config.Op)
 		{
 			avlib::CSequence seq(config.OutputFile);
 			avlib::CBitstream * bstr = new avlib::CBitstream(10000000);
@@ -86,7 +86,7 @@ int main(int argc,char * argv[])
 			delete dec;
 			delete bstr;
 		}
-		else if(diamond::DIAMOND_OP_PSNR == config.Op)
+		else if(irena::OP_PSNR == config.Op)
 		{
 			if(NULL == config.PSNRConfig.Seq[0].File
 			|| NULL == config.PSNRConfig.Seq[1].File)
@@ -122,7 +122,7 @@ int main(int argc,char * argv[])
 			delete seq2;
 		}
 	}
-	catch(diamond::ExitException & e)
+	catch(irena::ExitException & e)
 	{
 		exit(e.getValue());
 	}

@@ -6,7 +6,6 @@ bin/
 obj/
 doc/
 video
-output.diamond
 *.swp
 *.yuv
 tools/

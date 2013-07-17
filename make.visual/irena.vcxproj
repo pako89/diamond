@@ -13,7 +13,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{EDA943C8-6E31-4AE8-AD63-986DDE8D7A70}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>diamond</RootNamespace>
+    <RootNamespace>irena</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -49,7 +49,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>DEFAULT_CL_SRC_FILE="d:\\Projects\\diamond\\src\\cl\\kernel.cl";WIN32;DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>DEFAULT_CL_SRC_FILE="d:\\Projects\\irena\\src\\cl\\kernel.cl";WIN32;DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\..\include;..\..\src\cl;%(AdditionalIncludeDirectories);c:\Program Files (x86)\Intel\OpenCL SDK\2.0\include\</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
@@ -67,7 +67,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>DEFAULT_CL_SRC_FILE="d:\\Projects\\diamond\\src\\cl\\kernel.cl";WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions);DEFAULT_CL_SRC_FILE="d:\Projects\diamond\src\cl\kernel.cl"</PreprocessorDefinitions>
+      <PreprocessorDefinitions>DEFAULT_CL_SRC_FILE="d:\\Projects\\irena\\src\\cl\\kernel.cl";WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions);DEFAULT_CL_SRC_FILE="d:\Projects\irena\src\cl\kernel.cl"</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\..\include;..\..\src\cl;%(AdditionalIncludeDirectories);c:\Program Files (x86)\Intel\OpenCL SDK\2.0\include\</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
@@ -108,7 +108,7 @@
     <ClCompile Include="..\..\src\component.cpp" />
     <ClCompile Include="..\..\src\dct.cpp" />
     <ClCompile Include="..\..\src\decoder.cpp" />
-    <ClCompile Include="..\..\src\DiamondApp.cpp" />
+    <ClCompile Include="..\..\src\app.cpp" />
     <ClCompile Include="..\..\src\dynamic_huffman.cpp" />
     <ClCompile Include="..\..\src\dynamic_rlc.cpp" />
     <ClCompile Include="..\..\src\encoder.cpp" />
@@ -161,7 +161,7 @@
     <ClInclude Include="..\..\include\component.h" />
     <ClInclude Include="..\..\include\dct.h" />
     <ClInclude Include="..\..\include\decoder.h" />
-    <ClInclude Include="..\..\include\DiamondApp.h" />
+    <ClInclude Include="..\..\include\app.h" />
     <ClInclude Include="..\..\include\dynamic_huffman.h" />
     <ClInclude Include="..\..\include\dynamic_rlc.h" />
     <ClInclude Include="..\..\include\encoder.h" />

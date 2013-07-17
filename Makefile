@@ -1,5 +1,5 @@
 # Target name
-TARGET	= diamond
+TARGET	= irena
 TESTS_DIR = ./unittests
 
 # Compiler
@@ -35,6 +35,7 @@ LIBS = -lOpenCL
 
 # Source files
 SRC += src/main.cpp
+SRC += src/app.cpp
 SRC += src/log.cpp
 SRC += src/avlib.cpp
 SRC += src/decoder.cpp
@@ -42,7 +43,6 @@ SRC += src/getopt.cpp
 SRC += src/prediction.cpp
 SRC += src/static_huffman.cpp
 SRC += src/basic_decoder.cpp
-SRC += src/DiamondApp.cpp
 SRC += src/getopt_long.cpp
 SRC += src/quantizer.cpp
 SRC += src/static_rlc.cpp

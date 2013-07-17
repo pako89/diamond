@@ -1,4 +1,4 @@
-#include "DiamondApp.h"
+#include "app.h"
 #include <string.h>
 #include <algorithm>
 #include <cl_base.h>
@@ -13,7 +13,7 @@
 #define BUILD_DATE __DATE__
 #endif
 
-namespace diamond
+namespace irena
 {
 
 
@@ -57,28 +57,28 @@ ParseArgsException::ParseArgsException(const char * fmt, ...)
 	va_end(argptr);
 }
 
-CDiamondApp * CDiamondApp::m_instance = NULL;
+CApplication * CApplication::m_instance = NULL;
 
-CDiamondApp::CDiamondApp(void) : 
+CApplication::CApplication(void) : 
 	m_appName(NULL)
 {
 }
 
 
-CDiamondApp::~CDiamondApp(void)
+CApplication::~CApplication(void)
 {
 }
 
-CDiamondApp * CDiamondApp::getInstance(void)
+CApplication * CApplication::getInstance(void)
 {
 	if(NULL == m_instance)
 	{
-		m_instance = new CDiamondApp();
+		m_instance = new CApplication();
 	}
 	return m_instance;
 }
 
-void CDiamondApp::setName(const char * appName)
+void CApplication::setName(const char * appName)
 {
 	if(NULL != appName)
 	{
@@ -86,12 +86,12 @@ void CDiamondApp::setName(const char * appName)
 	}
 }
 
-const char * CDiamondApp::getName(void)
+const char * CApplication::getName(void)
 {
 	return m_appName;
 }
 
-avlib::ImageType CDiamondApp::parseImageType(const char * arg)
+avlib::ImageType CApplication::parseImageType(const char * arg)
 {
 	avlib::ImageType ret;
 	if(NULL != arg)
@@ -109,7 +109,7 @@ avlib::ImageType CDiamondApp::parseImageType(const char * arg)
 	return ret;
 }
 
-avlib::HUFFMAN_TYPE CDiamondApp::parseHuffman(const char * arg)
+avlib::HUFFMAN_TYPE CApplication::parseHuffman(const char * arg)
 {
 	if(!strcmp(arg, "dynamic"))
 	{
@@ -121,39 +121,39 @@ avlib::HUFFMAN_TYPE CDiamondApp::parseHuffman(const char * arg)
 	}
 }
 
-DiamondOperation CDiamondApp::parseOperation(std::string op)
+Operation CApplication::parseOperation(std::string op)
 {
 	std::transform(op.begin(), op.end(), op.begin(), ::tolower);
 	if(op == "encode")
 	{
-		return diamond::DIAMOND_OP_ENCODE;
+		return irena::OP_ENCODE;
 	}
 	else if(op == "decode")
 	{
-		return diamond::DIAMOND_OP_DECODE;
+		return irena::OP_DECODE;
 	}
 	else if(op == "psnr")
 	{
-		return diamond::DIAMOND_OP_PSNR;
+		return irena::OP_PSNR;
 	}
 	else if(op == "info")
 	{
-		return diamond::DIAMOND_OP_INFO;
+		return irena::OP_INFO;
 	}
 	else
 	{
-		return diamond::DIAMOND_NOP;
+		return irena::NOP;
 	}
 }
 
-void CDiamondApp::PrintVersion(void)
+void CApplication::PrintVersion(void)
 {
 	log_info("version", "%s", VERSION);
 	log_info("build date", "%s", BUILD_DATE);
-	log_info("Github", "%s", "https://github.com/pako89/diamond");
+	log_info("Github", "%s", "https://github.com/pako89/irena");
 }
 
-void CDiamondApp::PrintBanner(void)
+void CApplication::PrintBanner(void)
 {
 	if(NULL != m_appName)
 	{
@@ -162,12 +162,12 @@ void CDiamondApp::PrintBanner(void)
 	
 }
 
-void CDiamondApp::PrintUsage(void)
+void CApplication::PrintUsage(void)
 {
 	printf("Usage: %s encode|decode|psnr|info [OPTIONS] FILE[S]\n", m_appName);
 }
 
-void CDiamondApp::PrintHelp(void)
+void CApplication::PrintHelp(void)
 {
 printf("\
 %s is a non-standarized hybrid video encoder and decoder implementation using CPU and OpenCL technology.\n\
@@ -289,7 +289,7 @@ printf("\n");
 }
 
 
-const struct option CDiamondApp::common_options[] = {
+const struct option CApplication::common_options[] = {
 	{"help",		no_argument,		NULL,	'h'},
 	{"progress-bar",	required_argument, 	NULL, 	'p'},
 	{"print-timers",	required_argument,	NULL, 	'T'},
@@ -299,7 +299,7 @@ const struct option CDiamondApp::common_options[] = {
 
 #define COMMON_OPTS_SIZE	ARRAY_SIZE(common_options)
 
-const struct option CDiamondApp::encoder_options[] = {
+const struct option CApplication::encoder_options[] = {
 	{"output",		required_argument,	NULL, 	'o'},
 	{"type",		required_argument,	NULL,	't'},
 	{"height",		required_argument,	NULL,	'H'},
@@ -313,13 +313,13 @@ const struct option CDiamondApp::encoder_options[] = {
 
 #define ENCODER_OPTS_SIZE	ARRAY_SIZE(encoder_options)
 
-const struct option CDiamondApp::decoder_options[] = {
+const struct option CApplication::decoder_options[] = {
 	{"output",		required_argument,	NULL, 	'o'},
 };
 
 #define DECODER_OPTS_SIZE	ARRAY_SIZE(decoder_options)
 
-const struct option CDiamondApp::psnr_options[] = {
+const struct option CApplication::psnr_options[] = {
 	{"gop",			required_argument,	NULL, 	'g'},
 	{"type",		required_argument,	NULL,	't'},
 	{"height",		required_argument,	NULL,	'H'},
@@ -328,7 +328,7 @@ const struct option CDiamondApp::psnr_options[] = {
 
 #define PSNR_OPTS_SIZE		ARRAY_SIZE(psnr_options)
 
-std::string CDiamondApp::getShortOpts(const struct option long_options[], int size)
+std::string CApplication::getShortOpts(const struct option long_options[], int size)
 {
 	std::string shortOpts;
 	for(int i=0 ; i<size; i++)
@@ -350,7 +350,7 @@ std::string CDiamondApp::getShortOpts(const struct option long_options[], int si
 	return shortOpts;
 }
 	
-bool CDiamondApp::parseBool(std::string arg)
+bool CApplication::parseBool(std::string arg)
 {
 	std::transform(arg.begin(), arg.end(), arg.begin(), ::tolower);
 	if(arg == "no" || arg == "false")
@@ -367,7 +367,7 @@ bool CDiamondApp::parseBool(std::string arg)
 	}
 }
 
-void CDiamondApp::appendLongOptions(std::list<option> & options, const option * long_options, int c)
+void CApplication::appendLongOptions(std::list<option> & options, const option * long_options, int c)
 {
 	for(int i=0;i<c;i++)
 	{
@@ -375,7 +375,7 @@ void CDiamondApp::appendLongOptions(std::list<option> & options, const option * 
 	}
 }
 
-void CDiamondApp::ParseArgs(int argc, char * argv[])
+void CApplication::ParseArgs(int argc, char * argv[])
 {
 	if(NULL != argv)
 	{
@@ -398,19 +398,19 @@ void CDiamondApp::ParseArgs(int argc, char * argv[])
 	std::string operation_opts;
 	switch(m_config.Op)
 	{
-	case DIAMOND_OP_ENCODE:
+	case OP_ENCODE:
 		operation_opts = getShortOpts(encoder_options, ENCODER_OPTS_SIZE);
 		appendLongOptions(long_options, encoder_options, ENCODER_OPTS_SIZE);
 		break;
-	case DIAMOND_OP_DECODE:
+	case OP_DECODE:
 		operation_opts = getShortOpts(decoder_options, DECODER_OPTS_SIZE);
 		appendLongOptions(long_options, decoder_options, DECODER_OPTS_SIZE);
 		break;
-	case DIAMOND_OP_PSNR:
+	case OP_PSNR:
 		operation_opts = getShortOpts(psnr_options, PSNR_OPTS_SIZE);
 		appendLongOptions(long_options, psnr_options, PSNR_OPTS_SIZE);
 		break;
-	case DIAMOND_OP_INFO:
+	case OP_INFO:
 		PrintVersion();
 		PrintCPUInfo();
 		PrintMemInfo();
@@ -426,7 +426,7 @@ void CDiamondApp::ParseArgs(int argc, char * argv[])
 	}
 	int _argc;
 	char ** _argv;
-	if(DIAMOND_NOP != m_config.Op)
+	if(NOP != m_config.Op)
 	{
 #ifndef WIN32
 		_argc = argc-1;
@@ -538,7 +538,7 @@ void CDiamondApp::ParseArgs(int argc, char * argv[])
 		}
 	}
 	delete [] _long_options;
-	if(DIAMOND_NOP == m_config.Op)
+	if(NOP == m_config.Op)
 	{
 		throw utils::StringFormatException("unknown operation '%s'", argv[1]);
 	}
@@ -546,9 +546,9 @@ void CDiamondApp::ParseArgs(int argc, char * argv[])
 	{
 		switch(m_config.Op)
 		{
-		case DIAMOND_OP_ENCODE:
+		case OP_ENCODE:
 			/* FALL THROUGH */
-		case DIAMOND_OP_DECODE:
+		case OP_DECODE:
 			m_config.InputFileName = _argv[_argc-1];
 			if(strcmp(m_config.InputFileName, "stdin"))
 			{
@@ -559,7 +559,7 @@ void CDiamondApp::ParseArgs(int argc, char * argv[])
 				}
 			}
 			break;
-		case DIAMOND_OP_PSNR:
+		case OP_PSNR:
 			if(optind + 1 < _argc)
 			{
 				m_config.PSNRConfig.GOP = m_config.EncoderConfig.GOP;
@@ -590,12 +590,12 @@ void CDiamondApp::ParseArgs(int argc, char * argv[])
 	}
 }
 
-DiamondConfig CDiamondApp::getConfig(void)
+Config CApplication::getConfig(void)
 {
 	return m_config;
 }
 
-CDiamondApp::props_t CDiamondApp::GetProcInfo(const char * procname)
+CApplication::props_t CApplication::GetProcInfo(const char * procname)
 {
 #define BUFF_SIZE	4096
 	static char BUFF[BUFF_SIZE];
@@ -604,7 +604,7 @@ CDiamondApp::props_t CDiamondApp::GetProcInfo(const char * procname)
 	{
 		throw utils::StringFormatException("can not open /proc/cpuinfo for read");
 	}
-	CDiamondApp::props_t l;
+	CApplication::props_t l;
 	char * line = NULL;
 	while(NULL != (line = fgets(BUFF, BUFF_SIZE, fh)))
 	{
@@ -624,14 +624,14 @@ CDiamondApp::props_t CDiamondApp::GetProcInfo(const char * procname)
 	return l;
 }
 
-void CDiamondApp::PrintMemInfo(void)
+void CApplication::PrintMemInfo(void)
 {
 #ifndef WIN32
-	CDiamondApp::props_t props = CDiamondApp::GetProcInfo("/proc/meminfo");
+	CApplication::props_t props = CApplication::GetProcInfo("/proc/meminfo");
 	if(props.size() > 0)
 	{
 		logv(0, "** Memory Info\n\n");
-		for(CDiamondApp::props_t::iterator itr = props.begin(); itr != props.end(); ++itr)
+		for(CApplication::props_t::iterator itr = props.begin(); itr != props.end(); ++itr)
 		{
 			log_info((*itr).first.c_str(), "%s", (*itr).second.c_str());
 		}
@@ -640,14 +640,14 @@ void CDiamondApp::PrintMemInfo(void)
 #endif
 }	
 
-void CDiamondApp::PrintCPUInfo(void)
+void CApplication::PrintCPUInfo(void)
 {
 #ifndef WIN32
-	CDiamondApp::props_t props = CDiamondApp::GetProcInfo("/proc/cpuinfo");
+	CApplication::props_t props = CApplication::GetProcInfo("/proc/cpuinfo");
 	if(props.size() > 0)
 	{
 		logv(0, "\n** CPU Info\n");
-		for(CDiamondApp::props_t::iterator itr = props.begin(); itr != props.end(); ++itr)
+		for(CApplication::props_t::iterator itr = props.begin(); itr != props.end(); ++itr)
 		{
 			if((*itr).first == "processor")
 			{
@@ -660,7 +660,7 @@ void CDiamondApp::PrintCPUInfo(void)
 #endif
 }
 
-void CDiamondApp::PrintOpenCLInfo(void)
+void CApplication::PrintOpenCLInfo(void)
 {
 	CCLBase & base = CCLBase::getInstance();
 	logv(0, "** OpenCL platforms information\n\n");

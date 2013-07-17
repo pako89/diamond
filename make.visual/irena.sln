@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "diamond", "diamond.vcxproj", "{EDA943C8-6E31-4AE8-AD63-986DDE8D7A70}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "irena", "irena.vcxproj", "{EDA943C8-6E31-4AE8-AD63-986DDE8D7A70}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

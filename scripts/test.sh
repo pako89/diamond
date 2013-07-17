@@ -8,10 +8,19 @@ HEIGHT=
 VARIANT=2
 HUFFMAN="static"
 PROGRESS_BAR="--progress-bar yes"
+PRINT_TIMERS="--print-timers yes"
+VERBOSE="-vv"
 GOP="3"
-COMMON=$PROGRESS_BAR
+Q="2"
 DEBUG=0
 DIR="yuvvideo"
+
+if [ $DEBUG == 1 ]
+then
+	COMMON="--progress-bar no $PRINT_TIMERS $VERBOSE"
+else
+	COMMON="$PROGRESS_BAR $PRINT_TIMERS $VERBOSE"
+fi
 
 RES=$(ls $DIR)
 select R in $RES
@@ -42,21 +51,28 @@ do
 done
 WIDTH=$(echo $RES | sed 's/\([0-9]\+\)x\([0-9]\+\)/\1/')
 HEIGHT=$(echo $RES | sed 's/\([0-9]\+\)x\([0-9]\+\)/\2/')
+ARGS="encode $COMMON -V$VARIANT -g$GOP -q$Q -tYUV420 -W $WIDTH -H $HEIGHT -e $HUFFMAN -o $TEMP $VIDEO"
 
 if [ $DEBUG == 1 ]
 then
 cat > .gdbinit << EOF
 b main
-run encode $COMMON -V$VARIANT -g$GOP -tYUV420 -W $WIDTH -H $HEIGHT -e $HUFFMAN -o $TEMP $VIDEO
+run $ARGS
 EOF
-cgdb ./diamond
+cgdb ./irena
 else
-	./diamond encode $COMMON -V$VARIANT -g$GOP -tYUV420 -W $WIDTH -H $HEIGHT -e $HUFFMAN -o $TEMP $VIDEO
+	CMD="./irena $ARGS"
+	echo "Encoding...[$CMD]"
+	$CMD
+	if [ $? == 0 ];
+	then
+		echo "Encoding Done"
+	fi
 fi
 
 if [ $? == 0 ]
 then
-	./diamond decode $COMMON -o $OUT $TEMP
+	./irena decode $COMMON -o $OUT $TEMP
 fi
 
 if [ $? == 0 ]

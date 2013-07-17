@@ -102,7 +102,7 @@
     <ClCompile Include="..\..\src\decoder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\DiamondApp.cpp">
+    <ClCompile Include="..\..\src\app.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\dynamic_huffman.cpp">
@@ -257,7 +257,7 @@
     <ClInclude Include="..\..\include\decoder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\DiamondApp.h">
+    <ClInclude Include="..\..\include\app.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\dynamic_huffman.h">
