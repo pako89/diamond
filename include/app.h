@@ -86,6 +86,7 @@ class CApplication
 {
 public:
 	static CApplication * getInstance(void);
+	static void releaseInstance(void);
 	static void PrintOpenCLInfo(void);
 	static void PrintCPUInfo(void);
 	static void PrintMemInfo(void);

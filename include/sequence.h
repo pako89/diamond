@@ -20,7 +20,6 @@ public:
 	bool OpenFile(const char * file);
 	bool OpenFile(const char * file, ImageType type, int height, int width);
 	CImage<uint8_t> * getFrame(void);
-	void CloseFile();
 	bool ReadNext(void);
 	bool WriteNext(void);
 	bool Seek(int num);

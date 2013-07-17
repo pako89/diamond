@@ -70,8 +70,6 @@ int main(int argc,char * argv[])
 			}
 			enc->Encode(seq, bstr);
 			bstr->flush_all();
-			fclose(config.OutputFile);
-			fclose(config.InputFile);
 			delete enc;
 			delete bstr;
 			delete seq;
@@ -131,6 +129,6 @@ int main(int argc,char * argv[])
 		fprintf(stderr, "error: %s\n", e.what());
 		exit(1);	
 	}
-	
+	irena::CApplication::releaseInstance();
 	exit(0);
 }

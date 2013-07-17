@@ -67,6 +67,10 @@ CApplication::CApplication(void) :
 
 CApplication::~CApplication(void)
 {
+	CLOSE(m_config.InputFile);
+	CLOSE(m_config.OutputFile);
+	CLOSE(m_config.PSNRConfig.Seq[0].File);
+	CLOSE(m_config.PSNRConfig.Seq[1].File);
 }
 
 CApplication * CApplication::getInstance(void)
@@ -76,6 +80,15 @@ CApplication * CApplication::getInstance(void)
 		m_instance = new CApplication();
 	}
 	return m_instance;
+}
+
+void CApplication::releaseInstance(void)
+{
+	if(NULL != m_instance)
+	{
+		delete m_instance;
+		m_instance = NULL;
+	}
 }
 
 void CApplication::setName(const char * appName)

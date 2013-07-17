@@ -13,13 +13,14 @@
 #include <vector>
 #include <sstream>
 
-#define INSTANTIATE(t_class, t_arg)		template class t_class<t_arg>
+#define INSTANTIATE(t_class, t_arg) 		template class t_class<t_arg>
 #define INSTANTIATE2(t_class, t_arg1, t_arg2)	template class t_class<t_arg1, t_arg2>
-#define CONVERSION(t_class, t_from, t_to) template t_class<t_to> & t_class<t_to>::operator=(const t_class<t_from> & src)
+#define CONVERSION(t_class, t_from, t_to) 	template t_class<t_to> & t_class<t_to>::operator=(const t_class<t_from> & src)
 #define ARRAY_SIZE(x)				(sizeof(x)/sizeof((x)[0]))
 
 #define LIMIT(v, l)	( (v) > (l) ? (l) : ((v) < -(l) ? -(l) : (v)) )
-#define RELEASE(p)	if(NULL != (p)) delete (p);
+#define RELEASE(p)	if(NULL != (p)) delete (p)
+#define CLOSE(f)	if(NULL != (f)) fclose((f))
 
 #define USE(v)		defined USE_##v
 

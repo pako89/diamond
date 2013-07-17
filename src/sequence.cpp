@@ -30,7 +30,7 @@ CSequence::CSequence(FILE * fh, ImageType type, int height, int width) :
 
 CSequence::~CSequence()
 {
-	CloseFile();
+	m_fh = NULL;
 	if(NULL != m_image)
 	{
 		delete m_image;
@@ -169,18 +169,20 @@ void CSequence::WriteYUV4MPEG()
 	CImageFormat imageFormat = getFormat();
 #define BUFF_SIZE	2048
 	char buff[BUFF_SIZE] = {0,};
+	int s = 
 #ifndef WIN32
-	int s = snprintf(
+	snprintf
 #else
-	int s = _snprintf(
+	_snprintf
 #endif
-			buff, BUFF_SIZE, "%sW%d H%d C%s F%d:%d\n",
-			YUV4MPEG_HEADER,
-			imageFormat.Size.Width,
-			imageFormat.Size.Height,
-			"420jpeg",
-			m_frameRate.Nom,
-			m_frameRate.Denom);
+		(
+		buff, BUFF_SIZE, "%sW%d H%d C%s F%d:%d\n",
+		YUV4MPEG_HEADER,
+		imageFormat.Size.Width,
+		imageFormat.Size.Height,
+		"420jpeg",
+		m_frameRate.Nom,
+		m_frameRate.Denom);
 	if(fwrite(buff, s, 1, m_fh) != 1)
 	{
 		throw utils::StringFormatException("Can not write YUV4MPEG Header: '%s'", buff);
@@ -234,14 +236,6 @@ bool CSequence::OpenFile(const char * file, ImageType type, int height, int widt
 	else
 	{
 		return false;
-	}
-}
-
-void CSequence::CloseFile()
-{
-	if(NULL != m_fh)
-	{
-			fclose(m_fh);
 	}
 }
 
