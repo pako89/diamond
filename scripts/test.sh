@@ -5,7 +5,7 @@ OUT=out.yuv
 VIDEO=
 WIDTH=
 HEIGHT=
-VARIANT=2
+VARIANT=1
 HUFFMAN="static"
 PROGRESS_BAR="--progress-bar yes"
 PRINT_TIMERS="--print-timers yes"
@@ -13,7 +13,7 @@ VERBOSE="-vv"
 GOP="3"
 Q="2"
 DEBUG=0
-DIR="yuvvideo"
+DIR="videos"
 
 if [ $DEBUG == 1 ]
 then
@@ -25,7 +25,7 @@ fi
 RES=$(ls $DIR)
 select R in $RES
 do
-	if [ -d video/$R ]
+	if [ -d $DIR/$R ]
 	then
 		echo "Resolution: ${R}"
 		RES=$R
