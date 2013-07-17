@@ -10,10 +10,6 @@
 #include <cl_shift.h>
 #include <cl_dctqzz.h>
 
-#ifndef DEFAULT_CL_SRC_FILE
-#define DEFAULT_CL_SRC_FILE "kernel.cl"
-#endif
-
 namespace avlib
 {
 

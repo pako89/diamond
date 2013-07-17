@@ -16,10 +16,6 @@
 #include <CL/opencl.h>
 #include <mtimer.h>
 
-#ifndef DEFAULT_CL_SRC_FILE
-#define DEFAULT_CL_SRC_FILE "kernel.cl"
-#endif
-
 namespace avlib
 {
 

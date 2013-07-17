@@ -32,6 +32,11 @@ bool CCLFirstDevicePolicy::checkDeviceInfo(CCLDeviceInfo * deviceInfo)
 	return (NULL != deviceInfo);
 }
 
+bool CCLFirstCPUDevicePolicy::checkDeviceInfo(CCLDeviceInfo * deviceInfo)
+{
+	return CCLFirstDevicePolicy::checkDeviceInfo(deviceInfo) && (deviceInfo->getDeviceType() == CL_DEVICE_TYPE_CPU);
+}
+
 bool CCLFirstGPUDevicePolicy::checkDeviceInfo(CCLDeviceInfo * deviceInfo)
 {
 	return CCLFirstDevicePolicy::checkDeviceInfo(deviceInfo) && (deviceInfo->getDeviceType() == CL_DEVICE_TYPE_GPU);

@@ -33,8 +33,23 @@
 #define DEFAULT_Q	1
 #endif
 
+#ifndef DEFAULT_DEVICE_TYPE
+#define DEFAULT_DEVICE_TYPE	DEVICE_TYPE_GPU
+#endif
+
+#ifndef DEFAULT_KERNEL_SRC
+#define DEFAULT_KERNEL_SRC	"kernel.cl"
+#endif
+
 namespace avlib
 {
+
+enum DeviceType
+{
+	DEVICE_TYPE_UNKNOWN = 0,
+	DEVICE_TYPE_CPU,
+	DEVICE_TYPE_GPU
+};
 
 struct EncoderConfig
 {
@@ -44,8 +59,9 @@ struct EncoderConfig
 		InterpolationScale(DEFAULT_INTERPOLATION_SCALE),
 		PrintProgressBar(DEFAULT_PROGRESS_BAR),
 		PrintTimers(DEFAULT_PRINT_TIMERS),
-		Q(DEFAULT_Q)
-		
+		Q(DEFAULT_Q),
+		Device(DEFAULT_DEVICE_TYPE),
+		KernelSrc(DEFAULT_KERNEL_SRC)	
 	{}
 	HUFFMAN_TYPE HuffmanType;
 	int GOP;
@@ -53,6 +69,8 @@ struct EncoderConfig
 	int InterpolationScale;
 	bool PrintProgressBar;
 	bool PrintTimers;
+	const char * KernelSrc;
+	DeviceType Device;
 };
 
 class CEncoder : public utils::ITimer

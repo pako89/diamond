@@ -61,6 +61,7 @@ class Config:
 		self.EncoderVariant = string.split(self.ConfigParser.get('Options', 'EncoderVariant'), ' ')
 		self.GOP = string.split(self.ConfigParser.get('Options', 'GOP'), ' ')
 		self.Q = string.split(self.ConfigParser.get('Options', 'Q'), ' ')
+		self.Device = string.split(self.ConfigParser.get('Options', 'Device'), ' ')
 
 	def get_count(self):
 		r = 1
@@ -70,6 +71,7 @@ class Config:
 		r *= len(self.EncoderVariant)
 		r *= len(self.GOP)
 		r *= len(self.Q)
+		r *= len(self.Device)
 		return r
 	
 	def wildcard_results_dir(self):
@@ -124,13 +126,14 @@ class Command:
 		self._stdout = o
 
 class EncoderConfig:
-	def __init__(self, video, variant, interpol, huffman, gop, q):
+	def __init__(self, video, variant, interpol, huffman, gop, q, device):
 		self.Video = video
 		self.Variant = variant
 		self.Interpol = interpol
 		self.Huffman = huffman
 		self.GOP = gop
 		self.Q = q
+		self.Device = device
 	
 	def get_video_variant(self):
 		return self.Video.get_name() + self.get_variant()
@@ -142,6 +145,7 @@ class EncoderConfig:
 		s += "I"+self.Interpol
 		s += "G"+self.GOP
 		s += "Q"+self.Q
+		s += "D"+self.Device
 		return s
 
 class Benchmark:
@@ -174,9 +178,10 @@ class Benchmark:
 					for V in self.Config.EncoderVariant:
 						for G in self.Config.GOP:
 							for Q in self.Config.Q:
-								cfg = EncoderConfig(v, V, I, H, G, Q)
-								self._run_item(cfg, i)
-								i = i+1
+								for D in self.Config.Device:
+									cfg = EncoderConfig(v, V, I, H, G, Q, D)
+									self._run_item(cfg, i)
+									i = i+1
 	
 	def save_results(self):
 		resf = open(os.path.join(self.Config.ResultsDir, self.Config.ResultsName), 'w')
@@ -222,6 +227,7 @@ class Benchmark:
 		cmd.add_option("--variant", cfg.Variant)
 		cmd.add_option("--gop", cfg.GOP)
 		cmd.add_option("--quant", cfg.Q)
+		cmd.add_option("--device", cfg.Device)
 		self._append_video(cfg.Video, cmd, bstr)
 		self._log_lsep()
 		self._log(cmd.Command+'\n')
@@ -273,13 +279,13 @@ class Benchmark:
 		return stdout
 
 	def _run_tar(self, tar, output):
-		self._out_progress("Tarring")
+		self._out_progress("Compressing")
 		self._log_lsep()
 		tarcmd = self.Config.Tar.replace('%O', tar).replace('%I', output)
 		cmd = Command(tarcmd)
 		self._log(cmd.Command+'\n')
 		cmd.run()
-		self._out_done("Tarring", cmd.get_status())
+		self._out_done("Compressing", cmd.get_status())
 
 	def _remove_output(self, output):
 		self._out_progress("Removing decoded video")

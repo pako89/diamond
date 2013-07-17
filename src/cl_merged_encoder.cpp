@@ -52,8 +52,18 @@ CCLMergedEncoder::~CCLMergedEncoder()
 
 void CCLMergedEncoder::init(CImageFormat fmt)
 {
-	this->m_clPolicy = new CCLFirstGPUDevicePolicy();
-	ICLHost::init(m_clPolicy, (char*)DEFAULT_CL_SRC_FILE);
+	switch(m_config.Device)
+	{
+	case DEVICE_TYPE_CPU:
+		m_clPolicy = new CCLFirstCPUDevicePolicy();
+		break;
+	case DEVICE_TYPE_GPU:
+		m_clPolicy = new CCLFirstGPUDevicePolicy();
+		break;
+	default:
+		throw utils::StringFormatException("Invalid Device type: '%d'", m_config.Device);
+	}
+	ICLHost::init(m_clPolicy, (char*)m_config.KernelSrc);
 	this->m_imgF = new CCLImage<float>(&this->m_dev, fmt);
 	this->m_img = new CCLImage<int16_t>(&this->m_dev, fmt);
 	this->m_shift = new CCLShift<float>(-128.0f, &this->m_dev, this->m_program, "shift");

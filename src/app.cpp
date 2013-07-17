@@ -103,6 +103,23 @@ const char * CApplication::getName(void)
 {
 	return m_appName;
 }
+	
+avlib::DeviceType CApplication::parseDevice(std::string dev)
+{
+	std::transform(dev.begin(), dev.end(), dev.begin(), ::tolower);
+	if(dev == "cpu")
+	{
+		return avlib::DEVICE_TYPE_CPU;
+	}
+	else if(dev == "gpu")
+	{
+		return avlib::DEVICE_TYPE_GPU;
+	}
+	else
+	{
+		return avlib::DEVICE_TYPE_UNKNOWN;
+	}
+}
 
 avlib::ImageType CApplication::parseImageType(const char * arg)
 {
@@ -274,6 +291,12 @@ printf("\
 printf("\
 	-I, --interpolation INT		Interpolation scale for prediction\n\
 ");
+printf("\
+	-k, --kernel	FILE		Path to file contatining kernel sources\n\
+");
+printf("\
+	-d, --device	CPU|GPU		Specify device type for OpenCL\n\
+");
 printf("\n");
 printf("\
 Decoder options:\n\
@@ -322,6 +345,8 @@ const struct option CApplication::encoder_options[] = {
 	{"gop",			required_argument,	NULL, 	'g'},
 	{"quant",		required_argument,	NULL, 	'q'},
 	{"interpolation",	optional_argument,	NULL,	'I'},
+	{"kernel",		required_argument,	NULL,	'k'},
+	{"device",		required_argument,	NULL, 	'd'},
 };
 
 #define ENCODER_OPTS_SIZE	ARRAY_SIZE(encoder_options)
@@ -540,6 +565,16 @@ void CApplication::ParseArgs(int argc, char * argv[])
 			break;
 		case 'T':
 			m_config.EncoderConfig.PrintTimers = parseBool(optarg);
+			break;
+		case 'k':
+			m_config.EncoderConfig.KernelSrc = optarg;
+			break;
+		case 'd':
+			m_config.EncoderConfig.Device = parseDevice(optarg);
+			if(avlib::DEVICE_TYPE_UNKNOWN == m_config.EncoderConfig.Device)
+			{
+				throw utils::StringFormatException("unknown device type: '%s'", optarg);
+			}
 			break;
 		case 'v':
 			inc_logv();

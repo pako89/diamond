@@ -21,6 +21,14 @@ protected:
 	virtual bool checkDeviceInfo(CCLDeviceInfo * deviceInfo);
 };
 
+class CCLFirstCPUDevicePolicy : public CCLFirstDevicePolicy
+{
+public:
+	CCLFirstCPUDevicePolicy(){}
+protected:
+	virtual bool checkDeviceInfo(CCLDeviceInfo * deviceInfo);
+};
+
 class CCLFirstGPUDevicePolicy : public CCLFirstDevicePolicy
 {
 public:

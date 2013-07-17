@@ -1,10 +1,6 @@
 #ifndef _CL_PARALLEL_ENCODER_H
 #define _CL_PARALLEL_ENCODER_H
 
-#ifndef DEFAULT_CL_SRC_FILE
-#define DEFAULT_CL_SRC_FILE "kernel.cl"
-#endif
-
 #include <avlib.h>
 #include <utils.h>
 #include <encoder.h>
