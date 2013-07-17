@@ -431,6 +431,7 @@ class Result:
 		self.Dict['Huffman'] = self.EncoderConfig.Huffman
 		self.Dict['GOP'] = self.EncoderConfig.GOP
 		self.Dict['Q'] = self.EncoderConfig.Q
+		self.Dict['Device'] = self.EncoderConfig.Device
 		for i in self.Items:
 			self.Dict[i.Description] = i.Value
 

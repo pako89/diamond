@@ -30,6 +30,7 @@ int main(int argc,char * argv[])
 			if(!seq->IsYUV4MPEG())
 			{
 				seq->setFormat(config.ImageType, config.ImageSize.Height, config.ImageSize.Width);
+				seq->setFrameRate(config.FrameRate);
 			}
 			log_prop("Variant", "%s", irena::EncoderVariant2Str(config.Variant));
 			log_prop("Image type", "%s", config.ImageTypeStr);

@@ -345,6 +345,7 @@ const struct option CApplication::encoder_options[] = {
 	{"gop",			required_argument,	NULL, 	'g'},
 	{"quant",		required_argument,	NULL, 	'q'},
 	{"interpolation",	optional_argument,	NULL,	'I'},
+	{"frame-rate",	required_argument,	NULL,	'f'},
 	{"kernel",		required_argument,	NULL,	'k'},
 	{"device",		required_argument,	NULL, 	'd'},
 };
