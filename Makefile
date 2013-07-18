@@ -6,13 +6,9 @@ TESTS_DIR = ./unittests
 CC	= g++
 
 # Compiler flags
-CFLAGS += -g
 CFLAGS += -Iinclude
 CFLAGS += -I/usr/local/cuda/include
 CFLAGS += -Isrc/cl
-cflags += $(INCDIR) 
-CFLAGS += -DDEBUG
-CFLAGS += -DCHECK_HUFFMAN
 CFLAGS += -DDEFAULT_MAX_PREDICTION=2
 CFLAGS += -DDEFAULT_KERNEL_SRC="\"src/cl/kernel.cl\""
 CFLAGS += -DDEFAULT_PREDICTION_METHOD=PREDICTION_METHOD_MSE
@@ -23,9 +19,15 @@ CFLAGS += -DDEFAULT_VERBOSE=0
 CFLAGS += -DDEFAULT_Q=1
 CFLAGS += -DDEFAULT_HUFFMAN_TYPE=HUFFMAN_TYPE_STATIC
 CFLAGS += -DDEFAULT_DEVICE_TYPE=CL_DEVICE_TYPE_GPU
+CFLAGS += -DVERSION="\""$(shell git describe)"\""
+CFLAGS += -O3
+ifeq ($(DEBUG), 1)
+CFLAGS += -g
+CFLAGS += -DDEBUG
+CFLAGS += -DCHECK_HUFFMAN
 CFLAGS += -DIMAGE_CHECK_INDEX
 CFLAGS += -DCOMPONENT_CHECK_INDEX
-CFLAGS += -DVERSION="\""$(shell git describe)"\""
+endif
 #CFLAGS += -DCL_KERNEL_FINISH
 
 # Linker flags
@@ -91,6 +93,10 @@ SRC += src/cl_timers.cpp
 OBJ	= $(SRC:.cpp=.o)
 
 default: $(TARGET)
+
+.PHONY : debug all
+debug:
+	$(MAKE) default DEBUG=1
 
 all: $(TARGET) tests
 
