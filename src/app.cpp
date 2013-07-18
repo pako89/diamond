@@ -104,20 +104,20 @@ const char * CApplication::getName(void)
 	return m_appName;
 }
 	
-avlib::DeviceType CApplication::parseDevice(std::string dev)
+cl_device_type CApplication::parseDevice(std::string dev)
 {
 	std::transform(dev.begin(), dev.end(), dev.begin(), ::tolower);
 	if(dev == "cpu")
 	{
-		return avlib::DEVICE_TYPE_CPU;
+		return CL_DEVICE_TYPE_CPU;
 	}
 	else if(dev == "gpu")
 	{
-		return avlib::DEVICE_TYPE_GPU;
+		return CL_DEVICE_TYPE_GPU;
 	}
 	else
 	{
-		return avlib::DEVICE_TYPE_UNKNOWN;
+		return CL_DEVICE_TYPE_DEFAULT;
 	}
 }
 
@@ -572,7 +572,7 @@ void CApplication::ParseArgs(int argc, char * argv[])
 			break;
 		case 'd':
 			m_config.EncoderConfig.Device = parseDevice(optarg);
-			if(avlib::DEVICE_TYPE_UNKNOWN == m_config.EncoderConfig.Device)
+			if(CL_DEVICE_TYPE_DEFAULT == m_config.EncoderConfig.Device)
 			{
 				throw utils::StringFormatException("unknown device type: '%s'", optarg);
 			}

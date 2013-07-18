@@ -8,6 +8,7 @@
 #include <utils.h>
 #include <avlib.h>
 #include <proto.h>
+#include <cl_device_info.h>
 
 #ifndef DEFAULT_GOP
 #define DEFAULT_GOP	4
@@ -34,7 +35,7 @@
 #endif
 
 #ifndef DEFAULT_DEVICE_TYPE
-#define DEFAULT_DEVICE_TYPE	DEVICE_TYPE_GPU
+#define DEFAULT_DEVICE_TYPE	CL_DEVICE_TYPE_GPU
 #endif
 
 #ifndef DEFAULT_KERNEL_SRC
@@ -43,13 +44,6 @@
 
 namespace avlib
 {
-
-enum DeviceType
-{
-	DEVICE_TYPE_UNKNOWN = 0,
-	DEVICE_TYPE_CPU,
-	DEVICE_TYPE_GPU
-};
 
 struct EncoderConfig
 {
@@ -70,7 +64,7 @@ struct EncoderConfig
 	bool PrintProgressBar;
 	bool PrintTimers;
 	const char * KernelSrc;
-	DeviceType Device;
+	cl_device_type Device;
 };
 
 class CEncoder : public utils::ITimer

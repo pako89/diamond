@@ -1,5 +1,6 @@
 #include <cl_host.h>
-	
+#include <log.h>
+
 ICLHost::ICLHost()
 {
 }
@@ -15,6 +16,8 @@ void ICLHost::init(CCLDevicePolicy * policy, char * fileName)
 	{
 		throw utils::StringFormatException("can not get device due to policy\n");
 	}
+	log_prop("OpenCL vendor", "%s", this->m_dev.getInfo()->getVendor().c_str());
+	log_prop("OpenCL device", "%s", this->m_dev.getInfo()->getName().c_str());
 	this->m_dev.createContext();
 	this->m_dev.createCommandQueue();
 	cl_int err;

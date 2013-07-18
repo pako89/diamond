@@ -2,6 +2,11 @@
 #include <cl_base.h>
 #include <utils.h>
 
+CCLFirstDevicePolicy::CCLFirstDevicePolicy(cl_device_type type) : 
+	m_type(type)
+{
+}
+
 CCLDevice CCLFirstDevicePolicy::getDevice()
 {
 	CCLBase & clBase = CCLBase::getInstance();
@@ -29,15 +34,5 @@ CCLDevice CCLFirstDevicePolicy::getDevice()
 
 bool CCLFirstDevicePolicy::checkDeviceInfo(CCLDeviceInfo * deviceInfo)
 {
-	return (NULL != deviceInfo);
-}
-
-bool CCLFirstCPUDevicePolicy::checkDeviceInfo(CCLDeviceInfo * deviceInfo)
-{
-	return CCLFirstDevicePolicy::checkDeviceInfo(deviceInfo) && (deviceInfo->getDeviceType() == CL_DEVICE_TYPE_CPU);
-}
-
-bool CCLFirstGPUDevicePolicy::checkDeviceInfo(CCLDeviceInfo * deviceInfo)
-{
-	return CCLFirstDevicePolicy::checkDeviceInfo(deviceInfo) && (deviceInfo->getDeviceType() == CL_DEVICE_TYPE_GPU);
+	return (NULL != deviceInfo) && (deviceInfo->getDeviceType() == m_type);
 }

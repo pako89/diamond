@@ -15,26 +15,11 @@ protected:
 class CCLFirstDevicePolicy : public CCLDevicePolicy
 {
 public:
-	CCLFirstDevicePolicy(){}
+	CCLFirstDevicePolicy(cl_device_type type = CL_DEVICE_TYPE_GPU);
 	CCLDevice getDevice();
 protected:		
 	virtual bool checkDeviceInfo(CCLDeviceInfo * deviceInfo);
-};
-
-class CCLFirstCPUDevicePolicy : public CCLFirstDevicePolicy
-{
-public:
-	CCLFirstCPUDevicePolicy(){}
-protected:
-	virtual bool checkDeviceInfo(CCLDeviceInfo * deviceInfo);
-};
-
-class CCLFirstGPUDevicePolicy : public CCLFirstDevicePolicy
-{
-public:
-	CCLFirstGPUDevicePolicy(){}
-protected:
-	virtual bool checkDeviceInfo(CCLDeviceInfo * deviceInfo);
+	cl_device_type m_type;
 };
 
 #endif //_CL_PLATFORM_POLICY

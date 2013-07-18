@@ -26,17 +26,7 @@ CCLEncoder::~CCLEncoder()
 
 void CCLEncoder::init(CImageFormat fmt)
 {
-	switch(m_config.Device)
-	{
-	case DEVICE_TYPE_CPU:
-		m_clPolicy = new CCLFirstCPUDevicePolicy();
-		break;
-	case DEVICE_TYPE_GPU:
-		m_clPolicy = new CCLFirstGPUDevicePolicy();
-		break;
-	default:
-		throw utils::StringFormatException("Invalid Device type: '%d'", m_config.Device);
-	}
+	m_clPolicy = new CCLFirstDevicePolicy(m_config.Device);
 	ICLHost::init(m_clPolicy, (char*)m_config.KernelSrc);
 	this->m_imgF = new CCLImage<float>(&this->m_dev, fmt);
 	this->m_img = new CCLImage<int16_t>(&this->m_dev, fmt);

@@ -114,7 +114,7 @@ public:
 protected:
 	CApplication(void);
 	Operation parseOperation(std::string op);
-	avlib::DeviceType parseDevice(std::string dev);
+	cl_device_type parseDevice(std::string dev);
 	avlib::HUFFMAN_TYPE parseHuffman(const char * op);
 	avlib::ImageType parseImageType(const char * arg);
 	bool parseBool(std::string arg);
