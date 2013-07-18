@@ -21,6 +21,10 @@ CFLAGS += -DDEFAULT_HUFFMAN_TYPE=HUFFMAN_TYPE_STATIC
 CFLAGS += -DDEFAULT_DEVICE_TYPE=CL_DEVICE_TYPE_GPU
 CFLAGS += -DVERSION="\""$(shell git describe)"\""
 CFLAGS += -O3
+CFLAGS += -Wall
+# Enablde this flag if you want to call clFinish after every clEnqueueNDRangeKernel
+#CFLAGS += -DCL_KERNEL_FINISH
+
 ifeq ($(DEBUG), 1)
 CFLAGS += -g
 CFLAGS += -DDEBUG
@@ -28,7 +32,6 @@ CFLAGS += -DCHECK_HUFFMAN
 CFLAGS += -DIMAGE_CHECK_INDEX
 CFLAGS += -DCOMPONENT_CHECK_INDEX
 endif
-#CFLAGS += -DCL_KERNEL_FINISH
 
 # Linker flags
 LDFLAGS	+= -L/usr/lib
