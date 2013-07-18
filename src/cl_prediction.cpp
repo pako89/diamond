@@ -105,7 +105,6 @@ void CCLPrediction::clTransform(CCLKernel * kernel, CImage<float> * pSrc, CImage
 	{
 		throw utils::StringFormatException("clTransform(): src or dst is not CCLImage<float>\n");
 	}
-	int predHeight = clPred->getHeight();
 	int predWidth = clPred->getWidth();
 	for(int k=0;k<clSrc->getComponents();k++)
 	{

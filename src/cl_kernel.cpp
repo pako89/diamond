@@ -34,6 +34,7 @@ void CCLKernel::EnqueueNDRangeKernel(
 			)
 {
 	cl_int err;
+	/*TODO
 	size_t g_work_size[3];
 	size_t global_work_offset[3] = {0,};
 	do
@@ -42,7 +43,7 @@ void CCLKernel::EnqueueNDRangeKernel(
 		{
 			g_work_size[i] = utils::min(global_work_size[i]-global_work_offset[i], m_max_global_work_size[i]);
 		}
-	}while(false);
+	}while(false);*/
 	err = clEnqueueNDRangeKernel(
 			this->m_dev->getCommandQueue(), 
 			m_kernel, 

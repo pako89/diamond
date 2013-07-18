@@ -64,8 +64,8 @@ struct Config
 		ImageType(avlib::IMAGE_TYPE_UNKNOWN),
 		ImageTypeStr("unknown"),
 		ImageSize(0, 0),
-		Variant(ENCODER_VARIANT_OPENCL),
-		FrameRate(24, 1)
+		FrameRate(24, 1),
+		Variant(ENCODER_VARIANT_OPENCL)
 	{}
 	Operation Op;
 	const char * InputFileName;
@@ -76,8 +76,8 @@ struct Config
 	const char * ImageTypeStr;
 	avlib::CSize ImageSize;
 	avlib::CFrameRate FrameRate;
-	avlib::EncoderConfig EncoderConfig;	
 	EncoderVariant Variant;
+	avlib::EncoderConfig EncoderConfig;	
 	utils::PSNRConfig PSNRConfig;
 };
 

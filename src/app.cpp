@@ -455,6 +455,8 @@ void CApplication::ParseArgs(int argc, char * argv[])
 		PrintMemInfo();
 		PrintOpenCLInfo();
 		throw ExitException(0);
+	default:
+		break;
 	}
 	std::string shortopts = common_opts + operation_opts;
 	option * _long_options = new option[long_options.size()];
@@ -630,6 +632,8 @@ void CApplication::ParseArgs(int argc, char * argv[])
 				throw ExitException(1);
 			}
 			break;
+		default:
+			break;
 		}
 	}
 	if(NULL == m_config.InputFileName)
@@ -733,7 +737,7 @@ void CApplication::PrintOpenCLInfo(void)
 		if(extensions.size() > 0)
 		{
 			log_info("Extensions", "%s", extensions[0].c_str());
-			for(int i=1;i<extensions.size();i++)
+			for(unsigned int i=1;i<extensions.size();i++)
 			{
 				log_info("", "%s", extensions[i].c_str());
 			}
@@ -785,7 +789,7 @@ void CApplication::PrintOpenCLInfo(void)
 			if(sizes.size()>0)
 			{
 				log_info("Max work item sizes", "%d", sizes[0]);
-				for(int i=1;i<sizes.size();i++)
+				for(unsigned int i=1;i<sizes.size();i++)
 				{
 					log_info("", "%d", sizes[i]);
 				}
@@ -805,7 +809,7 @@ void CApplication::PrintOpenCLInfo(void)
 			if(extensions.size() > 0)
 			{
 				log_info("Extensions", "%s", extensions[0].c_str());
-				for(int i=1;i<extensions.size();i++)
+				for(unsigned int i=1;i<extensions.size();i++)
 				{
 					if(extensions[i].size() > 0 && extensions[i] != " ")
 					{

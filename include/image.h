@@ -36,8 +36,8 @@ protected:
 	virtual void alloc(int num);
 	int m_comp_num;
 	CComponent<T> ** m_comp;
-	CImageFormat m_format;
 	int * m_scale;
+	CImageFormat m_format;
 template <class> friend class CImage;
 
 };

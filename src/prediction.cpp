@@ -11,11 +11,12 @@ namespace avlib
 {
 
 CPrediction::CPrediction() : 
+	m_interpol(NULL),
 	m_last(NULL),
 	m_IFT(NULL),
 	m_IFIT(NULL),
-	m_interpol(NULL),
-	m_max(DEFAULT_MAX_PREDICTION)
+	m_max(DEFAULT_MAX_PREDICTION),
+	m_huff(NULL)
 {
 	m_huff = new CDynamicHuffman<int>();
 }

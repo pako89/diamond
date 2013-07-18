@@ -12,8 +12,8 @@ CCLShift<T>::CCLShift(CCLDevice * dev, cl_program program, const char * kernel) 
 
 template <class T>
 CCLShift<T>::CCLShift(T s, CCLDevice * dev, cl_program program, const char * kernel) :
-	m_kernel(NULL),
-	CShift<T>::CShift(s)
+	CShift<T>::CShift(s),
+	m_kernel(NULL)
 {
 	m_kernel = new CCLKernel(dev, program, kernel);
 }

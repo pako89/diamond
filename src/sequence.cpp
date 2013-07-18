@@ -75,11 +75,8 @@ bool CSequence::readFrame()
 		{
 			return !strcmp(frame, YUV4MPEG_FRAME);
 		}
-		else
-		{
-			return false;
-		}
 	}
+	return false;
 }
 	
 std::string CSequence::readProperties()
@@ -118,7 +115,7 @@ void CSequence::parseYUV4MPEG()
 		CImageFormat imageFormat;
 		CFrameRate frameRate;
 		std::string props = readProperties();
-		int pos=0;
+		unsigned int pos=0;
 		do
 		{
 			int space = props.find(' ', pos);
@@ -338,12 +335,9 @@ bool CSequence::read(void)
 			{
 				int o_height = (*m_image)[k].getOriginalHeight();
 				int o_width = (*m_image)[k].getOriginalWidth();
-				int width = (*m_image)[k].getWidth();
-				int height = (*m_image)[k].getHeight();
 				for(int y=0;y<o_height; y++)
 				{
 					ret += fread((*m_image)[k][y], o_width, 1, m_fh);
-					//memset(&(*m_image)[k][y][o_width], 0, width-o_width);
 				}
 			}
 			else

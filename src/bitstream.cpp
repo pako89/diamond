@@ -144,6 +144,10 @@ void CBitstream::set_fh_fill(FILE * fh)
 
 		this->fh=fh;
 		size_t ret = fread(this->mBuffer, 1, this->mSize, this->fh);
+		if(ret < 0)
+		{
+			dbg("%s:%d:fread: %d\n", __FILE__, __LINE__, ret);
+		}
 	}
 
 }

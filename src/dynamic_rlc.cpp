@@ -42,7 +42,6 @@ void CDynamicRLC<T>::EncodeBlock(const T * pSrc, CPoint p, CSize s, CBitstream *
 {
 	const T * src = &pSrc[p.Y*s.Width + p.X];
 	uint8_t run=0;
-	int counter = 0;
 	for(int y=0;y<8;y++)
 	{
 		for(int x = 0; x<8; x++)

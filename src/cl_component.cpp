@@ -27,17 +27,6 @@ CCLComponent<T>::CCLComponent(CCLDevice * dev, CSize size, cl_mem_flags mem_flag
 }
 
 template <class T>
-CCLComponent<T>::CCLComponent(CCLDevice * dev, int height, int width, cl_mem_flags mem_flags) :
-	m_dev(dev),
-	CComponent<T>(height, width),
-	m_cldata(0),
-	m_mem_flags(mem_flags),
-	m_autoCopy(true),
-	m_state(CLMEM_STATE_HOST)
-{
-}
-
-template <class T>
 CCLComponent<T>::~CCLComponent()
 {
 	if(this->m_cldata)

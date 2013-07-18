@@ -73,7 +73,6 @@ void CStaticRLC<T>::encodeDC(T val, int c, CBitstream * bstr)
 	else
 	{
 		T mant = val;
-		T _val = val;
 		if(val < 0)
 		{
 			val = -val;
