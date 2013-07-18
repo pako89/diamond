@@ -5,15 +5,17 @@ namespace avlib
 
 template <class T>
 CCLShift<T>::CCLShift(CCLDevice * dev, cl_program program, const char * kernel) :
-	ICLKernel(dev, program, kernel)
+	m_kernel(NULL)
 {
+	m_kernel = new CCLKernel(dev, program, kernel);
 }
 
 template <class T>
 CCLShift<T>::CCLShift(T s, CCLDevice * dev, cl_program program, const char * kernel) :
-	ICLKernel(dev, program, kernel),
+	m_kernel(NULL),
 	CShift<T>::CShift(s)
 {
+	m_kernel = new CCLKernel(dev, program, kernel);
 }
 
 template <class T>
@@ -36,14 +38,14 @@ void CCLShift<T>::doTransform(CImage<T> * src, CImage<T> * dst)
 			local_work_size[0] = 8;
 			local_work_size[1] = 8;		
 
-			SetArg(0, sizeof(srcMem), &srcMem);
-			SetArg(1, sizeof(dstMem), &dstMem);
-			SetArg(2, sizeof(height), &height);
-			SetArg(3, sizeof(width), &width);
-			SetArg(4, sizeof(this->m_shift), &this->m_shift);
-			EnqueueNDRangeKernel(2, global_work_size, local_work_size, 0, NULL, NULL);
+			m_kernel->SetArg(0, sizeof(srcMem), &srcMem);
+			m_kernel->SetArg(1, sizeof(dstMem), &dstMem);
+			m_kernel->SetArg(2, sizeof(height), &height);
+			m_kernel->SetArg(3, sizeof(width), &width);
+			m_kernel->SetArg(4, sizeof(this->m_shift), &this->m_shift);
+			m_kernel->EnqueueNDRangeKernel(2, global_work_size, local_work_size, 0, NULL, NULL);
 #ifdef CL_FINISH_KERNEL
-			Finish();
+			m_kernel->Finish();
 #endif
 		}
 	}

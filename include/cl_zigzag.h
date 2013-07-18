@@ -9,12 +9,13 @@ namespace avlib
 {
 
 template <class S, class D>
-class CCLZigZag : public CZigZag<S, D>, public ICLKernel
+class CCLZigZag : public CZigZag<S, D>
 {
 public:
 	CCLZigZag(CCLDevice * dev, cl_program program, const char * kernel);
 protected:
 	virtual void doTransform(CImage<S> * src, CImage<D> * dst);
+	CCLKernel * m_kernel;
 };
 
 }

@@ -11,7 +11,7 @@
 namespace avlib
 {
 
-class CCLQuant : public CQuant, public ICLKernel
+class CCLQuant : public CQuant
 {
 public:
 	CCLQuant(CCLDevice * dev, cl_program program, const char * kernel);
@@ -19,9 +19,10 @@ public:
 	virtual void setTables(const uint8_t * YQ, const uint8_t * UQ, const uint8_t * VQ, int qp);
 protected:
 	virtual void doTransform(CImage<float> * src, CImage<float> * dst);
+	CCLKernel * m_kernel;
 };
 
-class CCLIQuant : public CIQuant, public ICLKernel
+class CCLIQuant : public CIQuant
 {
 public:
 	CCLIQuant(CCLDevice * dev, cl_program program, const char * kernel);
@@ -29,6 +30,7 @@ public:
 	virtual void setTables(const uint8_t * YQ, const uint8_t * UQ, const uint8_t * VQ, int qp);
 protected:
 	virtual void doTransform(CImage<float> * src, CImage<float> * dst);
+	CCLKernel * m_kernel;
 };
 
 }

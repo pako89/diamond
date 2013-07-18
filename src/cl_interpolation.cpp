@@ -8,7 +8,7 @@ namespace avlib
 template <class T>
 CCLInterpolation<T>::CCLInterpolation(CCLDevice * dev, cl_program program, const char * kernel)
 {
-	m_kernel = new ICLKernel(dev, program, kernel);
+	m_kernel = new CCLKernel(dev, program, kernel);
 }
 
 template <class T>

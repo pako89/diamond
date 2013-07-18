@@ -9,11 +9,11 @@
 namespace avlib
 {
 
-class ICLKernel
+class CCLKernel
 {
 public:
-	ICLKernel(CCLDevice * dev, cl_program program, const char * kernel);
-	virtual ~ICLKernel();
+	CCLKernel(CCLDevice * dev, cl_program program, const char * kernel);
+	virtual ~CCLKernel();
 	void EnqueueNDRangeKernel(
 			cl_uint work_dim, 
 			const size_t *global_work_size, 

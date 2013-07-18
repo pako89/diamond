@@ -6,7 +6,7 @@ namespace avlib
 
 CCLDCTQZZ::CCLDCTQZZ(CCLDevice * dev, cl_program program, const char * kernel)
 {
-	m_kernel = new ICLKernel(dev, program, kernel);
+	m_kernel = new CCLKernel(dev, program, kernel);
 	m_q = new CCLImage<float>(dev, CSize(8, 8), CL_MEM_READ_ONLY);
 }
 
@@ -70,7 +70,7 @@ void CCLDCTQZZ::doTransform(CImage<float> * src, CImage<int16_t> * dst)
 
 CCLIDCTQ::CCLIDCTQ(CCLDevice * dev, cl_program program, const char * kernel)
 {
-	m_kernel = new ICLKernel(dev, program, kernel);
+	m_kernel = new CCLKernel(dev, program, kernel);
 	m_q = new CCLImage<float>(dev, CSize(8, 8), CL_MEM_READ_ONLY);
 }
 

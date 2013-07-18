@@ -15,7 +15,7 @@ public:
 	~CCLInterpolation();
 protected:
 	virtual void doTransform(CImage<T> * src, CImage<T> * dst);
-	ICLKernel * m_kernel;
+	CCLKernel * m_kernel;
 };
 
 }

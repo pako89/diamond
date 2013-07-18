@@ -4,7 +4,7 @@
 namespace avlib
 {
 
-ICLKernel::ICLKernel(CCLDevice * dev, cl_program program, const char * kernel) :
+CCLKernel::CCLKernel(CCLDevice * dev, cl_program program, const char * kernel) :
 	m_dev(dev),
 	m_program(program),
 	m_name(kernel)
@@ -20,11 +20,11 @@ ICLKernel::ICLKernel(CCLDevice * dev, cl_program program, const char * kernel) :
 }
 
 
-ICLKernel::~ICLKernel()
+CCLKernel::~CCLKernel()
 {
 }
 
-void ICLKernel::EnqueueNDRangeKernel(
+void CCLKernel::EnqueueNDRangeKernel(
 			cl_uint work_dim, 
 			const size_t *global_work_size, 
 			const size_t *local_work_size,
@@ -56,7 +56,7 @@ void ICLKernel::EnqueueNDRangeKernel(
 	if(CL_SUCCESS != err) throw utils::StringFormatException("clEnqueueNDRangeKernel(%d)\n", err);
 }
 
-void ICLKernel::Finish(void)
+void CCLKernel::Finish(void)
 {
 	CCLTimers::getFinish().start();
 	cl_int err = clFinish(this->m_dev->getCommandQueue());
@@ -64,29 +64,29 @@ void ICLKernel::Finish(void)
 	if(CL_SUCCESS != err) throw utils::StringFormatException("clFinish(%d)\n", err);
 }
 
-void ICLKernel::SetArg(cl_uint arg_index, size_t arg_size, const void * arg_value)
+void CCLKernel::SetArg(cl_uint arg_index, size_t arg_size, const void * arg_value)
 {
 	cl_int err = clSetKernelArg(m_kernel, arg_index, arg_size, arg_value);
 	if(CL_SUCCESS != err) throw utils::StringFormatException("clSetKernelArg(%d)\n", err);
 
 }
 
-cl_program ICLKernel::getProgramId()
+cl_program CCLKernel::getProgramId()
 {
 	return m_program;
 }
 
-cl_kernel ICLKernel::getKernelId()
+cl_kernel CCLKernel::getKernelId()
 {
 	return m_kernel;
 }
 
-std::string ICLKernel::getName()
+std::string CCLKernel::getName()
 {
 	return m_name;
 }
 
-CCLDevice * ICLKernel::getDevice()
+CCLDevice * CCLKernel::getDevice()
 {
 	return m_dev;
 }

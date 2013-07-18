@@ -10,13 +10,14 @@
 namespace avlib
 {
 
-class CCLDCT : public CDCT, public ICLKernel
+class CCLDCT : public CDCT
 {
 public:
 	CCLDCT(CCLDevice * dev, cl_program program, const char * kernel);
 	virtual ~CCLDCT();
 protected:
 	virtual void doTransform(CImage<float> * src, CImage<float> * dst);
+	CCLKernel * m_kernel;
 };
 
 class CCLIDCT : public CCLDCT, public CIDCT

@@ -28,12 +28,12 @@ protected:
 	virtual void doTransformPFrame(CImage<float> * pSrc, CImage<float> * pDst, CPredictionInfoTable * pPred);
 	virtual void doITransformPFrame(CImage<float> * pSrc, CImage<float> * pDst, CPredictionInfoTable * pPred);
 	virtual void doPredict(CComponent<float> * pSrc, CPredictionInfoTable * pPred);
-	virtual void clTransform(ICLKernel * kernel, CImage<float> * pSrc, CImage<float> * pDst, CPredictionInfoTable * pPred);
+	virtual void clTransform(CCLKernel * kernel, CImage<float> * pSrc, CImage<float> * pDst, CPredictionInfoTable * pPred);
 	virtual void clPredict(CCLComponent<float> * pSrc, CCLComponent<float> * pLast, CCLPredictionInfoTable * pPred);
 	CCLDevice * m_dev;
-	ICLKernel * m_kernelTransform;
-	ICLKernel * m_kernelITransform;
-	ICLKernel * m_kernelPrediction;
+	CCLKernel * m_kernelTransform;
+	CCLKernel * m_kernelITransform;
+	CCLKernel * m_kernelPrediction;
 };
 
 }

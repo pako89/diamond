@@ -22,7 +22,7 @@ public:
 	virtual void setTables(const uint8_t * YQ, const uint8_t * UQ, const uint8_t * VQ, int qp);
 protected:
 	virtual void doTransform(CImage<float> * src, CImage<int16_t> * dst);
-	ICLKernel * m_kernel;
+	CCLKernel * m_kernel;
 	CCLImage<float> * m_q;
 };
 
@@ -35,7 +35,7 @@ public:
 	virtual void setTables(const uint8_t * YQ, const uint8_t * UQ, const uint8_t * VQ, int qp);
 protected:
 	virtual void doTransform(CImage<float> * src, CImage<float> * dst);
-	ICLKernel * m_kernel;
+	CCLKernel * m_kernel;
 	CCLImage<float> * m_q;
 };
 

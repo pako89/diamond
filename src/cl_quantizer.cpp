@@ -4,8 +4,9 @@ namespace avlib
 {
 
 CCLQuant::CCLQuant(CCLDevice * dev, cl_program program, const char * kernel) : 
-	ICLKernel(dev, program, kernel)
+	m_kernel(NULL)
 {
+	m_kernel = new CCLKernel(dev, program, kernel);
 }
 
 void CCLQuant::setTables(int qp)
@@ -15,7 +16,7 @@ void CCLQuant::setTables(int qp)
 
 void CCLQuant::setTables(const uint8_t * YQ, const uint8_t * UQ, const uint8_t * VQ, int qp)
 {
-	if(NULL == this->m_q) this->m_q = new CCLImage<float>(this->m_dev, CSize(8, 8), CL_MEM_READ_ONLY);
+	if(NULL == this->m_q) this->m_q = new CCLImage<float>(this->m_kernel->getDevice(), CSize(8, 8), CL_MEM_READ_ONLY);
 	CQuant::setTables(YQ, UQ, VQ, qp);
 	dynamic_cast<CCLImage<float>*>(m_q)->CopyToDevice();
 }
@@ -25,11 +26,7 @@ void CCLQuant::doTransform(CImage<float> * src, CImage<float> * dst)
 	CCLImage<float> * clSrc = dynamic_cast<CCLImage<float>*>(src);
 	CCLImage<float> * clDst = dynamic_cast<CCLImage<float>*>(dst);
 	CCLImage<float> * clQ = dynamic_cast<CCLImage<float>*>(m_q);
-	if(NULL == clSrc || NULL == clDst)
-	{
-		throw utils::StringFormatException("src or dst is not CCLImage<float>\n");
-	}
-	if(this->m_kernel)
+	if(this->m_kernel && NULL != clSrc && NULL != clDst && NULL != clQ)
 	{
 		for(int i=0;i<clSrc->getComponents(); i++)
 		{
@@ -45,14 +42,14 @@ void CCLQuant::doTransform(CImage<float> * src, CImage<float> * dst)
 			local_work_size[0] = 8;
 			local_work_size[1] = 8;
 			
-			SetArg(0, sizeof(srcMem), &srcMem);
-			SetArg(1, sizeof(dstMem), &dstMem);
-			SetArg(2, sizeof(qMem), &qMem);
-			SetArg(3, sizeof(height), &height);
-			SetArg(4, sizeof(width), &width);
-			EnqueueNDRangeKernel(2, global_work_size, local_work_size, 0, NULL, NULL);
+			m_kernel->SetArg(0, sizeof(srcMem), &srcMem);
+			m_kernel->SetArg(1, sizeof(dstMem), &dstMem);
+			m_kernel->SetArg(2, sizeof(qMem), &qMem);
+			m_kernel->SetArg(3, sizeof(height), &height);
+			m_kernel->SetArg(4, sizeof(width), &width);
+			m_kernel->EnqueueNDRangeKernel(2, global_work_size, local_work_size, 0, NULL, NULL);
 #ifdef CL_KERNEL_FINISH
-			Finish();
+			m_kernel->Finish();
 #endif
 		}
 	}
@@ -63,8 +60,9 @@ void CCLQuant::doTransform(CImage<float> * src, CImage<float> * dst)
 }
 
 CCLIQuant::CCLIQuant(CCLDevice * dev, cl_program program, const char * kernel) :
-	ICLKernel(dev, program, kernel)
+	m_kernel(NULL)
 {
+	m_kernel = new CCLKernel(dev, program, kernel);
 }
 
 void CCLIQuant::setTables(int qp)
@@ -74,7 +72,7 @@ void CCLIQuant::setTables(int qp)
 
 void CCLIQuant::setTables(const uint8_t * YQ, const uint8_t * UQ, const uint8_t * VQ, int qp)
 {
-	if(NULL == this->m_q) this->m_q = new CCLImage<float>(this->m_dev, CSize(8, 8), CL_MEM_READ_ONLY);
+	if(NULL == this->m_q) this->m_q = new CCLImage<float>(this->m_kernel->getDevice(), CSize(8, 8), CL_MEM_READ_ONLY);
 	CIQuant::setTables(YQ, UQ, VQ, qp);
 	dynamic_cast<CCLImage<float>*>(m_q)->CopyToDevice();
 
@@ -85,11 +83,7 @@ void CCLIQuant::doTransform(CImage<float> * src, CImage<float> * dst)
 	CCLImage<float> * clSrc = dynamic_cast<CCLImage<float>*>(src);
 	CCLImage<float> * clDst = dynamic_cast<CCLImage<float>*>(dst);
 	CCLImage<float> * clQ = dynamic_cast<CCLImage<float>*>(m_q);
-	if(NULL == clSrc || NULL == clDst)
-	{
-		throw utils::StringFormatException("src or dst is not CCLImage<float>\n");
-	}
-	if(this->m_kernel)
+	if(this->m_kernel && NULL != clSrc && NULL != clDst && NULL != clQ)
 	{
 		for(int i=0;i<clSrc->getComponents(); i++)
 		{
@@ -105,14 +99,14 @@ void CCLIQuant::doTransform(CImage<float> * src, CImage<float> * dst)
 			local_work_size[0] = 8;
 			local_work_size[1] = 8;
 
-			SetArg(0, sizeof(srcMem), &srcMem);
-			SetArg(1, sizeof(dstMem), &dstMem);
-			SetArg(2, sizeof(qMem), &qMem);
-			SetArg(3, sizeof(height), &height);
-			SetArg(4, sizeof(width), &width);
-			EnqueueNDRangeKernel(2, global_work_size, local_work_size, 0, NULL, NULL);
+			m_kernel->SetArg(0, sizeof(srcMem), &srcMem);
+			m_kernel->SetArg(1, sizeof(dstMem), &dstMem);
+			m_kernel->SetArg(2, sizeof(qMem), &qMem);
+			m_kernel->SetArg(3, sizeof(height), &height);
+			m_kernel->SetArg(4, sizeof(width), &width);
+			m_kernel->EnqueueNDRangeKernel(2, global_work_size, local_work_size, 0, NULL, NULL);
 #ifdef CL_KERNEL_FINISH			
-			Finish();
+			m_kernel->Finish();
 #endif 
 		}
 	}

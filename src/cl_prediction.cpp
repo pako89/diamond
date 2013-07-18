@@ -38,17 +38,17 @@ void CCLPrediction::Init(CImageFormat format, int scale, cl_program program, con
 
 void CCLPrediction::setTransformKernel(cl_program program, const char * kernel)
 {
-	m_kernelTransform = new ICLKernel(m_dev, program, kernel);
+	m_kernelTransform = new CCLKernel(m_dev, program, kernel);
 }
 
 void CCLPrediction::setITransformKernel(cl_program program, const char * kernel)
 {
-	m_kernelITransform = new ICLKernel(m_dev, program, kernel);
+	m_kernelITransform = new CCLKernel(m_dev, program, kernel);
 }
 
 void CCLPrediction::setPredictionKernel(cl_program program, const char * kernel)
 {
-	m_kernelPrediction = new ICLKernel(m_dev, program, kernel);
+	m_kernelPrediction = new CCLKernel(m_dev, program, kernel);
 }
 
 void CCLPrediction::doPredict(CComponent<float> * pSrc, CPredictionInfoTable * pPred)
@@ -95,7 +95,7 @@ void CCLPrediction::doITransformPFrame(CImage<float> * pSrc, CImage<float> * pDs
 }
 
 
-void CCLPrediction::clTransform(ICLKernel * kernel, CImage<float> * pSrc, CImage<float> * pDst, CPredictionInfoTable * pPred)
+void CCLPrediction::clTransform(CCLKernel * kernel, CImage<float> * pSrc, CImage<float> * pDst, CPredictionInfoTable * pPred)
 {
 	CCLImage<float> * clSrc = dynamic_cast<CCLImage<float>*>(pSrc);
 	CCLImage<float> * clDst = dynamic_cast<CCLImage<float>*>(pDst);

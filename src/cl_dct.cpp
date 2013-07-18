@@ -5,8 +5,9 @@ namespace avlib
 {
 
 CCLDCT::CCLDCT(CCLDevice * dev, cl_program program, const char * kernel) :
-	ICLKernel(dev, program, kernel)
+	m_kernel(NULL)
 {
+	m_kernel = new CCLKernel(dev, program, kernel);
 }
 
 CCLDCT::~CCLDCT()
@@ -18,11 +19,7 @@ void CCLDCT::doTransform(CImage<float> * src, CImage<float> * dst)
 {
 	CCLImage<float> * clSrc = dynamic_cast<CCLImage<float>*>(src);
 	CCLImage<float> * clDst = dynamic_cast<CCLImage<float>*>(dst);
-	if(NULL == clSrc || NULL == clDst)
-	{
-		throw utils::StringFormatException("src or dst is not CCLImage<float>\n");
-	}
-	if(m_kernel)
+	if(m_kernel && NULL != clSrc && NULL != clDst)
 	{
 		for(int i=0;i<clSrc->getComponents(); i++)
 		{
@@ -37,13 +34,13 @@ void CCLDCT::doTransform(CImage<float> * src, CImage<float> * dst)
 			local_work_size[0] = 8;
 			local_work_size[1] = 1;
 			
-			SetArg(0, sizeof(srcMem), &srcMem);
-			SetArg(1, sizeof(dstMem), &dstMem);
-			SetArg(2, sizeof(height), &height);
-			SetArg(3, sizeof(width), &width);
-			EnqueueNDRangeKernel(2, global_work_size, local_work_size, 0, NULL, NULL);
+			m_kernel->SetArg(0, sizeof(srcMem), &srcMem);
+			m_kernel->SetArg(1, sizeof(dstMem), &dstMem);
+			m_kernel->SetArg(2, sizeof(height), &height);
+			m_kernel->SetArg(3, sizeof(width), &width);
+			m_kernel->EnqueueNDRangeKernel(2, global_work_size, local_work_size, 0, NULL, NULL);
 #ifdef CL_KERNEL_FINISH
-			Finish();
+			m_kernel->Finish();
 #endif
 		}
 	}
