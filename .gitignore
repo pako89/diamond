@@ -22,3 +22,5 @@ Release
 *.yuv
 irena
 *.suo
+kernel.cl
+.vimrc

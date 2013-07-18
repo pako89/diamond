@@ -10,7 +10,7 @@ CFLAGS += -Iinclude
 CFLAGS += -I/usr/local/cuda/include
 CFLAGS += -Isrc/cl
 CFLAGS += -DDEFAULT_MAX_PREDICTION=2
-CFLAGS += -DDEFAULT_KERNEL_SRC="\"src/cl/kernel.cl\""
+CFLAGS += -DDEFAULT_KERNEL_SRC="\"kernel.cl\""
 CFLAGS += -DDEFAULT_PREDICTION_METHOD=PREDICTION_METHOD_MSE
 CFLAGS += -DDEFAULT_INTERPOLATION_SCALE=2
 CFLAGS += -DDEFAULT_PROGRESS_BAR=true
@@ -89,7 +89,11 @@ SRC += src/cl_dctqzz.cpp
 SRC += src/cl_interpolation.cpp
 SRC += src/cl_timers.cpp
 
-# Objects
+# OpenCL kernel source
+CL_KERNEL = kernel.cl
+CL_KERNEL_PATH = src/cl/$(CL_KERNEL)
+
+# Objectsa
 OBJ	= $(SRC:.cpp=.o)
 
 default: $(TARGET)
@@ -100,11 +104,24 @@ debug:
 
 all: $(TARGET) tests
 
-$(TARGET): $(OBJ) 
+$(TARGET): $(OBJ) $(CL_KERNEL)
 	$(CC) $(LDFLAGS) -o $(TARGET) $(OBJ) $(LIBS)
+
+$(CL_KERNEL): $(CL_KERNEL_PATH)
+	@echo Copying $(CL_KERNEL)
+	@cp -vf $(CL_KERNEL_PATH) $(CL_KERNEL)
 
 %.o : %.cpp
 	$(CC) $(CFLAGS) -c $< -o $@
+
+.PHONY : vim vim_clean
+vim: 
+	@echo Creating .vimrc file
+	@ln -sfv scripts/.vimrc
+
+vim_clean:
+	@echo Removing .vimrc file
+	@rm -rf .vimrc
 
 .PHONY : tests tests_clean
 tests:
@@ -114,4 +131,4 @@ tests_clean:
 	$(MAKE) -C $(TESTS_DIR) clean
 
 clean: tests_clean
-	rm -rf $(TARGET) $(OBJ)
+	rm -rf $(TARGET) $(OBJ) $(CL_KERNEL)
