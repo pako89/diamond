@@ -450,7 +450,7 @@ __kernel void prediction_predict(
 	int gy = get_global_id(0);
 	int gx = get_global_id(1);
 	int y = gy*16;
-	int x = gx*16;
+	int x = gx*16;	
 	copyGlobal2Array(&pSrc[y*width+x], width, block);
 	struct 
 	{
@@ -500,8 +500,10 @@ __kernel void prediction_predict_interpolation(
 	float block[16*16];
 	int gy = get_global_id(0);
 	int gx = get_global_id(1);
-	int y = gy*16*scale;
-	int x = gx*16*scale;
+	int y = gy*16;
+	int x = gx*16;
+	int sy = y*scale;
+	int sx = x*scale;
 	copyGlobal2Array(&pSrc[y*width+x], width, block);
 	struct 
 	{
@@ -516,8 +518,8 @@ __kernel void prediction_predict_interpolation(
 	{
 		for(int dx=-max_d ; dx <= max_d ; dx++)
 		{
-			int dpy = y + dy*16;
-			int dpx = x + dx*16;
+			int dpy = sy + dy*16;
+			int dpx = sx + dx*16;
 			if(dpx >= 0 && dpy >= 0 && (dpy+16) < lastHeight && (dpx+16) < lastWidth)
 			{
 				float d = diff_mse(block, &pLast[dpy*lastWidth+dpx], lastWidth);
