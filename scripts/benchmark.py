@@ -90,7 +90,7 @@ class Config:
 		self.VideosFormat = self._get_config('Input', 'VideosFormat')
 		self.parse_videos()
 		# Options configuration
-		self.Interpolation = string.split(self._get_config('Options', 'Interpolation'), ' ')
+		self.InterpolationScale = string.split(self._get_config('Options', 'Interpolation'), ' ')
 		self.Huffman = string.split(self._get_config('Options', 'Huffman'), ' ')
 		self.EncoderVariant = string.split(self._get_config('Options', 'EncoderVariant'), ' ')
 		self.GOP = string.split(self._get_config('Options', 'GOP'), ' ')
@@ -100,7 +100,7 @@ class Config:
 	def get_count(self):
 		r = 1
 		r *= len(self.Videos)
-		r *= len(self.Interpolation)
+		r *= len(self.InterpolationScale)
 		r *= len(self.Huffman)
 		r *= len(self.EncoderVariant)
 		r *= len(self.GOP)
@@ -163,7 +163,7 @@ class EncoderConfig:
 	def __init__(self, video, variant, interpol, huffman, gop, q, device):
 		self.Video = video
 		self.Variant = variant
-		self.Interpol = interpol
+		self.InterpolationScale = interpol
 		self.Huffman = huffman
 		self.GOP = gop
 		self.Q = q
@@ -176,7 +176,7 @@ class EncoderConfig:
 		s = "_"
 		s += "V"+self.Variant
 		s += "H"+self.Huffman
-		s += "I"+self.Interpol
+		s += "I"+self.InterpolationScale
 		s += "G"+self.GOP
 		s += "Q"+self.Q
 		s += "D"+self.Device
@@ -207,7 +207,7 @@ class Benchmark:
 		print BLUE + "Running benchmark"+ EC
 		i = 1
 		for v in self.Config.Videos:
-			for I in self.Config.Interpolation:
+			for I in self.Config.InterpolationScale:
 				for H in self.Config.Huffman:
 					for V in self.Config.EncoderVariant:
 						for G in self.Config.GOP:
@@ -256,7 +256,7 @@ class Benchmark:
 		self._out_progress("Encoding")
 		cmd = Command(self.Config.Encoder)
 		cmd.add_arg(self.Config.EncoderArgs)
-		cmd.add_option("--interpolation", cfg.Interpol)
+		cmd.add_option("--interpolation", cfg.InterpolationScale)
 		cmd.add_option("--huffman", cfg.Huffman)
 		cmd.add_option("--variant", cfg.Variant)
 		cmd.add_option("--gop", cfg.GOP)
@@ -427,7 +427,7 @@ class Result:
 	
 	def create_dict(self):
 		self.Dict['Variant'] = self.EncoderConfig.Variant
-		self.Dict['Interpolation'] = self.EncoderConfig.Interpol
+		self.Dict['InterpolationScale'] = self.EncoderConfig.InterpolationScale
 		self.Dict['Huffman'] = self.EncoderConfig.Huffman
 		self.Dict['GOP'] = self.EncoderConfig.GOP
 		self.Dict['Q'] = self.EncoderConfig.Q
