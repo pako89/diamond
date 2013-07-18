@@ -13,8 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="OpenCL">
-      <UniqueIdentifier>{35c8a003-9719-48e2-8244-c0f33497a861}</UniqueIdentifier>
+    <Filter Include="OpenCL Files">
+      <UniqueIdentifier>{D011BB44-1BF7-4113-997B-A081035B40D8}</UniqueIdentifier>
+      <Extensions>cl</Extensions>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -324,12 +325,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\cl\clkernel.h">
-      <Filter>OpenCL</Filter>
+      <Filter>OpenCL Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\src\cl\kernel.cl">
-      <Filter>OpenCL</Filter>
-    </None>
+    <Intel_OpenCL_Build_Rules Include="..\src\cl\kernel.cl">
+      <Filter>OpenCL Files</Filter>
+    </Intel_OpenCL_Build_Rules>
   </ItemGroup>
 </Project>
