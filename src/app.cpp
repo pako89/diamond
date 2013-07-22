@@ -180,7 +180,7 @@ void CApplication::PrintVersion(void)
 {
 	log_info("version", "%s", VERSION);
 	log_info("build date", "%s", BUILD_DATE);
-	log_info("Github", "%s", "https://github.com/pako89/irena");
+	log_info("webpage", "%s", "https://github.com/pako89/irena");
 }
 
 void CApplication::PrintBanner(void)
@@ -201,7 +201,7 @@ void CApplication::PrintHelp(void)
 {
 printf("\
 %s is a non-standarized hybrid video encoder and decoder implementation using CPU and OpenCL technology.\n\
-Copyright © 2013 by Pawel Lebioda <pawel.lebioda89@gmail.com>\n\
+Copyright (c) 2013 by Pawel Lebioda <pawel.lebioda89@gmail.com>\n\
 ", m_appName);
 printf("\n");
 	PrintVersion();
@@ -214,25 +214,25 @@ printf("\
 Avalibale operations:\n\
 ");
 printf("\
-	encode	[OPTIONS] FILE	- Encode sequence using specigied variant of encoder.\n\
-			  	  Input file must be in YUV4MPEG2 format, otherwise sequence\n\
-				  parameters must be specified by encoder options.\n\
+	encode	[OPTIONS] FILE	 	Encode sequence using specigied variant of encoder.\n\
+			  	  	Input file must be in YUV4MPEG2 format, otherwise sequence\n\
+				  	parameters must be specified by encoder options.\n\
 ");
 printf("\
-	decode	[OPTIONS] FILE	- Decode bitstream file. Output file will be in YUV4MPEG2 format\n\
+	decode	[OPTIONS] FILE	 	Decode bitstream file. Output file will be in YUV4MPEG2 format\n\
 ");
 printf("\
-	psnr	[OPTIONS] FILES	- Compute PSNR value for two sequences.\n\
-				  Sequences must be in YUV4MPEG2 format, otherwise sequence\n\
-				  parameters must be specified by PSNR options\n\
+	psnr	[OPTIONS] FILES	 	Compute PSNR value for two sequences.\n\
+				  	Sequences must be in YUV4MPEG2 format, otherwise sequence\n\
+				  	parameters must be specified by PSNR options\n\
 ");
 printf("\
-	info			- Print system information including:\n\
-				  * Version\n\
-				  * Build data\n\
-				  * CPU information\n\
-				  * Memory information\n\
-				  * OpenCL platforms and devices informations\n\
+	info			 	Print system information including:\n\
+				  	* Version\n\
+				  	* Build data\n\
+				  	* CPU information\n\
+				  	* Memory information\n\
+				  	* OpenCL platforms and devices informations\n\
 ");
 printf("\n");
 printf("\
