@@ -242,16 +242,6 @@ printf("\
 	-h, --help			Print this help message\n\
 ");
 printf("\
-	-p, --progress-bar yes|no	Indicates whether progress bar should be printed\n\
-					Requires -v option\n\
-					[Default: no]\n\
-");
-printf("\
-	-T, --print-timers yes|no	Indicates whether timers' values should be printed\n\
-					Requires -v option\n\
-					[Default: no]\n\
-");
-printf("\
 	-v, --verbose			Increase verbose level\n\
 ");
 printf("\
@@ -297,12 +287,32 @@ printf("\
 printf("\
 	-d, --device	CPU|GPU		Specify device type for OpenCL\n\
 ");
+printf("\
+	-p, --progress-bar yes|no	Indicates whether progress bar should be printed\n\
+					Requires -v option\n\
+					[Default: no]\n\
+");
+printf("\
+	-T, --print-timers yes|no	Indicates whether timers' values should be printed\n\
+					Requires -v option\n\
+					[Default: no]\n\
+");
 printf("\n");
 printf("\
 Decoder options:\n\
 ");
 printf("\
 	-o, --output			Output file name\n\
+");
+printf("\
+	-p, --progress-bar yes|no	Indicates whether progress bar should be printed\n\
+					Requires -v option\n\
+					[Default: no]\n\
+");
+printf("\
+	-T, --print-timers yes|no	Indicates whether timers' values should be printed\n\
+					Requires -v option\n\
+					[Default: no]\n\
 ");
 printf("\n");
 printf("\
@@ -327,8 +337,6 @@ printf("\n");
 
 const struct option CApplication::common_options[] = {
 	{"help",		no_argument,		NULL,	'h'},
-	{"progress-bar",	required_argument, 	NULL, 	'p'},
-	{"print-timers",	required_argument,	NULL, 	'T'},
 	{"verbose",		no_argument,		NULL,	'v'},
 	{"version",		no_argument,		NULL,	'X'},
 };
@@ -345,15 +353,19 @@ const struct option CApplication::encoder_options[] = {
 	{"gop",			required_argument,	NULL, 	'g'},
 	{"quant",		required_argument,	NULL, 	'q'},
 	{"interpolation",	optional_argument,	NULL,	'I'},
-	{"frame-rate",	required_argument,	NULL,	'f'},
+	{"frame-rate",		required_argument,	NULL,	'f'},
 	{"kernel",		required_argument,	NULL,	'k'},
 	{"device",		required_argument,	NULL, 	'd'},
+	{"progress-bar",	required_argument, 	NULL, 	'p'},
+	{"print-timers",	required_argument,	NULL, 	'T'},
 };
 
 #define ENCODER_OPTS_SIZE	ARRAY_SIZE(encoder_options)
 
 const struct option CApplication::decoder_options[] = {
 	{"output",		required_argument,	NULL, 	'o'},
+	{"progress-bar",	required_argument, 	NULL, 	'p'},
+	{"print-timers",	required_argument,	NULL, 	'T'},
 };
 
 #define DECODER_OPTS_SIZE	ARRAY_SIZE(decoder_options)
