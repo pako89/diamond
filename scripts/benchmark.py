@@ -6,6 +6,7 @@ import ConfigParser
 import datetime
 import string
 import collections
+import time
 
 if sys.platform == 'win32':
 	BLUE=""
@@ -54,10 +55,10 @@ class Config:
 
 	def _get_config(self, section, name):
 		try:
-			ret = self.ConfigParser.get(section, name)
+			ret = self.ConfigParser.get(sys.platform, name)
 		except:
 			try:
-				ret = self.ConfigParser.get(sys.platform, name)
+				ret = self.ConfigParser.get(section, name)
 			except:
 				print "Can not find option {0} in sections {1}, {2}".format(name, section, sys.platform)
 				exit(1)
@@ -75,6 +76,7 @@ class Config:
 		self.Info = self._get_config('General', 'Info')
 		self.InfoArgs = self._get_config('General', 'InfoArgs')
 		self.Tar = self._get_config('General', 'Tar')
+		self.Sleep = float(self._get_config('General', 'Sleep'))
 		# Output configuration
 		self.TarDecoded = str2bool(self._get_config('Output', 'TarDecoded')) and self.Tar != ""		
 		self.ResultsDir = self._get_config('Output', 'ResultsDir')
@@ -321,6 +323,11 @@ class Benchmark:
 		cmd.run()
 		self._out_done("Compressing", cmd.get_status())
 
+	def _sleep(self):
+		self._out_progress("Sleep")
+		time.sleep(self.Config.Sleep)
+		self._out_done("Sleep", 0)
+	
 	def _remove_output(self, output):
 		self._out_progress("Removing decoded video")
 		os.remove(output)
@@ -342,6 +349,8 @@ class Benchmark:
 			self._run_tar(tar, output)
 		if self.Config.RemoveDecoded:
 			self._remove_output(output)
+		if self.Config.Sleep > 0:
+			self._sleep()
 
 	def _get_out_path(self, name):
 		return os.path.join(self.Config.ResultsDir, name)
