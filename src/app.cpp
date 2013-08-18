@@ -288,6 +288,9 @@ printf("\
 	-d, --device	CPU|GPU		Specify device type for OpenCL\n\
 ");
 printf("\
+	-e, --huffman	static|dynamic	Huffman entropy encoding type\n\
+");
+printf("\
 	-p, --progress-bar yes|no	Indicates whether progress bar should be printed\n\
 					Requires -v option\n\
 					[Default: no]\n\
