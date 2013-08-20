@@ -376,16 +376,21 @@ class Benchmark:
 
 class ResultItem:
 	INVALID = ""
-	def __init__(self, desc, reg):
+	TYPE_TEXT = 0
+	TYPE_FLOAT = 1
+	def __init__(self, desc, reg, t):
 		self.Value = self.INVALID
 		self.Description = desc
 		self._reg = reg
+		self.Type = t
 
 	def parse(self, data):
 		if self.Value == self.INVALID:
 			m = re.search(self._reg, data)
 			if m != None:
 				self.Value = m.group('v')
+				if self.Type == self.TYPE_FLOAT:
+					self.Value = self.Value.replace('.', ',')
 
 
 class Result:
@@ -424,10 +429,10 @@ class Result:
 			self.create_result_psnr("V PSNR for P frames")
 
 	def create_result_psnr(self, name):
-		self.Items.append(ResultItem(name, self.create_regex(name)))
+		self.Items.append(ResultItem(name, self.create_regex(name), ResultItem.TYPE_FLOAT))
 
 	def create_result_item_timer(self, name):
-		self.Items.append(ResultItem(name, self.create_regex("Timer " + name)))
+		self.Items.append(ResultItem(name, self.create_regex("Timer " + name), ResultItem.TYPE_FLOAT))
 
 	def create_regex(self, text):
 		text = text.replace("+", "\+")
