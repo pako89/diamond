@@ -386,7 +386,6 @@ class ResultItem:
 			m = re.search(self._reg, data)
 			if m != None:
 				self.Value = m.group('v')
-			#print "{0} = {1}".format(self.Description, self.Value)
 
 
 class Result:
@@ -435,6 +434,7 @@ class Result:
 		return "{0}\s*:\s*(?P<v>[0-9]+\.[0-9]+)".format(text)
 	
 	def create_dict(self):
+		self.Dict['Sequence'] = self.EncoderConfig.Video.get_name()
 		self.Dict['Variant'] = self.EncoderConfig.Variant
 		self.Dict['InterpolationScale'] = self.EncoderConfig.InterpolationScale
 		self.Dict['Huffman'] = self.EncoderConfig.Huffman
