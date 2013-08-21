@@ -195,4 +195,20 @@ std::string bool2str(bool v)
 	return v?"True":"False";
 }
 
+long FileSize(FILE * fh)
+{
+	if(NULL != fh)
+	{
+		long pos = ftell(fh);
+		fseek(fh, 0, SEEK_END);
+		long count = ftell(fh);
+		fseek(fh, pos, SEEK_SET);
+		return count;
+	}
+	else
+	{
+		return 0;
+	}
+}
+
 }

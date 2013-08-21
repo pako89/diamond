@@ -19,6 +19,29 @@
 #define	exit(v)	exit((v))
 #endif
 
+void print_compression_ratio(irena::Config * config)
+{
+	bool original_is_file = strcmp(config->InputFileName, "stdin") != 0;
+	bool compressed_is_file = strcmp(config->OutputFileName,"stdout") != 0;
+	long original_size = 0;
+	if(original_is_file)
+	{
+		original_size = utils::FileSize(config->InputFile);
+		log_prop("Original file size", "%lu b", original_size);
+	}
+	long compressed_size = 0;
+	if(compressed_is_file)
+	{
+		compressed_size = utils::FileSize(config->OutputFile);
+		log_prop("Compressed file size", "%lu b", compressed_size);
+	}
+	if(original_is_file && compressed_is_file)
+	{
+		double CR = (double)original_size/(double)compressed_size;
+		log_prop("Compression ratio", "%.3f", CR);
+	}
+}
+
 int main(int argc,char * argv[])
 {
 	irena::CApplication * app = irena::CApplication::getInstance();
@@ -70,6 +93,7 @@ int main(int argc,char * argv[])
 			}
 			enc->Encode(seq, bstr);
 			bstr->flush_all();
+			print_compression_ratio(&config);
 			delete enc;
 			delete bstr;
 			delete seq;

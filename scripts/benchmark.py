@@ -381,6 +381,7 @@ class ResultItem:
 	INVALID = ""
 	TYPE_TEXT = 0
 	TYPE_FLOAT = 1
+	TYPE_INT = 2
 	def __init__(self, desc, reg, t):
 		self.Value = self.INVALID
 		self.Description = desc
@@ -400,6 +401,10 @@ class Result:
 	def __init__(self, cfg, psnr):
 		self.EncoderConfig = cfg
 		self.Items = list()
+		self.Dict = collections.OrderedDict()
+		self.create_file_size_item("Original file size")
+		self.create_file_size_item("Compressed file size")
+		self.create_float_item("Compression ratio")
 		self.create_result_item_timer("Total")
 		self.create_result_item_timer("DCT")
 		self.create_result_item_timer("IDCT")
@@ -419,7 +424,6 @@ class Result:
 		self.create_result_item_timer("Copy to device")
 		self.create_result_item_timer("Copy buffer")
 		self.create_result_item_timer("Kernel finish")
-		self.Dict = collections.OrderedDict()
 		if psnr:
 			self.create_result_psnr("Y PSNR")
 			self.create_result_psnr("U PSNR")
@@ -430,14 +434,21 @@ class Result:
 			self.create_result_psnr("Y PSNR for P frames")
 			self.create_result_psnr("U PSNR for P frames")
 			self.create_result_psnr("V PSNR for P frames")
+	
+	def create_file_size_item(self, name):
+		r = "{0}\s*:\s*(?P<v>[0-9]+) b".format(name)
+		self.Items.append(ResultItem(name, r, ResultItem.TYPE_INT))
+
+	def create_float_item(self, name):
+		self.Items.append(ResultItem(name, self.create_regex_float(name), ResultItem.TYPE_FLOAT))
 
 	def create_result_psnr(self, name):
-		self.Items.append(ResultItem(name, self.create_regex(name), ResultItem.TYPE_FLOAT))
+		self.Items.append(ResultItem(name, self.create_regex_float(name), ResultItem.TYPE_FLOAT))
 
 	def create_result_item_timer(self, name):
-		self.Items.append(ResultItem(name, self.create_regex("Timer " + name), ResultItem.TYPE_FLOAT))
+		self.Items.append(ResultItem(name, self.create_regex_float("Timer " + name), ResultItem.TYPE_FLOAT))
 
-	def create_regex(self, text):
+	def create_regex_float(self, text):
 		text = text.replace("+", "\+")
 		return "{0}\s*:\s*(?P<v>[0-9]+\.[0-9]+)".format(text)
 	
