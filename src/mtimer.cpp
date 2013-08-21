@@ -4,8 +4,6 @@ namespace utils
 {
 
 CTimer::CTimer() :
-	m_start(0),
-	m_stop(0),
 	m_state(STOPPED),
 	m_total(0.0)
 {}
@@ -20,7 +18,11 @@ bool CTimer::start()
 	{
 	case STOPPED:
 		m_state = RUNNING;
-		m_start = clock();
+#if USE(TIMER_CHRONO)
+		m_start = clock_t::now();
+#elif USE(TIMER_REAL_TIME)
+		m_start = utils::getRealTime();
+#endif
 		break;
 	case RUNNING:
 		return false;
@@ -38,7 +40,11 @@ bool CTimer::stop()
 		return false;
 	case RUNNING:
 		m_state = STOPPED;
-		m_stop = clock();
+#if USE(TIMER_CHRONO)
+		m_stop = clock_t::now();
+#elif USE(TIMER_REAL_TIME)
+		m_stop = utils::getRealTime();
+#endif
 		m_total += getSeconds();
 		break;
 	default:
@@ -55,7 +61,11 @@ bool CTimer::isRunning()
 
 double CTimer::getSeconds()
 {
-	return (double)(m_stop - m_start)/(double)CLOCKS_PER_SEC;
+#if USE(TIMER_CHRONO)
+	return (double)(std::chrono::duration_cast<std::chrono::nanoseconds>(m_stop - m_start)).count()/1000000000.0;
+#else
+	return (m_stop - m_start);
+#endif
 }
 
 double CTimer::getTotalSeconds()
@@ -66,8 +76,8 @@ double CTimer::getTotalSeconds()
 void CTimer::reset()
 {
 	m_total = 0.0;
-	m_start = 0;
-	m_stop = 0;
+	m_start = time_t();
+	m_stop = time_t();
 	m_state = STOPPED;
 }
 

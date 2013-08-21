@@ -23,7 +23,7 @@ extern int logv;
 #define logev(v, ...)		if(logv>=(v)) _ELOG(__VA_ARGS__)
 #define log_fmtv(v, n, f, ...)	logv((v), "%-30s : " f "\n", n, __VA_ARGS__)
 #define log_prop(n, f, ...)	log_fmtv(2, n, f, __VA_ARGS__)
-#define log_timer(n, t)		log_fmtv(1, "Timer " n, "%.2f", (t).getTotalSeconds())
+#define log_timer(n, t)		log_fmtv(1, "Timer " n, "%.9f", (t).getTotalSeconds())
 #define log_res(n, f, ...)	log_fmtv(0, n, f, __VA_ARGS__)
 #define log_info(n, f, ...)	log_fmtv(0, n, f, __VA_ARGS__)
 

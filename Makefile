@@ -5,6 +5,9 @@ TESTS_DIR = ./unittests
 # Compiler
 CC	= g++
 
+# Timer implementation
+TIMER_CHRONO = n
+
 # Compiler flags
 CFLAGS += -Iinclude
 CFLAGS += -I/usr/local/cuda/include
@@ -24,14 +27,6 @@ CFLAGS += -O3
 CFLAGS += -Wall
 # Enablde this flag if you want to call clFinish after every clEnqueueNDRangeKernel
 #CFLAGS += -DCL_KERNEL_FINISH
-
-ifeq ($(DEBUG), 1)
-CFLAGS += -g
-CFLAGS += -DDEBUG
-CFLAGS += -DCHECK_HUFFMAN
-CFLAGS += -DIMAGE_CHECK_INDEX
-CFLAGS += -DCOMPONENT_CHECK_INDEX
-endif
 
 # Linker flags
 LDFLAGS	+= -L/usr/lib
@@ -96,7 +91,25 @@ SRC += src/cl_timers.cpp
 CL_KERNEL = kernel.cl
 CL_KERNEL_PATH = src/cl/$(CL_KERNEL)
 
-# Objectsa
+ifeq ($(TIMER_CHRONO), y)
+CFLAGS += -DUSE_TIMER_CHRONO
+CFLAGS += -std=c++0x
+else
+CFLAGS += -DUSE_TIMER_REAL_TIME
+SRC += src/getRealTime.cpp
+LIBS += -lrt
+endif
+
+ifeq ($(DEBUG), 1)
+CFLAGS += -g
+CFLAGS += -DDEBUG
+CFLAGS += -DCHECK_HUFFMAN
+CFLAGS += -DIMAGE_CHECK_INDEX
+CFLAGS += -DCOMPONENT_CHECK_INDEX
+endif
+
+
+# Objects
 OBJ	= $(SRC:.cpp=.o)
 
 default: $(TARGET)
