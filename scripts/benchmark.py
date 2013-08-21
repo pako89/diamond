@@ -7,6 +7,7 @@ import datetime
 import string
 import collections
 import time
+import shutil
 
 if sys.platform == 'win32':
 	BLUE=""
@@ -65,6 +66,7 @@ class Config:
 		return ret
 
 	def parse_config(self, config_file):
+		self.File = config_file
 		self.ConfigParser.read(config_file)
 		# General configuration
 		self.Encoder = self._get_config('General', 'Encoder')
@@ -190,9 +192,10 @@ class Benchmark:
 		self.Config = config
 		if not os.path.exists(self.Config.ResultsDir):
 			os.makedirs(self.Config.ResultsDir)
+		shutil.copy(self.Config.File, os.path.join(self.Config.ResultsDir, "benchmark.conf"))
 		self.flog = open(os.path.join(self.Config.ResultsDir, "benchmark.log"), 'w')
 		self.Results = list()
-	
+
 	def _write_sysinfo(self):
 		cmd = Command(self.Config.Info)
 		cmd.add_arg(self.Config.InfoArgs)
