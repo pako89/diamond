@@ -48,6 +48,7 @@ protected:
 	size_t m_frameSize;
 	bool m_yuv4mpeg;
 	CFrameRate m_frameRate;
+	int m_yuv4mpegFrameSize;
 };
 
 }

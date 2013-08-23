@@ -15,7 +15,8 @@ namespace avlib
 CSequence::CSequence(FILE * fh) : 
 	m_image(NULL),
 	m_fh(fh),
-	m_yuv4mpeg(false)
+	m_yuv4mpeg(false),
+	m_yuv4mpegFrameSize(0)
 {
 	parseYUV4MPEG();
 }
@@ -23,7 +24,8 @@ CSequence::CSequence(FILE * fh) :
 CSequence::CSequence(FILE * fh, ImageType type, int height, int width) :
 	m_image(NULL),
 	m_fh(fh),
-	m_yuv4mpeg(false)
+	m_yuv4mpeg(false),
+	m_yuv4mpegFrameSize(0)
 {
 	setFormat(type, height, width);
 }
@@ -159,6 +161,7 @@ void CSequence::parseYUV4MPEG()
 	{
 		fseek(m_fh, 0, SEEK_SET);
 	}
+	m_yuv4mpegFrameSize = ftell(m_fh);
 }
 	
 void CSequence::WriteYUV4MPEG()
@@ -361,7 +364,22 @@ size_t CSequence::getFramesCount(void)
 	fseek(m_fh, 0, SEEK_END);
 	long count = ftell(m_fh);
 	fseek(m_fh, pos, SEEK_SET);
-	return (count/frame_size);
+	/*if(m_yuv4mpeg)
+	{
+		long temp = count;
+		int ret = 0;
+		temp -= m_yuv4mpegFrameSize;
+		while(temp>0)
+		{
+			temp -= YUV4MPEG_FRAME_LEN + frame_size;
+			ret++;
+		}
+		return ret;
+	}
+	else*/
+	{
+		return (count/frame_size);
+	}
 }
 
 }
