@@ -51,7 +51,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>CL_KERNEL_FINISH;DEFAULT_KERNEL_SRC="d:\\Projects\\irena\\src\\cl\\kernel.cl";WIN32;DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>USE_TIMER_REAL_TIME;CL_KERNEL_FINISH;DEFAULT_KERNEL_SRC="d:\\Projects\\irena\\src\\cl\\kernel.cl";WIN32;DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\include;..\src\cl;%(AdditionalIncludeDirectories);c:\Program Files (x86)\Intel\OpenCL SDK\3.0\include\</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
@@ -69,7 +69,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>CL_KERNEL_FINISH;DEFAULT_KERNEL_SRC="d:\\Projects\\irena\\src\\cl\\kernel.cl";WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions);DEFAULT_CL_SRC_FILE="d:\Projects\irena\src\cl\kernel.cl"</PreprocessorDefinitions>
+      <PreprocessorDefinitions>USE_TIMER_REAL_TIME;CL_KERNEL_FINISH;DEFAULT_KERNEL_SRC="d:\\Projects\\irena\\src\\cl\\kernel.cl";WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions);DEFAULT_CL_SRC_FILE="d:\Projects\irena\src\cl\kernel.cl"</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\include;..\src\cl;%(AdditionalIncludeDirectories);c:\Program Files (x86)\Intel\OpenCL SDK\3.0\include\</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
@@ -116,6 +116,7 @@
     <ClCompile Include="..\src\encoder.cpp" />
     <ClCompile Include="..\src\getopt.cpp" />
     <ClCompile Include="..\src\getopt_long.cpp" />
+    <ClCompile Include="..\src\getRealTime.cpp" />
     <ClCompile Include="..\src\image.cpp" />
     <ClCompile Include="..\src\interpolation.cpp" />
     <ClCompile Include="..\src\log.cpp" />
