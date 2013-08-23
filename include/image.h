@@ -26,8 +26,6 @@ public:
 	virtual ~CImage();
 	virtual int getComponents(void);
 	virtual bool setFormat(CImageFormat format);
-	virtual bool setFormat(ImageType type, CSize size);
-	virtual bool setFormat(ImageType type, int height, int width);
 	virtual CImageFormat getFormat(void);
 	virtual CComponent<T> & operator[](int index);
 	virtual int getScale(int index);

@@ -24,16 +24,6 @@ CComponent<T>::CComponent(CSize size) :
 	setSize(size);
 }
 
-
-template <class T>
-CComponent<T>::CComponent(int height, int width) :
-	m_data(NULL),
-	m_size(0, 0),
-	m_original_size(0, 0)
-{
-	setSize(height, width);
-}
-
 template <class T>
 CComponent<T>::CComponent(const CComponent<T> & src) :
 	m_data(NULL),
@@ -63,7 +53,7 @@ void CComponent<T>::copy(const CComponent<T> * src)
 {
 	if(this->m_size != src->m_size)
 	{
-		setSize(src->m_size.Height, src->m_size.Width);
+		setSize(src->m_size, src->m_original_size);
 	}
 	for(int i=0;i<getPointsCount();i++)
 	{
@@ -76,7 +66,7 @@ template <class U> CComponent<T> & CComponent<T>::operator=(const CComponent<U> 
 {
 	if(this->m_size != src.m_size)
 	{
-		setSize(src.m_size.Height, src.m_size.Width);
+		setSize(src.m_size, src.m_original_size);
 	}
 	for(int i=0;i<getPointsCount();i++)
 	{
@@ -151,17 +141,26 @@ size_t CComponent<T>::getBytesCount(void)
 	return this->m_bytes;
 }
 
-
-template <class T>
-bool CComponent<T>::setSize(int height, int width)
-{
-	return setSize(CSize(height, width));
-}
-
 template <class T>
 bool CComponent<T>::setSize(CSize size)
 {
-	if(size.Height <= 0 || size.Width <=0)
+	return setSize(size, 0);
+}
+	
+template <class T>
+bool CComponent<T>::setSize(CSize size, int align)
+{
+	if(align < 0)
+	{
+		throw utils::StringFormatException("Component::setSize wrong align value '%d'", align);
+	}
+	return setSize(CSize(size, align), size);
+}
+
+template <class T>
+bool CComponent<T>::setSize(CSize size, CSize osize)
+{
+	if(size.Height <= 0 || size.Width <=0 || osize.Height<0 || osize.Width<0)
 	{
 		return false;
 	}
@@ -169,11 +168,18 @@ bool CComponent<T>::setSize(CSize size)
 	{
 		release();
 	}
-	this->m_size = CSize(size, true);
-	this->m_original_size = CSize(size, false);
+	this->m_size = size;
+	this->m_original_size = osize;
+	this->alloc();
+	return true;
+}
+
+template <class T>
+bool CComponent<T>::alloc()
+{
 	this->m_bytes = this->m_size.Height*this->m_size.Width*sizeof(T);
 	this->m_data = new T[this->m_size.Height*this->m_size.Width];
-	return true;
+	return this->m_data != NULL;
 }
 
 template <class T>

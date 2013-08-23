@@ -13,7 +13,6 @@ class CComponent
 public:
 	CComponent();
 	CComponent(CSize size);
-	CComponent(int height, int width);
 	CComponent(const CComponent<T> & src);
 	template <class U> CComponent(const CComponent<U> & src);
 	virtual ~CComponent();
@@ -28,15 +27,18 @@ public:
 	virtual CSize getOriginalSize(void);
 	virtual int getPointsCount(void);
 	virtual bool setSize(CSize size);
-	virtual bool setSize(int height, int width);
+	virtual bool setSize(CSize size, int align);
 	virtual size_t getBytesCount(void);
 protected:
+	virtual bool setSize(CSize size, CSize osize);
+	virtual bool alloc();
 	virtual void copy(const CComponent<T> * src);
 	void release();
 	T * m_data;
 	CSize m_size;
 	CSize m_original_size;
 	size_t m_bytes;
+	T * m_ptr;
 
 template <class> friend class CComponent;
 };

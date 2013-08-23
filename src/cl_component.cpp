@@ -53,23 +53,42 @@ bool CCLComponent<T>::setSize(CSize size, cl_mem_flags mem_flags)
 {
 	if(CComponent<T>::setSize(size))
 	{
-		if(this->m_size != size)
+		if(this->m_size != size || this->m_mem_flags != mem_flags)
 		{
 			clReleaseMemObject(this->m_cldata);
+			this->m_cldata = NULL;
 		}
-		cl_int err;
-		this->m_cldata = clCreateBuffer(this->m_dev->getContext(), mem_flags, this->getBytesCount(), NULL, &err);
-		if(!this->m_cldata || CL_SUCCESS != err)
+		if(!this->m_cldata)
 		{
-			throw utils::StringFormatException("clCreatebuffer(%d)[cl_mem_flags=%x]\n", err, mem_flags);
-		}
-		this->m_mem_flags = mem_flags;
+			cl_int err;
+			this->m_cldata = clCreateBuffer(this->m_dev->getContext(), mem_flags, this->getBytesCount(), NULL, &err);
+			if(!this->m_cldata || CL_SUCCESS != err)
+			{
+				throw utils::StringFormatException("clCreatebuffer(%d)[cl_mem_flags=%x]\n", err, mem_flags);
+			}
+		}		
 		return true;
 	}
 	else
 	{
 		return false;
 	}
+}
+template <class T>
+bool CCLComponent<T>::alloc()
+{
+	CComponent<T>::alloc();
+	if(this->m_cldata)
+	{
+		clReleaseMemObject(this->m_cldata);
+	}
+	cl_int err;
+	this->m_cldata = clCreateBuffer(this->m_dev->getContext(), m_mem_flags, this->getBytesCount(), NULL, &err);
+	if(!this->m_cldata || CL_SUCCESS != err)
+	{
+		throw utils::StringFormatException("clCreatebuffer(%d)[cl_mem_flags=%x]\n", err, m_mem_flags);
+	}
+	return true;
 }
 
 template <class T>

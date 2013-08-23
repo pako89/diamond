@@ -195,7 +195,7 @@ bool CSequence::setFormat(ImageType type, int height, int width)
 	}
 	if(type != IMAGE_TYPE_UNKNOWN)
 	{
-		m_image = new CImage<uint8_t>(type, height, width);
+		m_image = new CImage<uint8_t>(CImageFormat(type, CSize(height, width), 16));
 		return (NULL != m_image);
 	}
 	else
@@ -209,31 +209,6 @@ bool CSequence::openFile(const char * file)
 {
 	m_fh = fopen(file, "rb");
 	return (NULL != m_fh);
-}
-
-bool CSequence::OpenFile(const char * file)
-{
-	if(openFile(file))
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
-
-bool CSequence::OpenFile(const char * file, ImageType type, int height, int width)
-{
-	if(openFile(file))
-	{
-		m_image = new CImage<uint8_t>(type, height, width);
-		return read();
-	}
-	else
-	{
-		return false;
-	}
 }
 
 CImage<uint8_t> * CSequence::getFrame(void)
@@ -355,12 +330,12 @@ bool CSequence::read(void)
 
 int CSequence::getHeight(void)
 {
-	return (*m_image)[0].getHeight();
+	return (*m_image)[0].getOriginalHeight();
 }
 
 int CSequence::getWidth(void)
 {
-	return (*m_image)[0].getWidth();
+	return (*m_image)[0].getOriginalWidth();
 }
 
 avlib::CImageFormat CSequence::getFormat(void)

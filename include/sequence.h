@@ -17,8 +17,6 @@ public:
 	CSequence(FILE * fh, ImageType type, int height, int width);
 	virtual ~CSequence();
 	bool setFormat(ImageType type, int height, int width);
-	bool OpenFile(const char * file);
-	bool OpenFile(const char * file, ImageType type, int height, int width);
 	CImage<uint8_t> * getFrame(void);
 	bool ReadNext(void);
 	bool WriteNext(void);

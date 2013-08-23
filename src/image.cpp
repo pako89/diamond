@@ -30,27 +30,7 @@ CImage<T>::CImage(CSize size) :
 	m_scale(NULL),
 	m_format(IMAGE_TYPE_UNKNOWN, 0, 0)
 {
-	setFormat(IMAGE_TYPE_RGB, size);
-}
-
-template <class T>
-CImage<T>::CImage(enum ImageType type, CSize size) :
-	m_comp_num(0),
-	m_comp(NULL),
-	m_scale(NULL),
-	m_format(IMAGE_TYPE_UNKNOWN, 0, 0)
-{
-	setFormat(type, size);
-}
-
-template <class T>
-CImage<T>::CImage(enum ImageType type, int height, int width) :
-	m_comp_num(0),
-	m_comp(NULL),
-	m_scale(NULL),
-	m_format(IMAGE_TYPE_UNKNOWN, 0, 0)
-{
-	setFormat(type, height, width);
+	setFormat(CImageFormat(IMAGE_TYPE_RGB, size));
 }
 
 template <class T>
@@ -106,18 +86,6 @@ CImage<T>::~CImage()
 	{
 		release();
 	}
-}
-
-template <class T>
-bool CImage<T>::setFormat(enum ImageType type, CSize size)
-{
-	return setFormat(CImageFormat(type, size));
-}
-
-template <class T>
-bool CImage<T>::setFormat(enum ImageType type, int height, int width)
-{
-	return setFormat(CImageFormat(type, height, width));
 }
 
 template <class T>
@@ -199,7 +167,7 @@ bool CImage<T>::setFormat(CImageFormat format)
 	m_format = format;
 	for(int i=0;i<m_comp_num;i++)
 	{
-		m_comp[i]->setSize(format.Size.Height/m_scale[i], format.Size.Width/m_scale[i]);
+		m_comp[i]->setSize(CSize(m_format.Size.Height/m_scale[i], m_format.Size.Width/m_scale[i]),m_format.Align/m_scale[i] );
 	}
 	return true;
 }

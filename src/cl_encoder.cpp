@@ -43,7 +43,8 @@ void CCLEncoder::init(CImageFormat fmt)
 	this->m_pred->setPredictionKernel(this->m_program, "prediction_predict_interpolation");
 	this->m_pred->setIFrameTransform(m_shift);
 	this->m_pred->setIFrameITransform(m_ishift);
-	this->m_predTab = new CCLPredictionInfoTable(&this->m_dev, CSize(fmt.Size.Height/16, fmt.Size.Width/16));
+	CSize size(fmt.Size, fmt.Align);
+	this->m_predTab = new CCLPredictionInfoTable(&this->m_dev, CSize(size.Height/16, size.Width/16));
 	this->m_iquant = new CCLIQuant(&this->m_dev, this->m_program, "iquant_transform");
 	this->m_rlc = CRLCFactory<int16_t>::CreateRLC(m_config.HuffmanType);
 	if(NULL == this->m_rlc)

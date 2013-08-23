@@ -26,6 +26,7 @@ public:
 	virtual void setAutoCopy(bool autoCopy);
 protected:
 	virtual void copy(const CComponent<T> * src);
+	virtual bool alloc();
 	enum CLMEM_STATE
 	{
 		CLMEM_STATE_HOST=0,

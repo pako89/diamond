@@ -59,6 +59,7 @@ CBasicEncoder::~CBasicEncoder()
 
 void CBasicEncoder::init(CImageFormat fmt)
 {
+	
 	if(NULL == m_imgF) m_imgF = new CImage<float>(fmt);
 	if(NULL == m_imgLast) m_imgLast = new CImage<float>(fmt);
 	if(NULL == m_img) m_img = new CImage<int16_t>(fmt);
@@ -89,7 +90,11 @@ void CBasicEncoder::init(CImageFormat fmt)
 		m_pred = new CPrediction();
 		m_pred->Init(fmt, m_config.InterpolationScale);
 	}
-	if(NULL == m_predTab) m_predTab = new CPredictionInfoTable(CSize(fmt.Size.Height/16, fmt.Size.Width/16));
+	if(NULL == m_predTab)
+	{
+		CSize size(fmt.Size, fmt.Align);
+		m_predTab = new CPredictionInfoTable(CSize(size.Height/16, size.Width/16));
+	}
 	m_pred->setIFrameTransform(m_shift);
 	m_pred->setIFrameITransform(m_ishift);
 	m_quant->setTables(m_config.Q);

@@ -83,6 +83,7 @@ void CQuant::TransformBlock(float * pSrc, float * pDst, CPoint p, CSize s)
 	}
 }
 
+
 void CIQuant::TransformBlock(float * pSrc, float * pDst, CPoint p, CSize s)
 {
 	float * src = &pSrc[p.Y*s.Width+p.X];

@@ -37,12 +37,12 @@ CSize::CSize() :
 {
 }
 	
-CSize::CSize(const CSize & size, bool align)
+CSize::CSize(const CSize & size, int align)
 {
 	setSize(size.Height, size.Width, align);
 }
 
-CSize::CSize(int height, int width, bool align)
+CSize::CSize(int height, int width, int align)
 {
 	setSize(height, width, align);
 }
@@ -51,21 +51,21 @@ CSize::~CSize()
 {
 }
 
-void CSize::setSize(int height, int width, bool align)
+void CSize::setSize(int height, int width, int align)
 {
 	if(align)
 	{
-		if(height%8)
+		if(height%align)
 		{
-			this->Height = height + 8-(height%8);
+			this->Height = height + align-(height%align);
 		}
 		else
 		{
 			this->Height = height;
 		}
-		if(width%8)
+		if(width%align)
 		{
-			this->Width = width + 8-(width%8);
+			this->Width = width + align-(width%align);
 		}
 		else
 		{
@@ -121,15 +121,17 @@ CImageFormat::CImageFormat() :
 {
 }
 
-CImageFormat::CImageFormat(ImageType type, CSize size) :
+CImageFormat::CImageFormat(ImageType type, CSize size, int align) :
 	Type(type),
-	Size(size)
+	Size(size),
+	Align(align)
 {
 }
 
-CImageFormat::CImageFormat(ImageType type, int height, int width) :
+CImageFormat::CImageFormat(ImageType type, int height, int width, int align) :
 	Type(type),
-	Size(height, width)
+	Size(height, width),
+	Align(align)
 {
 }
 
