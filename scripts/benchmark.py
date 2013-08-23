@@ -116,7 +116,7 @@ class Config:
 		now = datetime.datetime.now()
 		date = now.strftime("%Y%m%d")
 		time = now.strftime("%H%M%S")
-		self.ResultsDir = self.ResultsDir.replace("%d", date).replace("%t", time)
+		self.ResultsDir = self.ResultsDir.replace("%d", date).replace("%t", time).replace('%p', sys.platform)
 
 	def print_videos(self):
 		print "Directory: {0}".format(self._videos_dir)
