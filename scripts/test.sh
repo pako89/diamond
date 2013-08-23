@@ -5,15 +5,15 @@ OUT=out.yuv
 VIDEO=
 WIDTH=
 HEIGHT=
-VARIANT=1
+VARIANT=0
 HUFFMAN="static"
 PROGRESS_BAR="--progress-bar yes"
 PRINT_TIMERS="--print-timers yes"
 VERBOSE="-vv"
 GOP="3"
 Q="2"
-DEBUG=0
-DIR="videos"
+DEBUG=1
+DIR="videos_test"
 
 if [ $DEBUG == 1 ]
 then
@@ -51,7 +51,7 @@ do
 done
 WIDTH=$(echo $RES | sed 's/\([0-9]\+\)x\([0-9]\+\)/\1/')
 HEIGHT=$(echo $RES | sed 's/\([0-9]\+\)x\([0-9]\+\)/\2/')
-ARGS="encode $COMMON -V$VARIANT -g$GOP -q$Q -tYUV420 -W $WIDTH -H $HEIGHT -e $HUFFMAN -o $TEMP $VIDEO"
+ARGS="encode $COMMON -I 2 -V$VARIANT -g$GOP -q$Q -tYUV420 -W $WIDTH -H $HEIGHT -e $HUFFMAN -o $TEMP $VIDEO"
 
 if [ $DEBUG == 1 ]
 then
