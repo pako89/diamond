@@ -85,6 +85,7 @@ class Config:
 		self.wildcard_results_dir()
 		self.ResultsName = self._get_config('Output', 'ResultsName')
 		self.RemoveDecoded = str2bool(self._get_config('Output', 'RemoveDecoded'))
+		self.RemoveEncoded = str2bool(self._get_config('Output', 'RemoveEncoded'))
 		self.ComputePSNR = str2bool(self._get_config('Output', 'ComputePSNR'))
 		self.WriteSysInfo = str2bool(self._get_config('Output', 'WriteSysInfo'));
 		self.SysInfoName = self._get_config('Output', 'SysInfoName')
@@ -336,6 +337,11 @@ class Benchmark:
 		os.remove(output)
 		self._out_done("Removing decoded video", 0)
 	
+	def _remove_encoded(self, bstr):
+		self._out_progress("Removing encoded bitstream")
+		os.remove(bstr)
+		self._out_done("Removing encoded bitstream", 0)
+	
 	def _run_item(self, cfg, i):
 		self._log_gsep()
 		self._log("Run {0}/{1}\n".format(i, self.Config.get_count()))
@@ -352,6 +358,8 @@ class Benchmark:
 			self._run_tar(tar, output)
 		if self.Config.RemoveDecoded:
 			self._remove_output(output)
+		if self.Config.RemoveEncoded:
+			self._remove_encoded(bstr)
 		if self.Config.Sleep > 0:
 			self._sleep()
 

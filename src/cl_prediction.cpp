@@ -112,7 +112,7 @@ void CCLPrediction::clTransform(CCLKernel * kernel, CImage<float> * pSrc, CImage
 		int width = (*clSrc)[k].getWidth();
 		int blockScale = 16/clSrc->getScale(k);
 		cl_mem srcMem = clSrc->getCLComponent(k).getCLMem(true);
-		cl_mem dstMem = clDst->getCLComponent(k).getCLMem(true);
+		cl_mem dstMem = clDst->getCLComponent(k).getCLMem(false);
 		cl_mem lastMem = clLast->getCLComponent(k).getCLMem(true);
 		cl_mem predMem = clPred->getCLMem(true);
 		size_t global_work_size[2];
@@ -145,7 +145,7 @@ void CCLPrediction::clPredict(CCLComponent<float> * pSrc, CCLComponent<float> * 
 	int predWidth = pPred->getWidth();
 	cl_mem srcMem = pSrc->getCLMem(true);
 	cl_mem lastMem = pLast->getCLMem(true);
-	cl_mem predMem = pPred->getCLMem(true);
+	cl_mem predMem = pPred->getCLMem(false);
 	size_t global_work_size[2] = {predHeight, predWidth};
 	
 	m_kernelPrediction->SetArg(0, sizeof(srcMem), &srcMem);

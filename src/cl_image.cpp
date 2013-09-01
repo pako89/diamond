@@ -57,23 +57,19 @@ void CCLImage<T>::alloc(int num)
 template <class T>
 void CCLImage<T>::CopyToDevice()
 {
-	CCLTimers::getCopyToDevice().start();
 	for(int i=0;i<this->m_comp_num; i++)
 	{
 		((CCLComponent<T>*)this->m_comp[i])->CopyToDevice();
 	}
-	CCLTimers::getCopyToDevice().stop();
 }
 
 template <class T>
 void CCLImage<T>::CopyToHost()
 {
-	CCLTimers::getCopyToHost().start();
 	for(int i=0;i<this->m_comp_num; i++)
 	{
 		((CCLComponent<T>*)this->m_comp[i])->CopyToHost();
 	}
-	CCLTimers::getCopyToHost().stop();
 }
 
 template <class T>
