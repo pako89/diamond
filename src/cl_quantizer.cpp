@@ -112,7 +112,7 @@ void CCLIQuant::doTransform(CImage<float> * src, CImage<float> * dst)
 	}
 	else
 	{
-		CQuant::doTransform(src, dst);
+		CIQuant::doTransform(src, dst);
 	}
 }
 

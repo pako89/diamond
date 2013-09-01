@@ -4,6 +4,10 @@ namespace utils
 {
 
 CTimer::CTimer() :
+#if USE(TIMER_REAL_TIME)
+	m_start(0.0),
+	m_stop(0.0),
+#endif
 	m_state(STOPPED),
 	m_total(0.0)
 {}

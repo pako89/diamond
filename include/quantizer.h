@@ -24,7 +24,7 @@ protected:
 	CImage<float> * m_q;
 };
 
-class CIQuant : public CQuant
+class CIQuant : public CTransform<float, float>
 {
 public:
 	CIQuant();
@@ -32,6 +32,7 @@ public:
 	virtual void setTables(int qp);
 	virtual void setTables(const uint8_t * YQ, const uint8_t * UQ, const uint8_t * VQ, int qp);
 protected:
+	CImage<float> * m_q;
 };
 
 }

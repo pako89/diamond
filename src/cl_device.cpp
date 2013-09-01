@@ -1,4 +1,5 @@
 #include <cl_device.h>
+#include <cl_timers.h>
 
 CCLDevice::CCLDevice(void) :
 	m_platform(NULL),
@@ -117,7 +118,10 @@ CCLPlatform * CCLDevice::getPlatform()
 
 void CCLDevice::Finish()
 {
+	CCLTimers::getFinish().start();
 	cl_int err = clFinish(this->m_queue);
 	if(CL_SUCCESS != err) throw utils::StringFormatException("clFinish(%d)\n", err);
+	CCLTimers::getFinish().stop();
 }
+
 

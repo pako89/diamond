@@ -97,7 +97,8 @@ void CIQuant::TransformBlock(float * pSrc, float * pDst, CPoint p, CSize s)
 	}
 }
 
-CIQuant::CIQuant()
+CIQuant::CIQuant() :
+	m_q(NULL)
 {
 }
 

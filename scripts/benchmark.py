@@ -211,13 +211,13 @@ class Benchmark:
 			self._write_sysinfo()
 		print BLUE + "Running benchmark"+ EC
 		i = 1
-		for v in self.Config.Videos:
-			for I in self.Config.InterpolationScale:
-				for H in self.Config.Huffman:
-					for V in self.Config.EncoderVariant:
-						for G in self.Config.GOP:
-							for Q in self.Config.Q:
-								for D in self.Config.Device:
+		for D in self.Config.Device:
+			for H in self.Config.Huffman:		
+				for Q in self.Config.Q:
+					for G in self.Config.GOP:
+						for I in self.Config.InterpolationScale:
+							for V in self.Config.EncoderVariant:
+								for v in self.Config.Videos:
 									cfg = EncoderConfig(v, V, I, H, G, Q, D)
 									self._run_item(cfg, i)
 									i = i+1
@@ -402,6 +402,7 @@ class Result:
 		self.EncoderConfig = cfg
 		self.Items = list()
 		self.Dict = collections.OrderedDict()
+		self.create_int_item("Numer of frames")
 		self.create_file_size_item("Original file size")
 		self.create_file_size_item("Compressed file size")
 		self.create_float_item("Compression ratio")
@@ -411,6 +412,8 @@ class Result:
 		self.create_result_item_timer("Quant")
 		self.create_result_item_timer("IQuant")
 		self.create_result_item_timer("Zig Zag")
+		self.create_result_item_timer("DCTQZZ")
+		self.create_result_item_timer("IDCTQ")
 		self.create_result_item_timer("RLC")
 		self.create_result_item_timer("Prediction")
 		self.create_result_item_timer("P FRAME Transform")
@@ -424,6 +427,7 @@ class Result:
 		self.create_result_item_timer("Copy to device")
 		self.create_result_item_timer("Copy buffer")
 		self.create_result_item_timer("Kernel finish")
+		self.create_result_item_timer("Enqueue kernel")
 		if psnr:
 			self.create_result_psnr("Y PSNR")
 			self.create_result_psnr("U PSNR")
@@ -434,6 +438,10 @@ class Result:
 			self.create_result_psnr("Y PSNR for P frames")
 			self.create_result_psnr("U PSNR for P frames")
 			self.create_result_psnr("V PSNR for P frames")
+	
+	def create_int_item(self, name):
+		r = "{0}\s*:\s*(?P<v>[0-9]+)".format(name)
+		self.Items.append(ResultItem(name, r, ResultItem.TYPE_INT))
 	
 	def create_file_size_item(self, name):
 		r = "{0}\s*:\s*(?P<v>[0-9]+) b".format(name)
